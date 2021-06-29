@@ -1,3 +1,4 @@
 configargparse
 Flask
 pythonping
+redis

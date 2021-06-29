@@ -1,6 +1,7 @@
 import configargparse
 import logging
 import os
+import redis
 import sys
 import threading
 import time
@@ -8,6 +9,7 @@ import modules.utils as utils
 from modules.monitor import HostMonitor
 from flask import Flask, render_template, jsonify, request
 
+db = redis.Redis('localhost', decode_responses=True)
 
 def webapp_thread(port_number, debugMode=False, logHandlers=[]):
     app = Flask(import_name="dr-dashboard", static_folder=os.path.join(utils.DIR_PATH, 'web', 'static'),
@@ -33,6 +35,14 @@ def webapp_thread(port_number, debugMode=False, logHandlers=[]):
     @app.route('/commands', methods=["GET"])
     def commands():
         return render_template("commands.html")
+
+    @app.route('/status', methods=['GET'])
+    def status():
+        # get the status of all the hosts
+        status = utils.read_db(db, 'host_status')
+
+        return jsonify(status)
+
 
     # run the web app
     app.run(debug=debugMode, host='0.0.0.0', port=port_number, use_reloader=False)
@@ -61,6 +71,9 @@ logging.basicConfig(datefmt='%m/%d %H:%M',
                     level=getattr(logging, logLevel),
                     handlers=logHandlers)
 
+# set host list (blank)
+utils.write_db(db, "host_status", [])
+
 # start the web app
 logging.info('Starting DR Dashboard Web Service')
 webAppThread = threading.Thread(name='Web App', target=webapp_thread, args=(5000, True, logHandlers))
@@ -72,6 +85,7 @@ monitor = HostMonitor(args.file)
 
 while 1:
     logging.debug("Running host check")
-    monitor.check_hosts()
+    status = monitor.check_hosts()
+    utils.write_db(db, "host_status", status)
 
     time.sleep(60 * args.interval)

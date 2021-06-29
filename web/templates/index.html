@@ -1,70 +1,62 @@
 {% extends "base.html" %}
+{% block header %}
+<script type="text/javascript">
+
+function load_status(){
+  $.ajax({type: 'GET', url: '/status', success: function(data, status, request){
+    table = $('#host_info > tbody');
+
+    //clear existing data
+    var tr = $('<tr>');
+    var td = $('<td>');
+    table.empty();
+
+    data.forEach(function(h){
+      row = tr.clone();
+
+      row.append(td.clone().text(h.name));
+      row.append(td.clone().text(h.ip));
+
+      // set the status
+      if(h.status)
+      {
+        row.append(td.clone().text("Online").addClass('text-success'));
+      }
+      else {
+        row.append(td.clone().text("Offline").addClass('text-danger'));
+      }
+
+      table.append(row);
+    });
+
+    // refresh in 15 seconds
+    setTimeout(load_status, 15000);
+  }});
+
+}
+
+</script>
+{% endblock %}
 {% block content %}
 <p>Status of each hardware component. Click the name of the component to see additional details. Click the IP address to launch the device configuration page.</p>
 <div class="container">
-  <div class="row">
-    <div class="col-md-4">
-      Firewall - ASA 5506
-    </div>
-    <div class="col-md-4">
-      <a href="http://192.168.20.1">192.168.20.1</a>
-    </div>
-    <div class="col-md-4 bg-success text-white">
-      Online
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-md-4">
-      Switch - Cisco SG500
-    </div>
-    <div class="col-md-4">
-      <a href="http://192.168.20.2">192.168.20.2</a>
-    </div>
-    <div class="col-md-4 bg-success text-white">
-      Online
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-md-4">
-      ESXi 1
-    </div>
-    <div class="col-md-4">
-      <a href="http://192.168.20.5">192.168.20.5</a>
-    </div>
-    <div class="col-md-4 bg-danger">
-      Offline
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-md-4">
-      <a href="#">ESXi 2</a>
-    </div>
-    <div class="col-md-4">
-      <a href="http://192.168.20.6">192.168.20.6</a>
-    </div>
-    <div class="col-md-4 bg-success text-white">
-      Online
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-md-4">
+  <table class="table table-striped" id="host_info">
+    <thead>
+      <tr>
+        <th>Host</th>
+        <th>IP</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
 
-    </div>
-    <div class="col-md-8">
-      VMs: 10 <br />
-      Datastore: 100GB/200GB (50%)
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-md-4">
-      Storage - SAN
-    </div>
-    <div class="col-md-4">
-      <a href="http://192.168.20.10">192.168.20.10</a>
-    </div>
-    <div class="col-md-4 bg-success text-white">
-      Online
-    </div>
-  </div>
+    </tbody>
+  </table>
 </div>
+
+<script type="text/javascript">
+  $(document).ready(function () {
+    load_status();
+  });
+</script>
 {% endblock %}

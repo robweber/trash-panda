@@ -23,6 +23,19 @@ def read_json(file):
 
     return result
 
+# read a key from the database, converting to dict
+def read_db(db, db_key):
+    result = {}
+
+    if(db.exists(db_key)):
+        result = json.loads(db.get(db_key))
+
+    return result
+
+
+# write a value to the datase, converting to JSON string
+def write_db(db, db_key, db_value):
+    db.set(db_key, json.dumps(db_value))
 
 # write JSON to file
 def write_json(file, data):
