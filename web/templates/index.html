@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block content %}
+<p>Status of each hardware component. Click the name of the component to see additional details. Click the IP address to launch the device configuration page.</p>
+<div class="container">
+  <div class="row">
+    <div class="col-md-4">
+      Firewall - ASA 5506
+    </div>
+    <div class="col-md-4">
+      <a href="http://192.168.20.1">192.168.20.1</a>
+    </div>
+    <div class="col-md-4 bg-success text-white">
+      Online
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-4">
+      Switch - Cisco SG500
+    </div>
+    <div class="col-md-4">
+      <a href="http://192.168.20.2">192.168.20.2</a>
+    </div>
+    <div class="col-md-4 bg-success text-white">
+      Online
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-4">
+      ESXi 1
+    </div>
+    <div class="col-md-4">
+      <a href="http://192.168.20.5">192.168.20.5</a>
+    </div>
+    <div class="col-md-4 bg-danger">
+      Offline
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-4">
+      <a href="#">ESXi 2</a>
+    </div>
+    <div class="col-md-4">
+      <a href="http://192.168.20.6">192.168.20.6</a>
+    </div>
+    <div class="col-md-4 bg-success text-white">
+      Online
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-4">
+
+    </div>
+    <div class="col-md-8">
+      VMs: 10 <br />
+      Datastore: 100GB/200GB (50%)
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-4">
+      Storage - SAN
+    </div>
+    <div class="col-md-4">
+      <a href="http://192.168.20.10">192.168.20.10</a>
+    </div>
+    <div class="col-md-4 bg-success text-white">
+      Online
+    </div>
+  </div>
+</div>
+{% endblock %}

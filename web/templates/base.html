@@ -1,0 +1,41 @@
+<html>
+    <head>
+        <title>DR Dashboard</title>
+        <link rel="stylesheet" href="/static/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="/static/css/bootstrap-theme.min.css" />
+        <link rel="stylesheet" href="/static/css/bootstrap-icons.css">
+        <script src="/static/js/jquery.min.js"></script>
+        <script src="/static/js/popper.min.js"></script>
+        <script src="/static/js/bootstrap.min.js"></script>
+        {% block header %}{% endblock %}
+    </head>
+    <body>
+        <div class="container">
+        <div class="header clearfix">
+          <div class="dropdown float-right">
+            <a class="btn btn-secondary dropdown-toggle ml-3" href="/" role="button" id="configMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              Config
+            </a>
+              <div class="dropdown-menu" aria-labelledby="configMenu">
+                <a class="dropdown-item" href="/commands">Commands</a>
+                <a class="dropdown-item" href="/files">Files</a>
+              </div>
+          </div>
+          <a class="btn btn-secondary float-right" href="/" role="button" id="statusMenu" aria-haspopup="false" aria-expanded="false">
+            Status
+          </a>
+        <h3 class="text-muted"><span class="text-danger">DR</span> Dashboard</h3>
+        </div>
+        {% for category,message in get_flashed_messages(with_categories=true) %}
+        <div class="alert alert-{{ category }}" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+        <div id="js-success-alert" class="alert alert-success" style="display:none" role="alert"></div>
+        <div id="js-error-alert" class="alert alert-danger" style="display:none" role="alert"></div>
+        {% block content %}{% endblock %}
+        <footer class="footer mt-5">
+             <p align="center"><a href="https://github.com/eau-claire-energy-cooperative/dr-dashboard"><i class="bi-github" style="font-size: 2rem;"></i></a></p>
+        </footer>
+    </body>
+</html>
