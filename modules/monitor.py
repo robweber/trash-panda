@@ -32,7 +32,9 @@ class HostMonitor:
         for aHost in self.hosts['hosts']:
             canSee = ping.check_host(aHost['ip'])
             logging.debug(f"{aHost['name']}: {canSee}")
+
             aHost['status'] = canSee
+
             result.append(aHost)
 
         return result

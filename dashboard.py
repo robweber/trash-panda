@@ -39,7 +39,7 @@ def webapp_thread(port_number, debugMode=False, logHandlers=[]):
     @app.route('/status', methods=['GET'])
     def status():
         # get the status of all the hosts
-        status = utils.read_db(db, 'host_status')
+        status = utils.read_db(db, utils.HOST_STATUS)
 
         return jsonify(status)
 
@@ -56,7 +56,7 @@ parser.add_argument('-f', '--file', default='conf/hosts.json',
                     help="Path to the config file for the host data, %(default)s by default")
 parser.add_argument('-p', '--port', default=5000,
                     help="Port number to run the web server on, %(default)d by default")
-parser.add_argument('-i', '--interval', default=1,
+parser.add_argument('-i', '--interval', default=3,
                     help="The monitoring system check interval, %(default)d by default")
 parser.add_argument('-D', '--debug', action='store_true',
                     help='If the program should run in debug mode')
@@ -72,7 +72,7 @@ logging.basicConfig(datefmt='%m/%d %H:%M',
                     handlers=logHandlers)
 
 # set host list (blank)
-utils.write_db(db, "host_status", [])
+utils.write_db(db, utils.HOST_STATUS, [])
 
 # start the web app
 logging.info('Starting DR Dashboard Web Service')
@@ -86,6 +86,6 @@ monitor = HostMonitor(args.file)
 while 1:
     logging.debug("Running host check")
     status = monitor.check_hosts()
-    utils.write_db(db, "host_status", status)
+    utils.write_db(db, utils.HOST_STATUS, status)
 
     time.sleep(60 * args.interval)
