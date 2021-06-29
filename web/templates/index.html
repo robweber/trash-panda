@@ -15,7 +15,18 @@ function load_status(){
       row = tr.clone();
 
       row.append(td.clone().text(h.name));
-      row.append(td.clone().text(h.ip));
+
+      if(h.hasOwnProperty('management_page'))
+      {
+        aLink = $('<a>').text(h.ip);
+        aLink.attr('href', h.management_page);
+        aLink.attr('target', "_blank");
+
+        row.append(td.clone().append(aLink));
+      }
+      else {
+        row.append(td.clone().text(h.ip));
+      }
 
       // set the status
       if(h.status)
