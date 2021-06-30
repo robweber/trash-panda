@@ -99,7 +99,7 @@ class HostMonitor:
 
             result.append(aHost)
 
-        return result
+        return sorted(result, key = lambda o: o['name'])
 
     def get_host(self, id):
         result = None  # return none if not found
