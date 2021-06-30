@@ -7,7 +7,7 @@
   <div class="col-md-8" align="right">
     <div class="card" style="width: 18rem;">
       <div class="card-body">
-        <h5 class="card-title">{{ host['type'].capitalize() }}</h5>
+        <h5 class="card-title">Type: <span class="text-primary">{{ host['type'].capitalize() }}</span></h5>
         <p class="card-text">
           IP Address: {{ host['ip'] }} <br />
           {% if 'config' in host %}
@@ -17,7 +17,7 @@
           {% endif %}
         </p>
         {% if('management_page' in host): %}
-        <a href="{{ host['management_page'] }}" class="card-link">Launch Management</a>
+        <a href="{{ host['management_page'] }}" class="card-link" target="_blank">Launch Management</a>
         {% endif %}
       </div>
     </div>
