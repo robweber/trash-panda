@@ -91,7 +91,8 @@ class HostMonitor:
             overall_status = reduce(lambda x, y: x if x['return_code'] > y['return_code'] else y, services)
             aHost['overall_status'] = overall_status['return_code']
 
-            aHost['services'] = services
+            # set services, sorted by name
+            aHost['services'] = sorted(services, key = lambda s: s['name'])
 
             # create a slug to act as the id for lookups
             if('id' not in aHost):
