@@ -2,8 +2,15 @@
 {% block header %}
 <script type="text/javascript">
 
+function toggleDetails(count){
+  alert(count);
+  row = $("#host_info > tbody > tr").eq(count + 1);
+
+  row.toggle();
+}
+
 function load_status(){
-  $.ajax({type: 'GET', url: '/status', success: function(data, status, request){
+  $.ajax({type: 'GET', url: '/api/status', success: function(data, status, request){
     table = $('#host_info > tbody');
 
     //clear existing data
@@ -14,7 +21,11 @@ function load_status(){
     data.forEach(function(h){
       row = tr.clone();
 
-      row.append(td.clone().text(h.name));
+      // link for the details
+      details = $('<a>').html('<i class="bi-server"></i> ' + h.name).addClass('ml-2');
+      details.attr('href', '/status/' + h.id);
+
+      row.append(td.clone().append(details));
 
       if(h.hasOwnProperty('management_page'))
       {
@@ -28,16 +39,16 @@ function load_status(){
         row.append(td.clone().text(h.ip));
       }
 
-      // set the status
       if(h.status)
       {
-        row.append(td.clone().text("Online").addClass('text-success'));
+        row.append(td.clone().text("Ready").addClass('text-success'));
       }
       else {
-        row.append(td.clone().text("Offline").addClass('text-danger'));
+        row.append(td.clone().text("Error").addClass('text-danger'));
       }
 
       table.append(row);
+
     });
 
     // refresh in 15 seconds
@@ -56,7 +67,7 @@ function load_status(){
       <tr>
         <th>Host</th>
         <th>IP</th>
-        <th>Status</th>
+        <th>Overall Status</th>
       </tr>
     </thead>
     <tbody>

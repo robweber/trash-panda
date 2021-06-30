@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+{% set current_status = ['text-success', 'text-warning', 'text-danger'] %}
+<h2>{{ host['name'] }}</h2>
+
+{% if('services' in host): %}
+
+<table class="table mt-3">
+  {% for row in host['services']: %}
+  <tr>
+    <td class="{{ current_status[row['return_code']] }}">{{ row['name'] }}</td>
+    <td>{{ row['text'].replace("\n", '<br />') | safe }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %}
+
+{% endblock %}

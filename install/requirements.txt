@@ -1,4 +1,6 @@
 configargparse
 Flask
 pythonping
+python-slugify
+pyvmomi
 redis

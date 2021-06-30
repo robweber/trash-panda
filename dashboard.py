@@ -36,7 +36,21 @@ def webapp_thread(port_number, debugMode=False, logHandlers=[]):
     def commands():
         return render_template("commands.html")
 
-    @app.route('/status', methods=['GET'])
+    @app.route('/status/<id>')
+    def host_status(id):
+
+        # get the host status from the db
+        hosts = utils.read_db(db, utils.HOST_STATUS)
+
+        # find the one we're looking for
+        result = None
+        for aHost in hosts:
+            if('id' in aHost and aHost['id'] == id):
+                result = aHost
+
+        return render_template("host_status.html", host=result)
+
+    @app.route('/api/status', methods=['GET'])
     def status():
         # get the status of all the hosts
         status = utils.read_db(db, utils.HOST_STATUS)
