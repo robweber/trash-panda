@@ -1,10 +1,30 @@
 {% extends "base.html" %}
 {% block content %}
 {% set current_status = ['text-success', 'text-warning', 'text-danger'] %}
-<h2>{{ host['name'] }}</h2>
+
+<div class="row">
+  <div class="col-md-4"><h2>{{ host['name'] }}</h2></div>
+  <div class="col-md-8" align="right">
+    <div class="card" style="width: 18rem;">
+      <div class="card-body">
+        <h5 class="card-title">{{ host['type'].capitalize() }}</h5>
+        <p class="card-text">
+          IP Address: {{ host['ip'] }} <br />
+          {% if 'config' in host %}
+            {% for c in host['config'].keys() %}
+              {{ c }}: {{ host['config'][c] }} <br />
+            {% endfor %}
+          {% endif %}
+        </p>
+        {% if('management_page' in host): %}
+        <a href="{{ host['management_page'] }}" class="card-link">Launch Management</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
 
 {% if('services' in host): %}
-
 <table class="table table-striped mt-3">
   {% for row in host['services']: %}
   <tr>
