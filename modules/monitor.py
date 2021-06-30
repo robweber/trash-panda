@@ -2,6 +2,7 @@ import logging
 import os
 import subprocess
 import modules.utils as utils
+from functools import reduce
 from pythonping import ping
 from slugify import slugify
 
@@ -70,17 +71,27 @@ class HostMonitor:
         ping = PingCheck()
 
         for aHost in self.hosts['hosts']:
+            services = []
 
             # check if the host can be pinged
             canSee = ping.check_host(aHost['ip'])
-            aHost['status'] = canSee
             logging.debug(f"{aHost['name']}: {canSee}")
 
             # check if there are any other services we should pull in
             if(canSee and aHost['type'] in self.types):
+                services.append({"name": "Alive", "return_code": 0, "text": "Ping successfull!"})
+
                 if(aHost['type'] == 'esxi'):
                     checker = ESXiCheck(aHost['ip'], aHost['config'])
-                    aHost['services'] = checker.check_host()
+                    services = services + checker.check_host()
+            else:
+                services.append({"name": "Alive", "return_code": 2, "text": "Ping failed"})
+
+            # figure out the overall worse status
+            overall_status = reduce(lambda x, y: x if x['return_code'] > y['return_code'] else y, services)
+            aHost['overall_status'] = overall_status['return_code']
+
+            aHost['services'] = services
 
             # create a slug to act as the id for lookups
             if('id' not in aHost):

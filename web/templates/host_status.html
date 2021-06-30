@@ -5,7 +5,7 @@
 
 {% if('services' in host): %}
 
-<table class="table mt-3">
+<table class="table table-striped mt-3">
   {% for row in host['services']: %}
   <tr>
     <td class="{{ current_status[row['return_code']] }}">{{ row['name'] }}</td>
