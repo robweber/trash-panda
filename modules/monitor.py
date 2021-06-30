@@ -1,6 +1,7 @@
 import logging
 import os
 import subprocess
+import time
 import modules.utils as utils
 from functools import reduce
 from pythonping import ping
@@ -46,7 +47,7 @@ class ESXiCheck:
         result = []
 
         # common args, minus the -t value
-        esxi_checks = {"VM Status": "vms", "Datastores": "datastore"}
+        esxi_checks = {"VM Status": "vms", "Datastores": "datastore", "Host Status": "status"}
         common_args = ["-H", self.host, "-U", self.user, "-P", self.password, "-p", "443", "-c", "90", "-w", "85", "-t"]
 
         # run the subprocess for each type of check
