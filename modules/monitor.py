@@ -57,6 +57,8 @@ class ESXiCheck:
 
             result.append({"return_code": output.returncode, "text": output.stdout, "name": aKey})
 
+            time.sleep(2)  # sleep 2 seconds between checks
+
         return result
 
 
@@ -76,7 +78,7 @@ class HostMonitor:
 
             # check if the host can be pinged
             canSee = ping.check_host(aHost['ip'])
-            logging.debug(f"{aHost['name']}: {canSee}")
+            logging.debug(f"{aHost['name']}: Alive {canSee}")
 
             # check if there are any other services we should pull in
             if(canSee and aHost['type'] in self.types):
