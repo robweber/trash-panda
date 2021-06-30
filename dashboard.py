@@ -2,6 +2,7 @@ import configargparse
 import logging
 import os
 import redis
+import signal
 import sys
 import threading
 import time
@@ -10,6 +11,12 @@ from modules.monitor import HostMonitor
 from flask import Flask, render_template, jsonify, request
 
 db = redis.Redis('localhost', decode_responses=True)
+
+# function to handle when the is killed and exit gracefully
+def signal_handler(signum, frame):
+    logging.debug('Exiting Program')
+    sys.exit(0)
+
 
 def webapp_thread(port_number, debugMode=False, logHandlers=[]):
     app = Flask(import_name="dr-dashboard", static_folder=os.path.join(utils.DIR_PATH, 'web', 'static'),
@@ -76,6 +83,10 @@ parser.add_argument('-D', '--debug', action='store_true',
                     help='If the program should run in debug mode')
 
 args = parser.parse_args()
+
+# add hooks for interrupt signal
+signal.signal(signal.SIGTERM, signal_handler)
+signal.signal(signal.SIGINT, signal_handler)
 
 # setup the logger
 logLevel = 'INFO' if not args.debug else 'DEBUG'
