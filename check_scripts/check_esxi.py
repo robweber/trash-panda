@@ -72,6 +72,7 @@ def overall_status(host):
         sys.exit(OK)
 
 def datastores(host,warn,crit):
+    all_stores = []
     critical_stores = []
     warning_stores = []
 
@@ -79,20 +80,19 @@ def datastores(host,warn,crit):
         #compute the disk usage
         used = (float(aStore.summary.capacity - aStore.summary.freeSpace) / aStore.summary.capacity) * 100
 
+        all_stores.append(aStore.name + " " + str(used) + "%")
+
         if(used > crit):
             critical_stores.append(aStore.name + " " + str(used) + "%")
         elif(used > warn):
             warning_stores.append(aStore.name + " " + str(used) + "%")
 
-
+    print('\n'.join(all_stores))
     if(len(critical_stores) > 0):
-        print(critical_stores)
         sys.exit(CRITICAL)
     elif(len(warning_stores) > 0):
-        print(warning_stores)
         sys.exit(WARNING)
     else:
-        print("Datastores all OK")
         sys.exit(OK)
 
 def snapshots(vmList,warn,crit):
