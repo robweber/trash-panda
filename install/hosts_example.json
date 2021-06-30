@@ -2,17 +2,17 @@
   "hosts": [
     {
       "type": "switch",
-      "name": "Fake Host",
-      "ip": "10.10.10.57"
+      "name": "Switch 1",
+      "ip": "192.168.0.1"
     },
     {
       "type": "esxi",
       "name": "ESXi 1",
-      "ip": "10.10.10.56",
-      "management_page": "https://10.10.10.56/ui/",
+      "ip": "192.168.0.2",
+      "management_page": "https://192.168.0.2/ui/",
       "config": {
         "username": "root",
-        "password": "ecec_s3cr3t"
+        "password": "pass"
       }
     }
   ]
