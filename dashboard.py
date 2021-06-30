@@ -8,7 +8,7 @@ import threading
 import time
 import modules.utils as utils
 from modules.monitor import HostMonitor
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, flash, render_template, jsonify, request, redirect
 
 db = redis.Redis('localhost', decode_responses=True)
 
@@ -21,6 +21,9 @@ def signal_handler(signum, frame):
 def webapp_thread(port_number, debugMode=False, logHandlers=[]):
     app = Flask(import_name="dr-dashboard", static_folder=os.path.join(utils.DIR_PATH, 'web', 'static'),
                 template_folder=os.path.join(utils.DIR_PATH, 'web', 'templates'))
+
+    # generate random number for session secret key
+    app.secret_key = os.urandom(24)
 
     # add handlers for this app
     for h in logHandlers:
@@ -55,7 +58,11 @@ def webapp_thread(port_number, debugMode=False, logHandlers=[]):
             if('id' in aHost and aHost['id'] == id):
                 result = aHost
 
-        return render_template("host_status.html", host=result)
+        if(result is not None):
+            return render_template("host_status.html", host=result)
+        else:
+            flash('Host page not found', 'warning')
+            return redirect('/')
 
     @app.route('/api/status', methods=['GET'])
     def status():
