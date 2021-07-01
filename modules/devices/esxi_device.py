@@ -30,3 +30,6 @@ class ESXiDevice(DRDevice):
             time.sleep(2)  # sleep 2 seconds between checks
 
         return result
+
+    def _get_services(self):
+        return ["Datastores", "Host Status", "VM Status"]

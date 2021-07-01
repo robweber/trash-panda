@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
-{% set current_status = ['text-success', 'text-warning', 'text-danger'] %}
+{% set current_status = ['text-success', 'text-warning', 'text-danger', 'text-secondary'] %}
+{% set status_text = ['', '', '', 'text-secondary'] %}
 
 <div class="row">
   <div class="col-md-4"><h2>{{ host['name'] }}</h2></div>
@@ -29,7 +30,7 @@
   {% for row in host['services']: %}
   <tr>
     <td class="{{ current_status[row['return_code']] }}">{{ row['name'] }}</td>
-    <td>{{ row['text'].replace("\n", '<br />') | safe }}</td>
+    <td class="{{ status_text[row['return_code']] }}">{{ row['text'].replace("\n", '<br />') | safe }}</td>
   </tr>
   {% endfor %}
 </table>

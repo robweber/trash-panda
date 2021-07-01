@@ -9,3 +9,6 @@ class SwitchDevice(DRDevice):
 
     def _custom_checks(self):
         return []
+
+    def _get_services(self):
+        return ["Uptime"]

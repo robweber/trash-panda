@@ -31,8 +31,14 @@ class DRDevice:
 
         return output
 
+    def _make_service(self, name, return_code, text):
+        return {"name": name, "return_code": return_code, "text": text}
+
     # implementing classes will override, should return an array
     def _custom_checks(self):
+        raise NotImplementedError
+
+    def _get_services(self):
         raise NotImplementedError
 
     def check_host(self):
@@ -40,17 +46,26 @@ class DRDevice:
 
         if(self._ping()):
             logging.debug(f"{self.name}: Is Alive")
+
             # the host is alive, continue checks
             result = self._custom_checks()
 
-            result.append({"name": "Alive", "return_code": 0, "text": "Ping successfull!"})
+            result.append(self._make_service("Alive", 0, "Ping successfull!"))
         else:
             logging.debug(f"{self.name}: Is Not Alive")
-            # the host is not alive, return false
-            result.append({"name": "Alive", "return_code": 2, "text": "Ping failed"})
+
+            # the host is not alive, set "unknown" for all other services
+            for service in self._get_services():
+                result.append(self._make_service(service, 3, "Not attempted"))
+
+            result.append(self._make_service("Alive", 2, "Ping failed"))
 
         return result
 
     # return a JSON formatted list of commands this device supports, if any
     def get_commands(self):
         return {}
+
+    # return the name of all services for this device
+    def get_services(self):
+        return ["Alive"] + self._get_services()
