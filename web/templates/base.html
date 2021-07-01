@@ -33,7 +33,15 @@
         {% endfor %}
         <div id="js-success-alert" class="alert alert-success" style="display:none" role="alert"></div>
         <div id="js-error-alert" class="alert alert-danger" style="display:none" role="alert"></div>
+        <div id="js-command-running" class="alert alert-primary" style="display:none" role="alert"></div>
         {% block content %}{% endblock %}
+        <script type="text/javascript">
+          $(document).ready(function () {
+
+            // unique page functions to load here
+            {% block onload_scripts %}{% endblock %}
+          });
+        </script>
         <footer class="footer mt-5">
              <p align="center"><a href="https://github.com/eau-claire-energy-cooperative/dr-dashboard"><i class="bi-github" style="font-size: 2rem;"></i></a></p>
         </footer>

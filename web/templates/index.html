@@ -81,9 +81,7 @@ function load_status(){
   </table>
 </div>
 
-<script type="text/javascript">
-  $(document).ready(function () {
-    load_status();
-  });
-</script>
+{% endblock %}
+{% block onload_scripts %}
+load_status();
 {% endblock %}
