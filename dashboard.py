@@ -7,7 +7,9 @@ import sys
 import threading
 import time
 import modules.utils as utils
-from modules.monitor import HostMonitor
+from modules.monitor import create_device, HostMonitor
+from modules.commands import async_command
+from celery.result import AsyncResult
 from flask import Flask, flash, render_template, jsonify, request, redirect
 
 db = redis.Redis('localhost', decode_responses=True)
@@ -25,6 +27,10 @@ def webapp_thread(port_number, debugMode=False, logHandlers=[]):
     # generate random number for session secret key
     app.secret_key = os.urandom(24)
 
+    # setup broker URLs
+    app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
+    app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
+
     # add handlers for this app
     for h in logHandlers:
         app.logger.addHandler(h)
@@ -38,25 +44,43 @@ def webapp_thread(port_number, debugMode=False, logHandlers=[]):
         werkzeug = logging.getLogger('werkzeug')
         werkzeug.disabled = True
 
+    def _get_host(id):
+        result = None
+
+        # get the host status from the db
+        hosts = utils.read_db(db, utils.HOST_STATUS)
+
+        # find the one we're looking for
+        result = list(filter(lambda h: 'id' in h and h['id'] == id, hosts))
+
+        if(len(result) == 1):
+            return result[0]
+        else:
+            return None
+
     @app.route('/', methods=["GET"])
     def index():
         return render_template("index.html")
 
     @app.route('/commands', methods=["GET"])
     def commands():
-        return render_template("commands.html")
+        result = []  # list of host commands
+
+        # get a list of the hosts from the db
+        hosts = utils.read_db(db, utils.HOST_STATUS)
+
+        for aHost in hosts:
+            device = create_device(aHost)
+            aHost['commands'] = device.get_commands()
+
+            result.append(aHost)
+
+        return render_template("commands.html", hosts=result)
 
     @app.route('/status/<id>')
     def host_status(id):
 
-        # get the host status from the db
-        hosts = utils.read_db(db, utils.HOST_STATUS)
-
-        # find the one we're looking for
-        result = None
-        for aHost in hosts:
-            if('id' in aHost and aHost['id'] == id):
-                result = aHost
+        result = _get_host(id)
 
         if(result is not None):
             return render_template("host_status.html", host=result)
@@ -64,12 +88,48 @@ def webapp_thread(port_number, debugMode=False, logHandlers=[]):
             flash('Host page not found', 'warning')
             return redirect('/')
 
+    @app.route('/run_command/<host>/<command>', methods=['GET'])
+    def run_host_command(host, command):
+        # get the host information from the DB
+        host_obj = _get_host(host)
+
+        if(host_obj is not None):
+            # run the celery command, send the device class
+            task = async_command.delay(host_obj, command)
+
+            # save the task id
+            utils.write_db(db, utils.COMMAND_TASK_ID, {"id": task.id})
+
+            flash(f"Command started on host {host_obj['name']}", 'success')
+        else:
+            flash(f"Command failed. {host} is not a valid host id", 'critical')
+
+        return redirect('/commands')
+
     @app.route('/api/status', methods=['GET'])
     def status():
         # get the status of all the hosts
         status = utils.read_db(db, utils.HOST_STATUS)
 
         return jsonify(status)
+
+    @app.route('/api/command/status', methods=['GET'])
+    def command_status():
+        result = {"task":"", "progress": 100, "status": "No Command Running"}
+
+        # check if there is a running command
+        task = utils.read_db(db, utils.COMMAND_TASK_ID)
+
+        if('id' in task):
+            # get the task info from the celery broker
+            result['task'] = task['id']
+            task_status = async_command.AsyncResult(task['id'])
+
+            if(task_status.state == "RUNNING"):
+                result['status'] =  task_status.info.get('message', '')
+                result['progress'] = task_status.info.get('progress', 0)
+
+        return jsonify(result)
 
 
     # run the web app

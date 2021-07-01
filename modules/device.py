@@ -62,6 +62,16 @@ class DRDevice:
 
         return result
 
+    def find_command(self, id):
+        result = None
+        commands = self.get_commands()
+
+        for c in commands:
+            if(c['command'] == id):
+                result = c
+
+        return result
+
     # return a JSON formatted list of commands this device supports, if any
     def get_commands(self):
         return {}
@@ -69,3 +79,6 @@ class DRDevice:
     # return the name of all services for this device
     def get_services(self):
         return ["Alive"] + self._get_services()
+
+    def run_command(self, command):
+        raise NotImplementedError

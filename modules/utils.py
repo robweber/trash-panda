@@ -13,6 +13,7 @@ DIR_PATH = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
 # Redis Keys
 HOST_STATUS = "host_status"
+COMMAND_TASK_ID = "command_task_id"
 
 # read JSON formatted file
 def read_json(file):

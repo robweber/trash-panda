@@ -40,3 +40,7 @@ class ESXiDevice(DRDevice):
         result.append({"name": "Shutdown VMs", "type": "button", "command": "shutdown_vms"})
 
         return result
+
+    def run_command(self, command):
+        for i in range(0,4):
+            time.sleep(15)

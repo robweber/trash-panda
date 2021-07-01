@@ -1,3 +1,4 @@
+celery
 configargparse
 Flask
 pythonping
