@@ -33,3 +33,10 @@ class ESXiDevice(DRDevice):
 
     def _get_services(self):
         return ["Datastores", "Host Status", "VM Status"]
+
+    def get_commands(self):
+        result = []
+
+        result.append({"name": "Shutdown VMs", "type": "button", "command": "shutdown_vms"})
+
+        return result
