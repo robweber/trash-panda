@@ -1,8 +1,7 @@
 import logging
-import os
-import subprocess
 import time
 import modules.utils as utils
+from modules.devices import ESXiDevice
 from functools import reduce
 from pythonping import ping
 from slugify import slugify
@@ -22,44 +21,6 @@ class PingCheck:
 
         # if over 50% responded return True
         return True if (len(total)/len(responses) > .5) else False
-
-
-class ESXiCheck:
-    host = None
-    user = None
-    password = None
-
-    def __init__(self, host, config):
-        self.host = host
-        self.user = config['username']
-        self.password = config['password']
-
-
-    def __run_process(self, script, args):
-        command = ["python3", script] + args
-        logging.debug(command)
-        # run process, pipe all output
-        output = subprocess.run(command, encoding="utf-8", stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-        return output
-
-    def check_host(self):
-        result = []
-
-        # common args, minus the -t value
-        esxi_checks = {"VM Status": "vms", "Datastores": "datastore", "Host Status": "status"}
-        common_args = ["-H", self.host, "-U", self.user, "-P", self.password, "-p", "443", "-c", "90", "-w", "85", "-t"]
-
-        # run the subprocess for each type of check
-        for aKey in esxi_checks.keys():
-            args = common_args + [esxi_checks[aKey]]
-            output = self.__run_process(os.path.join(utils.DIR_PATH, "check_scripts", "check_esxi.py"), args)
-
-            result.append({"return_code": output.returncode, "text": output.stdout, "name": aKey})
-
-            time.sleep(2)  # sleep 2 seconds between checks
-
-        return result
 
 
 class HostMonitor:
@@ -85,7 +46,7 @@ class HostMonitor:
                 services.append({"name": "Alive", "return_code": 0, "text": "Ping successfull!"})
 
                 if(aHost['type'] == 'esxi'):
-                    checker = ESXiCheck(aHost['ip'], aHost['config'])
+                    checker = ESXiDevice(aHost['name'], aHost['ip'], aHost['config'])
                     services = services + checker.check_host()
             else:
                 services.append({"name": "Alive", "return_code": 2, "text": "Ping failed"})
