@@ -6,6 +6,15 @@ from slugify import slugify
 from modules.devices.esxi_device import ESXiDevice
 from modules.devices.switch_device import SwitchDevice
 
+def create_device(host):
+    result = None
+
+    if(host['type'] == 'esxi'):
+        result = ESXiDevice(host['name'], host['ip'], host['config'])
+    elif(host['type'] == 'switch'):
+        result = SwitchDevice(host['name'], host['ip'], host['config'])
+
+    return result
 
 class HostMonitor:
     hosts = None
@@ -22,12 +31,7 @@ class HostMonitor:
 
             # if the host is a valid type, run service checks
             if(aHost['type'] in self.types):
-                checker = None
-
-                if(aHost['type'] == 'esxi'):
-                    checker = ESXiDevice(aHost['name'], aHost['ip'], aHost['config'])
-                if(aHost['type'] == 'switch'):
-                    checker = SwitchDevice(aHost['name'], aHost['ip'], aHost['config'])
+                checker = create_device(aHost)
 
                 # based on above "checker" should always have a value
                 services = checker.check_host()
