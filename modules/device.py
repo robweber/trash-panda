@@ -23,3 +23,7 @@ class DRDevice:
     # implementing classes will override
     def check_host(self):
         raise NotImplementedError
+
+    # return a JSON formatted list of commands this device supports, if any
+    def get_commands(self):
+        return {}
