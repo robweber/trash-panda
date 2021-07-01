@@ -1,5 +1,7 @@
 import logging
 import subprocess
+from pythonping import ping
+
 
 class DRDevice:
     name = None
@@ -11,6 +13,15 @@ class DRDevice:
         self.address = address
         self.type = type
 
+    def _ping(self):
+        responses = ping(self.address, verbose=False, count=5)
+
+        # get total of "success" responses
+        total = list(filter(lambda x: x.success == True, responses))
+
+        # if over 50% responded return True
+        return True if (len(total)/len(responses) > .5) else False
+
     # executes a subprocess (python script) and returns the results
     def _run_process(self, script, args):
         command = ["python3", script] + args
@@ -20,9 +31,25 @@ class DRDevice:
 
         return output
 
-    # implementing classes will override
-    def check_host(self):
+    # implementing classes will override, should return an array
+    def _custom_checks(self):
         raise NotImplementedError
+
+    def check_host(self):
+        result = []
+
+        if(self._ping()):
+            logging.debug(f"{self.name}: Is Alive")
+            # the host is alive, continue checks
+            result = self._custom_checks()
+
+            result.append({"name": "Alive", "return_code": 0, "text": "Ping successfull!"})
+        else:
+            logging.debug(f"{self.name}: Is Not Alive")
+            # the host is not alive, return false
+            result.append({"name": "Alive", "return_code": 2, "text": "Ping failed"})
+
+        return result
 
     # return a JSON formatted list of commands this device supports, if any
     def get_commands(self):

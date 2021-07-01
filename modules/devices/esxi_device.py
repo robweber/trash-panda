@@ -13,7 +13,7 @@ class ESXiDevice(DRDevice):
         self.password = config['password']
 
 
-    def check_host(self):
+    def _custom_checks(self):
         result = []
 
         # common args, minus the -t value

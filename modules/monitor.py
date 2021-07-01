@@ -2,54 +2,35 @@ import logging
 import time
 import modules.utils as utils
 from functools import reduce
-from pythonping import ping
 from slugify import slugify
 from modules.devices.esxi_device import ESXiDevice
-
-
-class PingCheck:
-    count = 5  # number of ping requests to make
-
-    def __init__(self, count=5):
-        self.count = count
-
-    def check_host(self, ip):
-        responses = ping(ip, verbose=False, count=self.count)
-
-        # get total of "success" responses
-        total = list(filter(lambda x: x.success == True, responses))
-
-        # if over 50% responded return True
-        return True if (len(total)/len(responses) > .5) else False
+from modules.devices.switch_device import SwitchDevice
 
 
 class HostMonitor:
     hosts = None
-    types = {"esxi"}
+    types = {"esxi", "switch"}
 
     def __init__(self, file):
         self.hosts = utils.read_json(file)
 
     def check_hosts(self):
         result = []
-        ping = PingCheck()
 
         for aHost in self.hosts['hosts']:
             services = []
 
-            # check if the host can be pinged
-            canSee = ping.check_host(aHost['ip'])
-            logging.debug(f"{aHost['name']}: Alive {canSee}")
-
-            # check if there are any other services we should pull in
-            if(canSee and aHost['type'] in self.types):
-                services.append({"name": "Alive", "return_code": 0, "text": "Ping successfull!"})
+            # if the host is a valid type, run service checks
+            if(aHost['type'] in self.types):
+                checker = None
 
                 if(aHost['type'] == 'esxi'):
                     checker = ESXiDevice(aHost['name'], aHost['ip'], aHost['config'])
-                    services = services + checker.check_host()
-            else:
-                services.append({"name": "Alive", "return_code": 2, "text": "Ping failed"})
+                if(aHost['type'] == 'switch'):
+                    checker = SwitchDevice(aHost['name'], aHost['ip'], aHost['config'])
+
+                # based on above "checker" should always have a value
+                services = checker.check_host()
 
             # figure out the overall worse status
             overall_status = reduce(lambda x, y: x if x['return_code'] > y['return_code'] else y, services)
