@@ -1,10 +1,10 @@
 import logging
 import time
 import modules.utils as utils
-from modules.devices import ESXiDevice
 from functools import reduce
 from pythonping import ping
 from slugify import slugify
+from modules.devices.esxi_device import ESXiDevice
 
 
 class PingCheck:
