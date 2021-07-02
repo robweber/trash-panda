@@ -3,7 +3,9 @@
     "type": "switch",
     "name": "Switch 1",
     "ip": "192.168.0.1",
-    "config": {}
+    "config": {
+      "community": "public"
+    }
   },
   {
     "type": "esxi",
