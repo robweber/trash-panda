@@ -4,6 +4,9 @@ import modules.utils as utils
 from .. device import DRDevice
 
 class ESXiDevice(DRDevice):
+    """
+    Represents a stand alone ESXi host.
+    """
     user = None
     password = None
 

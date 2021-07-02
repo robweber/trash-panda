@@ -4,6 +4,10 @@ from pythonping import ping
 
 
 class DRDevice:
+    """
+    Abstract device that represents a specific type of device.
+    Subclasses must implement specific methods or NotImplementedErrors will throw at runtime.
+    """
     name = None
     address = None
     type = None
@@ -15,6 +19,10 @@ class DRDevice:
         self.type = type
 
     def _ping(self):
+        """
+        Will attempt to ping the IP address via ICMP and return True or False
+        True will only return if 50% or more pings are responded to
+        """
         responses = ping(self.address, verbose=False, count=5)
 
         # get total of "success" responses
@@ -25,6 +33,10 @@ class DRDevice:
 
     # executes a subprocess (python script) and returns the results
     def _run_process(self, script, args):
+        """
+        Kicks off a subprocess to run the defined python script
+        with the given arguments. Returns subprocess output.
+        """
         command = ["python3", script] + args
         logging.debug(command)
         # run process, pipe all output
@@ -33,16 +45,35 @@ class DRDevice:
         return output
 
     def _make_service(self, name, return_code, text):
+        """
+        Helper method to take the name, return_code, and output and wrap
+        it in a Dict.
+        """
         return {"name": name, "return_code": return_code, "text": text}
 
-    # implementing classes will override, should return an array
     def _custom_checks(self):
+        """
+        Runs the checks on this host and return the results as an array of dicts in the format:
+        {"name": "", "return_code": 0-3, "text": ""}
+        The helper method _make_service() can be used to generate these.
+
+        Implementing classes must override.
+        """
         raise NotImplementedError
 
     def _get_services(self):
+        """
+        Returns a list of services this host will check.
+
+        Implementing classes must override.
+        """
         raise NotImplementedError
 
     def check_host(self):
+        """
+        Called to run the checks on this host. If the ping check fails all subsequent checks are skipped
+        and a result listing them as Not Attempted (return code of 3) is used.
+        """
         result = []
 
         if(self._ping()):
@@ -64,6 +95,9 @@ class DRDevice:
         return result
 
     def find_command(self, id):
+        """
+        Returns the command object based on the given id
+        """
         result = None
         commands = self.get_commands()
 
@@ -73,13 +107,23 @@ class DRDevice:
 
         return result
 
-    # return a JSON formatted list of commands this device supports, if any
     def get_commands(self):
-        return {}
+        """
+        Returns an array of commands this device supports, if any, in the following format
+        {"name":"", "type": "", "command": ""}
+        """
+        return []
 
-    # return the name of all services for this device
     def get_services(self):
+        """
+        Returns and array of all services this device will check
+        """
         return ["Alive"] + self._get_services()
 
     def run_command(self, command):
+        """
+        Runs the given command, logging any output or errors
+
+        Must be implemented, even if no commands valid for device.
+        """
         raise NotImplementedError

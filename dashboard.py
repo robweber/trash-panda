@@ -1,3 +1,16 @@
+"""
+Main class to start the program. Will kick off Flask based web application
+for the web interface and start the timer for the host checks. Must run as root.
+To run use:
+
+sudo python3 dashboard.py
+
+For a list of arguments use:
+
+sudo python3 dashboard.py -h
+"""
+
+
 import configargparse
 import logging
 import os

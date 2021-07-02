@@ -6,7 +6,12 @@ from slugify import slugify
 from modules.devices.esxi_device import ESXiDevice
 from modules.devices.switch_device import SwitchDevice
 
+
 def create_device(host):
+    """
+    Helper method to return a concrete DRDevice class from the given device information,
+    typically loaded from a JSON file
+    """
     result = None
 
     if(host['type'] == 'esxi'):
@@ -17,6 +22,11 @@ def create_device(host):
     return result
 
 class HostMonitor:
+    """
+    Reads in a list of host information from a given JSON file. Will run defined checks on all hosts
+    and return the results. Checks are run based on the loaded DRDevice class. 
+    """
+
     hosts = None
     types = {"esxi", "switch"}
 

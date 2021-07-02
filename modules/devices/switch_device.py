@@ -2,7 +2,9 @@ from .. device import DRDevice
 
 
 class SwitchDevice(DRDevice):
-
+    """
+    Represents a Cisco style network switch
+    """
     def __init__(self, name, address, config):
         super().__init__(name, address, "switch")
 
