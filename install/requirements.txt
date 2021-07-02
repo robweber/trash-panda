@@ -1,5 +1,6 @@
 celery
 configargparse
+hnmp
 Flask
 pythonping
 python-slugify
