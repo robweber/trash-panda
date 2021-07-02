@@ -15,6 +15,7 @@ DIR_PATH = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 HOST_STATUS = "host_status"
 COMMAND_TASK_ID = "command_task_id"
 
+
 # read JSON formatted file
 def read_json(file):
     result = {}
@@ -25,6 +26,7 @@ def read_json(file):
         logging.error(f"error parsing json from file {file}")
 
     return result
+
 
 # read a key from the database, converting to dict
 def read_db(db, db_key):
@@ -39,6 +41,7 @@ def read_db(db, db_key):
 # write a value to the datase, converting to JSON string
 def write_db(db, db_key, db_value):
     db.set(db_key, json.dumps(db_value))
+
 
 # write JSON to file
 def write_json(file, data):

@@ -26,7 +26,7 @@ class DRDevice:
         responses = ping(self.address, verbose=False, count=5)
 
         # get total of "success" responses
-        total = list(filter(lambda x: x.success == True, responses))
+        total = list(filter(lambda x: x.success is True, responses))
 
         # if over 50% responded return True
         return True if (len(total)/len(responses) > .5) else False

@@ -1,6 +1,6 @@
 """
 Main class to start the program. Will kick off Flask based web application
-for the web interface and start the timer for the host checks. Must run as root.
+for the web interfaceand start the timer for the host checks. Must run as root.
 To run use:
 
 sudo python3 dashboard.py
@@ -20,12 +20,12 @@ import sys
 import threading
 import time
 import modules.utils as utils
-from modules.monitor import create_device, HostMonitor
+from modules.monitor import HostMonitor
 from modules.commands import async_command
-from celery.result import AsyncResult
-from flask import Flask, flash, render_template, jsonify, request, redirect
+from flask import Flask, flash, render_template, jsonify, redirect
 
 db = redis.Redis('localhost', decode_responses=True)
+
 
 # function to handle when the is killed and exit gracefully
 def signal_handler(signum, frame):
@@ -77,8 +77,6 @@ def webapp_thread(port_number, debugMode=False, logHandlers=[]):
 
     @app.route('/commands', methods=["GET"])
     def commands():
-        result = []  # list of host commands
-
         # get a list of the hosts from the db
         hosts = utils.read_db(db, utils.HOST_STATUS)
 
@@ -122,7 +120,7 @@ def webapp_thread(port_number, debugMode=False, logHandlers=[]):
 
     @app.route('/api/command/status', methods=['GET'])
     def command_status():
-        result = {"task":"", "progress": 100, "status": "No Command Running"}
+        result = {"task": "", "progress": 100, "status": "No Command Running"}
 
         # check if there is a running command
         task = utils.read_db(db, utils.COMMAND_TASK_ID)
@@ -133,11 +131,10 @@ def webapp_thread(port_number, debugMode=False, logHandlers=[]):
             task_status = async_command.AsyncResult(task['id'])
 
             if(task_status.state == "RUNNING"):
-                result['status'] =  task_status.info.get('message', '')
+                result['status'] = task_status.info.get('message', '')
                 result['progress'] = task_status.info.get('progress', 0)
 
         return jsonify(result)
-
 
     # run the web app
     app.run(debug=debugMode, host='0.0.0.0', port=port_number, use_reloader=False)

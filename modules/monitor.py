@@ -1,5 +1,3 @@
-import logging
-import time
 import modules.utils as utils
 from functools import reduce
 from slugify import slugify
@@ -21,10 +19,11 @@ def create_device(host):
 
     return result
 
+
 class HostMonitor:
     """
     Reads in a list of host information from a given JSON file. Will run defined checks on all hosts
-    and return the results. Checks are run based on the loaded DRDevice class. 
+    and return the results. Checks are run based on the loaded DRDevice class.
     """
 
     hosts = None
@@ -58,7 +57,7 @@ class HostMonitor:
             aHost['overall_status'] = overall_status['return_code']
 
             # set services, sorted by name
-            aHost['services'] = sorted(services, key = lambda s: s['name'])
+            aHost['services'] = sorted(services, key=lambda s: s['name'])
 
             # create a slug to act as the id for lookups
             if('id' not in aHost):
@@ -66,7 +65,7 @@ class HostMonitor:
 
             result.append(aHost)
 
-        return sorted(result, key = lambda o: o['name'])
+        return sorted(result, key=lambda o: o['name'])
 
     def get_host(self, id):
         result = None  # return none if not found
