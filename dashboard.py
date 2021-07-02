@@ -69,13 +69,7 @@ def webapp_thread(port_number, debugMode=False, logHandlers=[]):
         # get a list of the hosts from the db
         hosts = utils.read_db(db, utils.HOST_STATUS)
 
-        for aHost in hosts:
-            device = create_device(aHost)
-            aHost['commands'] = device.get_commands()
-
-            result.append(aHost)
-
-        return render_template("commands.html", hosts=result)
+        return render_template("commands.html", hosts=hosts)
 
     @app.route('/status/<id>')
     def host_status(id):

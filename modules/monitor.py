@@ -23,10 +23,16 @@ class HostMonitor:
     def __init__(self, file):
         self.hosts = utils.read_json(file)
 
+        # get host description by type
+        for i in range(0, len(self.hosts)):
+            device = create_device(self.hosts[i])
+
+            self.hosts[i]['commands'] = device.get_commands()
+
     def check_hosts(self):
         result = []
 
-        for aHost in self.hosts['hosts']:
+        for aHost in self.hosts:
             services = []
 
             # if the host is a valid type, run service checks
@@ -54,7 +60,7 @@ class HostMonitor:
     def get_host(self, id):
         result = None  # return none if not found
 
-        for aHost in self.hosts['hosts']:
+        for aHost in self.hosts:
             if('id' in aHost and aHost['id'] == id):
                 result = aHost
 
