@@ -1,5 +1,6 @@
 import logging
 import subprocess
+from slugify import slugify
 from pythonping import ping
 
 
@@ -49,7 +50,7 @@ class DRDevice:
         Helper method to take the name, return_code, and output and wrap
         it in a Dict.
         """
-        return {"name": name, "return_code": return_code, "text": text}
+        return {"name": name, "return_code": return_code, "text": text, "id": slugify(name)}
 
     def _custom_checks(self):
         """

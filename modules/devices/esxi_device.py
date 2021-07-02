@@ -32,7 +32,7 @@ class ESXiDevice(DRDevice):
             args = common_args + [esxi_checks[aKey]]
             output = self._run_process(os.path.join(utils.DIR_PATH, "check_scripts", "check_esxi.py"), args)
 
-            result.append({"return_code": output.returncode, "text": output.stdout, "name": aKey})
+            result.append(self._make_service(aKey, output.returncode, output.stdout))
 
             time.sleep(2)  # sleep 2 seconds between checks
 

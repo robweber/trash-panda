@@ -9,14 +9,20 @@
 <div class="container mb-5">
   <h3>{{ aHost.name }}</h3>
 
-  {% for cmd in aHost['commands'] %}
+  {% if(aHost.alive == 0): %}
+    {% for cmd in aHost['commands'] %}
     <div class="row">
       <div class="col-md-2"><!-- acts as a spacer -->&nbsp;</div>
     {% if cmd['type'] == 'button' %}
       <div class="col-md-10"><a class="btn btn-primary" href="/run_command/{{ aHost['id'] }}/{{ cmd['command'] }}">{{ cmd['name'] }}</a></div>
     {% endif %}
     </div>
-  {% endfor %}
+    {% endfor %}
+  {% else %}
+    <div class="row">
+      <div class="col-md-12 text-muted" align="center">No commands available, host is offline</div>
+    </div>
+  {% endif %}
 </div>
 {% endfor %}
 

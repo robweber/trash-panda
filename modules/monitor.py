@@ -52,9 +52,13 @@ class HostMonitor:
                 # based on above "checker" should always have a value
                 services = checker.check_host()
 
-            # figure out the overall worse status
+            # figure out the overall worst status
             overall_status = reduce(lambda x, y: x if x['return_code'] > y['return_code'] else y, services)
             aHost['overall_status'] = overall_status['return_code']
+
+            # figure out if the host is alive at all
+            host_alive = list(filter(lambda x: x['id'] == 'alive', services))
+            aHost['alive'] = host_alive[0]['return_code']
 
             # set services, sorted by name
             aHost['services'] = sorted(services, key=lambda s: s['name'])
