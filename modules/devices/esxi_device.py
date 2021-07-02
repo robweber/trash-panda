@@ -12,6 +12,7 @@ class ESXiDevice(DRDevice):
         self.user = config['username']
         self.password = config['password']
 
+        self.info = "This device type works with stand alone ESXi devices. Username and password information for a local user with admin permissions must be set for queries and commands to function."
 
     def _custom_checks(self):
         result = []

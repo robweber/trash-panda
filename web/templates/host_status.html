@@ -4,8 +4,11 @@
 {% set status_text = ['', '', '', 'text-secondary'] %}
 
 <div class="row">
-  <div class="col-md-4"><h2>{{ host['name'] }}</h2></div>
-  <div class="col-md-8" align="right">
+  <div class="col-md-8">
+    <h2 class="mb-3">{{ host['name'] }}</h2>
+    <p>{{ host['info'] }}</p>
+  </div>
+  <div class="col-md-4" align="right">
     <div class="card" style="width: 18rem;">
       <div class="card-body">
         <h5 class="card-title">Type: <span class="text-primary">{{ host['type'].capitalize() }}</span></h5>

@@ -7,6 +7,7 @@ class DRDevice:
     name = None
     address = None
     type = None
+    info = ""
 
     def __init__(self, name, address, type):
         self.name = name
