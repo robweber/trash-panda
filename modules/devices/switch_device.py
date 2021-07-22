@@ -1,4 +1,5 @@
 import os
+import time
 import modules.utils as utils
 from .. device import DRDevice
 
@@ -24,7 +25,7 @@ class SwitchDevice(DRDevice):
         args = ["-H", self.address, "-c", self.community]
 
         # check system uptime
-        output = self._run_process(os.path.join(utils.DIR_PATH, "check_scripts", "check_snmp.py"), args + ['-o', '1.3.6.1.2.1.1.3.0'])
+        output = self._run_python(os.path.join(utils.DIR_PATH, "check_scripts", "check_snmp.py"), args + ['-o', '1.3.6.1.2.1.1.3.0'])
         result.append(self._make_service("Switch Uptime", output.returncode, output.stdout))
 
         return result
@@ -40,5 +41,7 @@ class SwitchDevice(DRDevice):
         return result
 
     def run_command(self, command):
-        for i in range(0, 4):
-            time.sleep(15)
+
+        if(command == 'reboot_switch'):
+            self._run_process(["expect", os.path.join(utils.DIR_PATH, "check_scripts", "bash", "reboot_switch.exp")],
+                              [self.address, "cisco", "ecec_s3cr3t"])

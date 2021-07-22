@@ -30,7 +30,7 @@ class ESXiDevice(DRDevice):
         # run the subprocess for each type of check
         for aKey in esxi_checks.keys():
             args = common_args + [esxi_checks[aKey]]
-            output = self._run_process(os.path.join(utils.DIR_PATH, "check_scripts", "check_esxi.py"), args)
+            output = self._run_python(os.path.join(utils.DIR_PATH, "check_scripts", "check_esxi.py"), args)
 
             result.append(self._make_service(aKey, output.returncode, output.stdout))
 

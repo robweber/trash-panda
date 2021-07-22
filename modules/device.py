@@ -33,17 +33,23 @@ class DRDevice:
         return True if (len(total)/len(responses) > .5) else False
 
     # executes a subprocess (python script) and returns the results
-    def _run_process(self, script, args):
+    def _run_process(self, program, args):
         """
-        Kicks off a subprocess to run the defined python script
+        Kicks off a subprocess to run the defined program
         with the given arguments. Returns subprocess output.
         """
-        command = ["python3", script] + args
+        command = program + args
         logging.debug(command)
         # run process, pipe all output
         output = subprocess.run(command, encoding="utf-8", stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         return output
+
+    def _run_python(self, script, args):
+        """
+        Helper method to run python programs specifically
+        """
+        return self._run_process(["python3", script], args)
 
     def _make_service(self, name, return_code, text):
         """
