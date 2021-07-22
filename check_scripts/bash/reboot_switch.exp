@@ -1,0 +1,21 @@
+set switchAddress [lindex $argv 0]
+set loginUser [lindex $argv 1]
+set loginPassword [lindex $argv 2]
+
+spawn ssh -l $loginUser $switchAddress -c aes128-cbc -o "StrictHostKeyChecking no"
+expect_after eof {exit 0}
+
+set timeout 10
+
+expect "password:" {send "$loginPassword\r"}
+puts "\nLogging in\n"
+set timeout 100
+
+expect "switch5cdee6#"
+send "reload\r"
+set timeout 10
+
+expect -exact "This command will reset the whole system and disconnect your current session. Do you want to continue ? (Y/N)"
+send "Y\r"
+
+puts "Rebooting\n"
