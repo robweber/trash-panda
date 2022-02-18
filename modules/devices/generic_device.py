@@ -9,8 +9,8 @@ defines which config named values go in which argument slots, if a named config
 value doesn't exist the placeholder value is used
 """
 SERVICES = {"http": {"command": os.path.join(utils.NAGIOS_PATH, "check_http"),
-                      "args": ['-H', "", '-p', "80", "-u", "/"],
-                      "arg_slots": {1: "hostname", 3: "port", 5: "path"}},
+                     "args": ['-H', "", '-p', "80", "-u", "/"],
+                     "arg_slots": {1: "hostname", 3: "port", 5: "path"}},
             "https": {"command": os.path.join(utils.NAGIOS_PATH, "check_http"),
                       "args": ['-H', "", '-p', "443", "-u", "/", "-S"],
                       "arg_slots": {1: "hostname", 3: "port", 5: "path"}}}
