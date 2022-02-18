@@ -36,8 +36,8 @@ class HostMonitor:
         for i in range(0, len(self.hosts)):
             device = create_device(self.hosts[i])
 
-            self.hosts[i]['commands'] = device.get_commands()
             self.hosts[i]['info'] = device.info
+            self.hosts[i]['icon'] = device.icon
 
     def check_hosts(self):
         result = []

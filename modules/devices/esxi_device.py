@@ -16,6 +16,7 @@ class ESXiDevice(DRDevice):
         self.user = config['username']
         self.password = config['password']
 
+        self.icon = 'pc'
         self.info = ("This device type works with stand alone ESXi devices. Username and password information "
                      "for a local user with admin permissions must be set for queries and commands to function.")
 
@@ -40,14 +41,3 @@ class ESXiDevice(DRDevice):
 
     def _get_services(self):
         return ["Datastores", "Host Status", "VM Status"]
-
-    def get_commands(self):
-        result = []
-
-        result.append({"name": "Shutdown VMs", "type": "button", "command": "shutdown_vms"})
-
-        return result
-
-    def run_command(self, command):
-        for i in range(0, 4):
-            time.sleep(15)

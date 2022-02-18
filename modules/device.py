@@ -13,6 +13,7 @@ class DRDevice:
     address = None
     type = None
     info = ""
+    icon = "laptop"
 
     def __init__(self, name, address, type):
         self.name = name
@@ -101,36 +102,8 @@ class DRDevice:
 
         return result
 
-    def find_command(self, id):
-        """
-        Returns the command object based on the given id
-        """
-        result = None
-        commands = self.get_commands()
-
-        for c in commands:
-            if(c['command'] == id):
-                result = c
-
-        return result
-
-    def get_commands(self):
-        """
-        Returns an array of commands this device supports, if any, in the following format
-        {"name":"", "type": "", "command": ""}
-        """
-        return []
-
     def get_services(self):
         """
         Returns and array of all services this device will check
         """
         return ["Alive"] + self._get_services()
-
-    def run_command(self, command):
-        """
-        Runs the given command, logging any output or errors
-
-        Must be implemented, even if no commands valid for device.
-        """
-        raise NotImplementedError

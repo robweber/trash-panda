@@ -5,7 +5,7 @@ from .. device import DRDevice
 
 class SwitchDevice(DRDevice):
     """
-    Represents a Cisco style network switch
+    Represents a generic network switch
     """
     community = None
 
@@ -14,7 +14,8 @@ class SwitchDevice(DRDevice):
 
         self.community = config['community']
 
-        self.info = ("This device type will work with Cisco branded switches. SNMP information must be correct "
+        self.icon = "hdd-network"
+        self.info = ("This device type will work with generic managed switches. SNMP information must be correct "
                      "and setup on the switch for services to properly be queried.")
 
     def _custom_checks(self):
@@ -31,16 +32,3 @@ class SwitchDevice(DRDevice):
 
     def _get_services(self):
         return ["Uptime"]
-
-    def get_commands(self):
-        result = []
-
-        result.append({"name": "Reboot Switch", "type": "button", "command": "reboot_switch"})
-
-        return result
-
-    def run_command(self, command):
-
-        if(command == 'reboot_switch'):
-            self._run_process(["expect", os.path.join(utils.DIR_PATH, "check_scripts", "bash", "reboot_switch.exp")],
-                              [self.address, "cisco", "ecec_s3cr3t"])

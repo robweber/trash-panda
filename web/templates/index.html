@@ -16,7 +16,6 @@ function load_status(){
     // setup row objects
     var tr = $('<tr>');
     var td = $('<td>');
-    var device_types = {"esxi": "bi-server", "switch": "bi-hdd-network"};  // map device types to icons
 
     //clear existing data
     table.empty();
@@ -25,7 +24,7 @@ function load_status(){
       row = tr.clone();
 
       // link for the details
-      details = $('<a>').html('<i class="' + device_types[h.type] + '"></i> ' + h.name).addClass('ml-2');
+      details = $('<a>').html('<i class="bi bi-' + h.icon + '"></i> ' + h.name).addClass('ml-2');
       details.attr('href', '/status/' + h.id);
 
       row.append(td.clone().append(details));
