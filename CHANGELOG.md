@@ -11,6 +11,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - added basic information to the README document (host types, basic usage, license info)
 - masking of passwords on status page
 
+### Changed
+
+- device type set their own icons in the device class instead of keeping track separate in index.html file
+
 ### Fixed
 
 - make sure port value from args is pushed to the web app

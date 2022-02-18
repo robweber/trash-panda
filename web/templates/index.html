@@ -24,7 +24,7 @@ function load_status(){
       row = tr.clone();
 
       // link for the details
-      details = $('<a>').html('<i class="bi bi-' + h.icon + '"></i> ' + h.name).addClass('ml-2');
+      details = $('<a>').html('<i class="mdi mdi-' + h.icon + ' icon-inline"></i> ' + h.name).addClass('ml-2');
       details.attr('href', '/status/' + h.id);
 
       row.append(td.clone().append(details));
@@ -34,7 +34,7 @@ function load_status(){
         aLink = $('<a>');
         aLink.attr('href', h.management_page);
         aLink.attr('target', "_blank");
-        aLink.attr('class', 'bi-box-arrow-up-right');
+        aLink.attr('class', 'mdi mdi-launch icon-sm icon-inline');
 
         row.append(td.clone().text(h.ip + ' ').append(aLink));
       }

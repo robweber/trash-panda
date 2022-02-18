@@ -14,7 +14,7 @@ class SwitchDevice(DRDevice):
 
         self.community = config['community']
 
-        self.icon = "hdd-network"
+        self.icon = "router-network"
         self.info = ("This device type will work with generic managed switches. SNMP information must be correct "
                      "and setup on the switch for services to properly be queried.")
 

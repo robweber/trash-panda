@@ -13,7 +13,7 @@ class DRDevice:
     address = None
     type = None
     info = ""
-    icon = "laptop"
+    icon = "devices"
 
     def __init__(self, name, address, type):
         self.name = name

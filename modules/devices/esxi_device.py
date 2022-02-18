@@ -16,7 +16,7 @@ class ESXiDevice(DRDevice):
         self.user = config['username']
         self.password = config['password']
 
-        self.icon = 'pc'
+        self.icon = 'desktop-tower'
         self.info = ("This device type works with stand alone ESXi devices. Username and password information "
                      "for a local user with admin permissions must be set for queries and commands to function.")
 
