@@ -126,6 +126,16 @@ type: esxi
     password: "pass"
 ```
 
+### Generic Device
+
+The most  basic device class available. Will check if the device is alive via a network ping but no other services will be checked.
+
+```
+type: generic
+  name: "Device 1"
+  ip: 192.168.0.5
+```
+
 #### Switch
 
 The switch host type will check the status of a basic managed switch that has generic SNMP enabled. Below is an example configuration:

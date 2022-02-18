@@ -6,9 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## Unreleased
 
+### Added
+
+- added a generic network device, shows up/down status only
+
 ### Changed
 
 - switch to YAML for the format of the host config file for better readability and easier config
+- device classes are loaded dynamically in monitor class
 
 ## 0.0.2
 

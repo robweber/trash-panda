@@ -1,9 +1,11 @@
+import importlib
 import modules.utils as utils
 from functools import reduce
 from slugify import slugify
-from modules.devices.esxi_device import ESXiDevice
-from modules.devices.switch_device import SwitchDevice
-from modules.devices.generic_device import GenericDevice
+
+DEVICE_TYPES = {"generic": {"package": "modules.devices.generic_device", "class": "GenericDevice"},
+                "esxi": {"package": "modules.devices.esxi_device", "class": "ESXiDevice"},
+                "switch": {"package": "modules.devices.switch_device", "class": "SwitchDevice"}}
 
 
 def create_device(host):
@@ -13,12 +15,14 @@ def create_device(host):
     """
     result = None
 
-    if(host['type'] == 'generic'):
-        result = GenericDevice(host['name'], host['ip'])
-    elif(host['type'] == 'esxi'):
-        result = ESXiDevice(host['name'], host['ip'], host['config'])
-    elif(host['type'] == 'switch'):
-        result = SwitchDevice(host['name'], host['ip'], host['config'])
+    if(host['type'] in DEVICE_TYPES):
+        mod = importlib.import_module(DEVICE_TYPES[host['type']]['package'])
+        classObj = getattr(mod, DEVICE_TYPES[host['type']]['class'])
+
+        if('config' in host):
+            result = classObj(host['name'], host['ip'], host['config'])
+        else:
+            result = classObj(host['name'], host['ip'])
 
     return result
 
