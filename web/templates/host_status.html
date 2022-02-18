@@ -13,6 +13,7 @@
       <div class="card-body">
         <h5 class="card-title">Type: <span class="text-primary">{{ host['type'] | capitalize }}</span></h5>
         <p class="card-text">
+          Last Check: {{ host['last_check'] }} <br />
           IP Address: {{ host['ip'] }} <br />
           {% if 'config' in host %}
             {% for c in host['config'].keys() %}

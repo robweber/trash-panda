@@ -42,6 +42,8 @@ function load_status(){
         row.append(td.clone().text(h.ip));
       }
 
+      row.append(td.clone().text(h.last_check));
+
       if(h.overall_status == 0){
         row.append(td.clone().text("Ready").addClass('text-success'));
       }
@@ -72,6 +74,7 @@ function load_status(){
       <tr>
         <th>Host</th>
         <th>IP</th>
+        <th>Last Check</th>
         <th>Overall Status</th>
       </tr>
     </thead>
