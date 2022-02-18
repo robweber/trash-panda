@@ -1,0 +1,13 @@
+hosts:
+  - type: switch
+    name: "Switch 1"
+    ip: 192.168.0.1
+    config:
+      community: "public"
+  - type: esxi
+    name: "ESXi 1"
+    ip: 192.168.0.2
+    management_page: "https://192.168.0.2/ui/"
+    config:
+      username: "root"
+      password: "pass"

@@ -7,6 +7,7 @@ Utility functions and variables for global use
 import json
 import logging
 import os
+import yaml
 
 # full path to the running directory of the program
 DIR_PATH = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
@@ -27,6 +28,14 @@ def read_json(file):
 
     return result
 
+# read a YAML formatted file
+def read_yaml(file):
+    result = {}
+
+    with open(file, 'r') as file:
+        result = yaml.safe_load(file)
+
+    return result
 
 # read a key from the database, converting to dict
 def read_db(db, db_key):

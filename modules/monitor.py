@@ -30,7 +30,8 @@ class HostMonitor:
     types = {"esxi", "switch"}
 
     def __init__(self, file):
-        self.hosts = utils.read_json(file)
+        yaml_file = utils.read_yaml(file)
+        self.hosts = yaml_file['hosts']
 
         # get host description by type
         for i in range(0, len(self.hosts)):
