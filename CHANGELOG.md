@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
-## Unreleased
+## 0.0.2
 
 ### Added
 
@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Changed
 
 - device type set their own icons in the device class instead of keeping track separate in index.html file
+- replaced Bootstrap Icons with [Material Design Icons](https://materialdesignicons.com/)
 
 ### Fixed
 
