@@ -16,10 +16,12 @@
           IP Address: {{ host['ip'] }} <br />
           {% if 'config' in host %}
             {% for c in host['config'].keys() %}
+              {% if host['config'][c] is not mapping and host['config'][c] is not sequence %}
               {% if "password" in c | lower %}
               {{ c | capitalize }}: ***** <br />
               {% else %}
               {{ c | capitalize }}: {{ host['config'][c] }} <br />
+              {% endif %}
               {% endif %}
             {% endfor %}
           {% endif %}
@@ -36,7 +38,7 @@
 <table class="table table-striped mt-3">
   {% for row in host['services']: %}
   <tr>
-    <td class="{{ current_status[row['return_code']] }}">{{ row['name'] }}</td>
+    <td class="{{ current_status[row['return_code']] }}" width="25%">{{ row['name'] }}</td>
     <td class="{{ status_text[row['return_code']] }}">{{ row['text'].replace("\n", '<br />') | safe }}</td>
   </tr>
   {% endfor %}
