@@ -97,7 +97,7 @@ The hosts file is where the configuration is set for what hosts are to be monito
 
 * type - the host type as defined below
 * name - the name of the host to show up in the dashboard
-* ip - the ip to check for a basic PING status
+* ip - the ip to check for a basic PING status, this can also be a hostname value as long as the name can be resolved on the network
 
 ```
 type: host_type
