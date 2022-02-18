@@ -6,3 +6,4 @@ pythonping
 python-slugify
 pyvmomi
 redis
+pyyaml
