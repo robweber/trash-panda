@@ -1,5 +1,3 @@
-import os
-import modules.utils as utils
 from .. device import DRDevice
 
 

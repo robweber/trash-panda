@@ -28,6 +28,7 @@ def read_json(file):
 
     return result
 
+
 # read a YAML formatted file
 def read_yaml(file):
     result = {}
@@ -36,6 +37,7 @@ def read_yaml(file):
         result = yaml.safe_load(file)
 
     return result
+
 
 # read a key from the database, converting to dict
 def read_db(db, db_key):

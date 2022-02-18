@@ -68,7 +68,6 @@ class HostMonitor:
             host_alive = list(filter(lambda x: x['id'] == 'alive', services))
             aHost['alive'] = host_alive[0]['return_code']
 
-
             # set services, sorted by name
             aHost['services'] = sorted(services, key=lambda s: s['name'])
 
