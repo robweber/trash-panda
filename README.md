@@ -8,7 +8,7 @@ Install the repository according to the instructions in the [Install](install/In
 
 ### Usage
 
-Before the program can be used hosts need to be configured in the `hosts.json` file created during the install. Detailed instructions for how to do this for different host types is below. Running the program must be done with `sudo` as root privileges are needed to bind to a socket.
+Before the program can be used hosts need to be configured in the `hosts.json` file created during the install. Detailed instructions for how to do this for different host types is below. Running the program must be done with `sudo` as root privileges are needed to bind to a socket. Once running the dashboard page will be available at `http://server_ip:5000/`. _Note the port may be different if you change it using the arguments below._
 
 ```
 sudo python3 dashboard.py
@@ -41,6 +41,54 @@ optional arguments:
                         default
   -D, --debug           If the program should run in debug mode
 
+```
+
+## Dashboard
+
+Once running the dashboard page can be loaded. The landing page will display all currently configured hosts and their overall status. If the host is down, or any configured service unavailable, the overall status will change. This page is refreshed every __15 seconds__. Data will change depending on the update interval set when the program is loaded.
+
+Clicking on a host name will show you more information about that device. Individual services will be listed along with any output to indicate their current status. If configured, the management page for the host can also be launched from here.
+
+### API
+
+For integration with other systems the API can be used to pull in a JSON listing of all hosts and their statuses. This is available at: `http://server_ip:5000/api/status`. To decode the status return codes use the following:
+
+* 0 - OK, everything normal
+* 1 - Warning, potential problem
+* 2 - Critical, definitely a problem
+
+The status codes are determined by the settings for the device and the output of the various check utilities. See the `check_scripts/` folder for individual scripts that are run.
+
+```
+[
+  {
+    "alive": 0,
+    "config": {
+      "community": "public"
+    },
+    "icon": "router-network",
+    "id": "switch-1",
+    "info": "This device type will work with generic managed switches. SNMP information must be correct and setup on the switch for services to properly be queried.",
+    "ip": "192.168.0.1",
+    "name": "Switch 1",
+    "overall_status": 1,
+    "services": [
+      {
+        "id": "alive",
+        "name": "Alive",
+        "return_code": 0,
+        "text": "Ping successfull!"
+      },
+      {
+        "id": "switch-uptime",
+        "name": "Switch Uptime",
+        "return_code": 1,
+        "text": "11 days, 2:09:34\n"
+      }
+    ],
+    "type": "switch"
+  }
+]
 ```
 
 ## Hosts File
