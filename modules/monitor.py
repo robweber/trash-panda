@@ -44,8 +44,9 @@ class HostMonitor:
         for i in range(0, len(self.hosts)):
             device = create_device(self.hosts[i])
 
+            # set the icon to either the class default or user custom
+            self.hosts[i]['icon'] = device.icon if 'icon' not in self.hosts[i] else self.hosts[i]['icon']
             self.hosts[i]['info'] = device.info
-            self.hosts[i]['icon'] = device.icon
 
     def check_hosts(self):
         result = []

@@ -108,6 +108,7 @@ ip: 127.0.0.1
 The following additional options are available depending on the type of device:
 
 * management_page - a link to the local management page of the host, if there is one. This will be displayed in the dashboard
+* icon - the icon to use for the device, overrides the default type. Should be found on [Material Design Icons](https://materialdesignicons.com/)
 * config - an additional mapping of config options specific to this host type
 
 ### Host Types
