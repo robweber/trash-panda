@@ -116,7 +116,7 @@ def webapp_thread(port_number, debugMode=False, logHandlers=[]):
 
 
 # parse the CLI args
-parser = configargparse.ArgumentParser(description='DR Dashboard Settings')
+parser = configargparse.ArgumentParser(description='Simple Monitoring')
 parser.add_argument('-c', '--config', is_config_file=True,
                     help='Path to custom config file')
 parser.add_argument('-f', '--file', default='conf/hosts.json',
