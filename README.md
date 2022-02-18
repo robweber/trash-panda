@@ -1,3 +1,104 @@
 # Simple Monitoring
 
-_TODO_
+This is a _very_ basic monitoring solution meant for simple home use. It will monitor the status of some basic IP systems and services in a simple dashboard.
+
+## Install
+
+Install the repository according to the instructions in the [Install](install/Install.md) guide. Once this is done you can proceed to the Usage section.
+
+### Usage
+
+Before the program can be used hosts need to be configured in the `hosts.json` file created during the install. Detailed instructions for how to do this for different host types is below. Running the program must be done with `sudo` as root privileges are needed to bind to a socket.
+
+```
+sudo python3 dashboard.py
+```
+
+You can also specify the `-c` flag to read in a config file instead of passing in arguments from the command line.
+
+```
+sudo python3 dashboard.py -c /path/to/config.conf
+```
+
+A full list of arguments can be found by using the `-h` flag.
+
+```
+python3 dashboard.py -h
+
+usage: dashboard.py [-h] [-c CONFIG] [-f FILE] [-p PORT] [-i INTERVAL] [-D]
+
+Simple Monitoring
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -c CONFIG, --config CONFIG
+                        Path to custom config file
+  -f FILE, --file FILE  Path to the config file for the host data,
+                        conf/hosts.json by default
+  -p PORT, --port PORT  Port number to run the web server on, 5000 by default
+  -i INTERVAL, --interval INTERVAL
+                        The monitoring system check interval, in minutes. 3 by
+                        default
+  -D, --debug           If the program should run in debug mode
+
+```
+
+## Hosts File
+
+The hosts file is where the configuration is set for what hosts are to be monitored when the program starts. This config is done using JSON as an array of values. At minimum each host needs the following config options:
+
+* type - the host type as defined below
+* name - the name of the host to show up in the dashboard
+* ip - the ip to check for a basic PING status
+
+```
+{
+  "type": "host_type",
+  "name": "Name",
+  "ip": "127.0.0.1"
+}
+```
+
+The following additional options are available depending on the type of device:
+
+* management_page - a link to the local management page of the host, if there is one. This will be displayed in the dashboard
+* config - an additional mapping of config options specific to this host type
+
+### Host Types
+
+#### ESXi
+
+This will define checks on a stand alone ESXi server. This includes overall ESXi status, status of running VMs, and datastore use. Below is an example configuration:
+
+```
+{
+  "type": "esxi",
+  "name": "ESXi 1",
+  "ip": "192.168.0.2",
+  "management_page": "https://192.168.0.2/ui/",
+  "config": {
+    "username": "root",
+    "password": "pass"
+  }
+}
+
+```
+
+#### Switch
+
+The switch host type will check the status of a basic managed switch that has generic SNMP enabled. Below is an example configuration:
+
+```
+{
+  "type": "switch",
+  "name": "Switch 1",
+  "ip": "192.168.0.1",
+  "config": {
+    "community": "public"
+  }
+}
+```
+
+## License
+
+[GPLv3](https://github.com/robweber/simple-monitoring/blob/main/LICENSE)
