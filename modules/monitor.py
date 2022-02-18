@@ -37,7 +37,6 @@ class HostMonitor:
 
     hosts = None
     time_format = "%m-%d-%Y %I:%M%p"
-    types = {"esxi", "switch", "generic"}
 
     def __init__(self, file, default_interval):
         yaml_file = utils.read_yaml(file)
@@ -68,14 +67,11 @@ class HostMonitor:
             last_check = datetime.datetime.strptime(aHost['last_check'], self.time_format)
             if(last_check < now - datetime.timedelta(minutes=aHost['interval'])):
                 logging.debug(f"Checking {aHost['name']}")
-                services = []
 
-                # if the host is a valid type, run service checks
-                if(aHost['type'] in self.types):
-                    checker = create_device(aHost)
+                checker = create_device(aHost)
 
-                    # based on above "checker" should always have a value
-                    services = checker.check_host()
+                # based on above "checker" should always have a value
+                services = checker.check_host()
 
                 # figure out the overall worst status
                 overall_status = reduce(lambda x, y: x if x['return_code'] > y['return_code'] else y, services)
