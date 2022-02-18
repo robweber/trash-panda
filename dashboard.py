@@ -172,7 +172,7 @@ utils.write_db(db, utils.HOST_STATUS, [])
 
 # start the web app
 logging.info('Starting DR Dashboard Web Service')
-webAppThread = threading.Thread(name='Web App', target=webapp_thread, args=(5000, True, logHandlers))
+webAppThread = threading.Thread(name='Web App', target=webapp_thread, args=(args.port, True, logHandlers))
 webAppThread.setDaemon(True)
 webAppThread.start()
 
