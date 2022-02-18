@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## Unreleased
 
+### Added
+
+- added basic information to the README document (host types, basic usage, license info)
+
 ### Fixed
 
 - make sure port value from args is pushed to the web app
