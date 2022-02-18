@@ -9,6 +9,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Fixed
 
 - make sure port value from args is pushed to the web app
+- fixed some typos in the install instructions
+
+### Removed
+
+- removed commands area, not going to use this from original
 
 ## Version 0.0.1
 

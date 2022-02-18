@@ -13,7 +13,7 @@ cd ~
 sudo apt-get update
 
 # install default packages we'll need
-sudo apt-get install apt-transport-https gnupggit python3 python3-pip redis-server wget
+sudo apt-get install apt-transport-https gnupg git python3 python3-pip redis-server wget
 
 # clone repo
 git clone https://github.com/eau-claire-energy-cooperative/dr-dashboard.git
@@ -49,7 +49,7 @@ echo CELERY_CREATE_DIRS=1 >> celeryd.config
 echo export SECRET_KEY=\"Ms53K10Xlf\" >> celeryd.config
 
 # move config file and start celery on startup
-sudo mv celery.config /etc/default/celeryd
+sudo mv celeryd.config /etc/default/celeryd
 sudo chown root:root /etc/default/celeryd
 sudo chmod 640 /etc/default/celeryd
 sudo update-rc.d celeryd defaults
@@ -59,5 +59,16 @@ sudo systemctl daemon-reload
 
 # start with
 sudo service celeryd start
+
+```
+
+### Running the program
+
+A configuration file is needed. This will copy the example config to the default directory for editing. Edit this file according to the instructions in the README document and run the `dashboard.py` file. 
+
+```
+
+mkdir conf
+cp install/hosts_example.json conf/hosts.json
 
 ```
