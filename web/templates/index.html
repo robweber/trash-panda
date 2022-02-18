@@ -32,11 +32,12 @@ function load_status(){
 
       if(h.hasOwnProperty('management_page'))
       {
-        aLink = $('<a>').text(h.ip);
+        aLink = $('<a>');
         aLink.attr('href', h.management_page);
         aLink.attr('target', "_blank");
+        aLink.attr('class', 'bi-box-arrow-up-right');
 
-        row.append(td.clone().append(aLink));
+        row.append(td.clone().text(h.ip + ' ').append(aLink));
       }
       else {
         row.append(td.clone().text(h.ip));
