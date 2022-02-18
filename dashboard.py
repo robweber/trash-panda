@@ -75,13 +75,6 @@ def webapp_thread(port_number, debugMode=False, logHandlers=[]):
     def index():
         return render_template("index.html")
 
-    @app.route('/commands', methods=["GET"])
-    def commands():
-        # get a list of the hosts from the db
-        hosts = utils.read_db(db, utils.HOST_STATUS)
-
-        return render_template("commands.html", hosts=hosts)
-
     @app.route('/status/<id>')
     def host_status(id):
 
@@ -92,24 +85,6 @@ def webapp_thread(port_number, debugMode=False, logHandlers=[]):
         else:
             flash('Host page not found', 'warning')
             return redirect('/')
-
-    @app.route('/run_command/<host>/<command>', methods=['GET'])
-    def run_host_command(host, command):
-        # get the host information from the DB
-        host_obj = _get_host(host)
-
-        if(host_obj is not None):
-            # run the celery command, send the device class
-            task = async_command.delay(host_obj, command)
-
-            # save the task id
-            utils.write_db(db, utils.COMMAND_TASK_ID, {"id": task.id})
-
-            flash(f"Command started on host {host_obj['name']}", 'success')
-        else:
-            flash(f"Command failed. {host} is not a valid host id", 'critical')
-
-        return redirect('/commands')
 
     @app.route('/api/status', methods=['GET'])
     def status():
@@ -149,7 +124,7 @@ parser.add_argument('-f', '--file', default='conf/hosts.json',
 parser.add_argument('-p', '--port', default=5000,
                     help="Port number to run the web server on, %(default)d by default")
 parser.add_argument('-i', '--interval', default=3,
-                    help="The monitoring system check interval, %(default)d by default")
+                    help="The monitoring system check interval, in minutes. %(default)d by default")
 parser.add_argument('-D', '--debug', action='store_true',
                     help='If the program should run in debug mode')
 
