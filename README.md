@@ -111,42 +111,68 @@ The following additional options are available depending on the type of device:
 * icon - the icon to use for the device, overrides the default type. Should be found on [Material Design Icons](https://materialdesignicons.com/)
 * config - an additional mapping of config options specific to this host type
 
-### Host Types
+## Host Types
 
-#### ESXi
+### ESXi
 
 This will define checks on a stand alone ESXi server. This includes overall ESXi status, status of running VMs, and datastore use. Below is an example configuration:
 
 ```
 type: esxi
-  name: "ESXi 1"
-  ip: 192.168.0.2
-  management_page: "https://192.168.0.2/ui/"
-  config:
-    username: "root"
-    password: "pass"
+name: "ESXi 1"
+ip: 192.168.0.2
+management_page: "https://192.168.0.2/ui/"
+config:
+  username: "root"
+  password: "pass"
 ```
 
 ### Generic Device
 
-The most  basic device class available. Will check if the device is alive via a network ping but no other services will be checked.
+A basic IP device with no special services defined. By default this Will check if the device is alive via a network ping but no other services will be checked. Additional services can be defined through the config based on the following available service definitions. Mostly these are port based TCP or UDP checks.
 
 ```
+# basic definition
 type: generic
-  name: "Device 1"
-  ip: 192.168.0.5
+name: "Device 1"
+ip: 192.168.0.5
+
+# definition with an https service
+type: generic
+name: "Device 2"
+ip: 192.168.0.6
+config:
+  services:
+    - type: https
+      name: "Website"
+      hostname: "sitename.com"
 ```
 
-#### Switch
+The following services are available, some require additional arguments.
+
+__http__
+
+* hostname - the hostname of the site, could just be the machine name or IP.
+* port - defaults to 80
+* path - base path if not the root (/)
+
+__https__
+
+* hostname - the hostname of the site, could just be the machine name or IP.
+* port - defaults to 443
+* path - base path if not the root (/)
+
+
+### Switch
 
 The switch host type will check the status of a basic managed switch that has generic SNMP enabled. Below is an example configuration:
 
 ```
 type: switch
-  name: "Switch 1"
-  ip: 192.168.0.1
-  config:
-    community: "public"
+name: "Switch 1"
+ip: 192.168.0.1
+config:
+  community: "public"
 ```
 
 ## License

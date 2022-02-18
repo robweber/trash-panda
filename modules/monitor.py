@@ -22,7 +22,7 @@ def create_device(host):
         if('config' in host):
             result = classObj(host['name'], host['ip'], host['config'])
         else:
-            result = classObj(host['name'], host['ip'])
+            result = classObj(host['name'], host['ip'], {})
 
     return result
 

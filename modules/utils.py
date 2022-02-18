@@ -11,6 +11,7 @@ import yaml
 
 # full path to the running directory of the program
 DIR_PATH = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+NAGIOS_PATH = "/usr/lib/nagios/plugins/"
 
 # Redis Keys
 HOST_STATUS = "host_status"
