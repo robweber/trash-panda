@@ -8,13 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Added
 
-- added a generic network device, shows up/down status only
+- added a generic network device that allows for custom tcp and udp services
 - allow custom override of device icon
 
 ### Changed
 
 - switch to YAML for the format of the host config file for better readability and easier config
 - device classes are loaded dynamically in monitor class
+- check interval is now per-host with a system wide default. This is set in the host config
 
 ## 0.0.2
 

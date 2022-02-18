@@ -1,4 +1,6 @@
+import datetime
 import importlib
+import logging
 import modules.utils as utils
 from functools import reduce
 from slugify import slugify
@@ -34,51 +36,67 @@ class HostMonitor:
     """
 
     hosts = None
+    time_format = "%m-%d-%Y %I:%M%p"
     types = {"esxi", "switch", "generic"}
 
-    def __init__(self, file):
+    def __init__(self, file, default_interval):
         yaml_file = utils.read_yaml(file)
         self.hosts = yaml_file['hosts']
 
         # get host description by type
+        fake_time = (datetime.datetime.now() - datetime.timedelta(weeks=1)).strftime(self.time_format)
         for i in range(0, len(self.hosts)):
             device = create_device(self.hosts[i])
 
             # set the icon to either the class default or user custom
             self.hosts[i]['icon'] = device.icon if 'icon' not in self.hosts[i] else self.hosts[i]['icon']
+            # interval is either the default or whatever custom interval the user has set
+            self.hosts[i]['interval'] = default_interval if 'interval' not in self.hosts[i] else self.hosts[i]['interval']
             self.hosts[i]['info'] = device.info
 
+            # set the last check to way back to trigger an update
+            self.hosts[i]['last_check'] = fake_time
+            logging.info(f"Loading device {device.name} with check interval every {self.hosts[i]['interval']} min")
+
     def check_hosts(self):
-        result = []
+        now = datetime.datetime.now()
 
-        for aHost in self.hosts:
-            services = []
+        for i in range(0, len(self.hosts)):
+            aHost = self.hosts[i]
 
-            # if the host is a valid type, run service checks
-            if(aHost['type'] in self.types):
-                checker = create_device(aHost)
+            # check if we need to check this host
+            last_check = datetime.datetime.strptime(aHost['last_check'], self.time_format)
+            if(last_check < now - datetime.timedelta(minutes=aHost['interval'])):
+                logging.debug(f"Checking {aHost['name']}")
+                services = []
 
-                # based on above "checker" should always have a value
-                services = checker.check_host()
+                # if the host is a valid type, run service checks
+                if(aHost['type'] in self.types):
+                    checker = create_device(aHost)
 
-            # figure out the overall worst status
-            overall_status = reduce(lambda x, y: x if x['return_code'] > y['return_code'] else y, services)
-            aHost['overall_status'] = overall_status['return_code']
+                    # based on above "checker" should always have a value
+                    services = checker.check_host()
 
-            # figure out if the host is alive at all
-            host_alive = list(filter(lambda x: x['id'] == 'alive', services))
-            aHost['alive'] = host_alive[0]['return_code']
+                # figure out the overall worst status
+                overall_status = reduce(lambda x, y: x if x['return_code'] > y['return_code'] else y, services)
+                aHost['overall_status'] = overall_status['return_code']
 
-            # set services, sorted by name
-            aHost['services'] = sorted(services, key=lambda s: s['name'])
+                # figure out if the host is alive at all
+                host_alive = list(filter(lambda x: x['id'] == 'alive', services))
+                aHost['alive'] = host_alive[0]['return_code']
 
-            # create a slug to act as the id for lookups
-            if('id' not in aHost):
-                aHost['id'] = slugify(aHost['name'])
+                # set services, sorted by name
+                aHost['services'] = sorted(services, key=lambda s: s['name'])
 
-            result.append(aHost)
+                # create a slug to act as the id for lookups
+                if('id' not in aHost):
+                    aHost['id'] = slugify(aHost['name'])
 
-        return sorted(result, key=lambda o: o['name'])
+                # save the last check date
+                aHost['last_check'] = now.strftime(self.time_format)
+                self.hosts[i] = aHost
+
+        return sorted(self.hosts, key=lambda o: o['name'])
 
     def get_host(self, id):
         result = None  # return none if not found

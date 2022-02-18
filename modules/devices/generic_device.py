@@ -25,7 +25,7 @@ class GenericDevice(DRDevice):
     def __init__(self, name, address, config):
         super().__init__(name, address, "generic")
 
-        self.info = ("This is a generic IP network device that by default checks up/down status only." +
+        self.info = ("This is a generic IP network device that by default checks up/down status only. " +
                      "Services can be configured but are custom per device type.")
 
         if('services' in config):
