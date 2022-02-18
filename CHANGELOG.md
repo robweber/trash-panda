@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## Unreleased
+
+### Changed
+
+- switch to YAML for the format of the host config file for better readability and easier config
+
 ## 0.0.2
 
 ### Added

@@ -8,7 +8,7 @@ Install the repository according to the instructions in the [Install](install/In
 
 ### Usage
 
-Before the program can be used hosts need to be configured in the `hosts.json` file created during the install. Detailed instructions for how to do this for different host types is below. Running the program must be done with `sudo` as root privileges are needed to bind to a socket. Once running the dashboard page will be available at `http://server_ip:5000/`. _Note the port may be different if you change it using the arguments below._
+Before the program can be used hosts need to be configured in the `hosts.yaml` file created during the install. Detailed instructions for how to do this for different host types is below. Running the program must be done with `sudo` as root privileges are needed to bind to a socket. Once running the dashboard page will be available at `http://server_ip:5000/`. _Note the port may be different if you change it using the arguments below._
 
 ```
 sudo python3 dashboard.py
@@ -93,18 +93,16 @@ The status codes are determined by the settings for the device and the output of
 
 ## Hosts File
 
-The hosts file is where the configuration is set for what hosts are to be monitored when the program starts. This config is done using JSON as an array of values. At minimum each host needs the following config options:
+The hosts file is where the configuration is set for what hosts are to be monitored when the program starts. This config is done using YAML as an array of values. At minimum each host needs the following config options:
 
 * type - the host type as defined below
 * name - the name of the host to show up in the dashboard
 * ip - the ip to check for a basic PING status
 
 ```
-{
-  "type": "host_type",
-  "name": "Name",
-  "ip": "127.0.0.1"
-}
+type: host_type
+name: "Host Name"
+ip: 127.0.0.1
 ```
 
 The following additional options are available depending on the type of device:
@@ -119,17 +117,13 @@ The following additional options are available depending on the type of device:
 This will define checks on a stand alone ESXi server. This includes overall ESXi status, status of running VMs, and datastore use. Below is an example configuration:
 
 ```
-{
-  "type": "esxi",
-  "name": "ESXi 1",
-  "ip": "192.168.0.2",
-  "management_page": "https://192.168.0.2/ui/",
-  "config": {
-    "username": "root",
-    "password": "pass"
-  }
-}
-
+type: esxi
+  name: "ESXi 1"
+  ip: 192.168.0.2
+  management_page: "https://192.168.0.2/ui/"
+  config:
+    username: "root"
+    password: "pass"
 ```
 
 #### Switch
@@ -137,14 +131,11 @@ This will define checks on a stand alone ESXi server. This includes overall ESXi
 The switch host type will check the status of a basic managed switch that has generic SNMP enabled. Below is an example configuration:
 
 ```
-{
-  "type": "switch",
-  "name": "Switch 1",
-  "ip": "192.168.0.1",
-  "config": {
-    "community": "public"
-  }
-}
+type: switch
+  name: "Switch 1"
+  ip: 192.168.0.1
+  config:
+    community: "public"
 ```
 
 ## License
