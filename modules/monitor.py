@@ -3,6 +3,7 @@ from functools import reduce
 from slugify import slugify
 from modules.devices.esxi_device import ESXiDevice
 from modules.devices.switch_device import SwitchDevice
+from modules.devices.generic_device import GenericDevice
 
 
 def create_device(host):
@@ -12,7 +13,9 @@ def create_device(host):
     """
     result = None
 
-    if(host['type'] == 'esxi'):
+    if(host['type'] == 'generic'):
+        result = GenericDevice(host['name'], host['ip'])
+    elif(host['type'] == 'esxi'):
         result = ESXiDevice(host['name'], host['ip'], host['config'])
     elif(host['type'] == 'switch'):
         result = SwitchDevice(host['name'], host['ip'], host['config'])
@@ -27,7 +30,7 @@ class HostMonitor:
     """
 
     hosts = None
-    types = {"esxi", "switch"}
+    types = {"esxi", "switch", "generic"}
 
     def __init__(self, file):
         yaml_file = utils.read_yaml(file)
@@ -60,6 +63,7 @@ class HostMonitor:
             # figure out if the host is alive at all
             host_alive = list(filter(lambda x: x['id'] == 'alive', services))
             aHost['alive'] = host_alive[0]['return_code']
+
 
             # set services, sorted by name
             aHost['services'] = sorted(services, key=lambda s: s['name'])
