@@ -1,5 +1,8 @@
+import jinja2
 import os
+import os.path
 import modules.utils as utils
+import modules.jinja_custom as jinja_custom
 from .. device import DRDevice
 
 """
@@ -20,32 +23,46 @@ class GenericDevice(DRDevice):
     """
     Represents a generic network device, only alive status supported by default but services can be defined
     """
-    services = []
+    _services = []
+    _services_def = {}
+    _jinja = None
 
     def __init__(self, name, address, config):
         super().__init__(name, address, "generic")
+
+        # load the services definitions
+        self._services_def = utils.read_yaml(os.path.join(utils.DIR_PATH, 'conf', 'services.yaml'))
 
         self.info = ("This is a generic IP network device that by default checks up/down status only. " +
                      "Services can be configured but are custom per device type.")
 
         if('services' in config):
-            self.services = config['services']
+            self._services = config['services']
+
+        # load jinja environment
+        self._jinja = jinja2.Environment()
+        self._jinja.globals['default'] = jinja_custom.load_default
+        self._jinja.globals['path'] = os.path.join
+
+    def __render_template(self, t_string, jinja_vars):
+        template = self._jinja.from_string(t_string)
+
+        return template.render(jinja_vars)
 
     def __create_service_call(self, service):
         result = None
 
-        if(service['type'] in SERVICES):
-            serviceObj = SERVICES[service['type']]
+        if(service['type'] in self._services_def):
+            serviceObj = self._services_def[service['type']]
+            jinja_vars = {"NAGIOS_PATH": utils.NAGIOS_PATH, 'service': service}
 
             # set the command first and then slot the arg values
-            result = [serviceObj['command']]
-            args = serviceObj['args'].copy()
+            result = [self.__render_template(serviceObj['command'], jinja_vars)]
 
-            # slot the values
-            for slot in serviceObj['arg_slots'].keys():
-                # make sure the key exists
-                if(serviceObj['arg_slots'][slot] in service):
-                    args[slot] = str(service[serviceObj['arg_slots'][slot]])
+            # load the arg values
+            args = []
+            for arg in serviceObj['args']:
+                args.append(self.__render_template(arg, jinja_vars))
 
             # return everything as one array
             result = result + args
@@ -55,7 +72,7 @@ class GenericDevice(DRDevice):
     def _custom_checks(self):
         result = []
 
-        for s in self.services:
+        for s in self._services:
             output = self._run_process(self.__create_service_call(s), [])
             result.append(self._make_service(s['name'], output.returncode, output.stdout))
 
@@ -63,4 +80,4 @@ class GenericDevice(DRDevice):
 
     def _get_services(self):
         # get the names defined in the custom service list
-        return [s['name'] for s in self.services]
+        return [s['name'] for s in self._services]

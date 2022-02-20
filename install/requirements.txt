@@ -7,3 +7,4 @@ python-slugify
 pyvmomi
 redis
 pyyaml
+Jinja2
