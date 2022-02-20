@@ -54,10 +54,10 @@ class GenericDevice(DRDevice):
 
         if(service['type'] in self._services_def):
             serviceObj = self._services_def[service['type']]
-            jinja_vars = {"NAGIOS_PATH": utils.NAGIOS_PATH, 'service': service}
+            jinja_vars = {"NAGIOS_PATH": utils.NAGIOS_PATH, "SCRIPTS_PATH": os.path.join(utils.DIR_PATH, 'check_scripts'), 'service': service}
 
             # set the command first and then slot the arg values
-            result = [self.__render_template(serviceObj['command'], jinja_vars)]
+            result = self.__render_template(serviceObj['command'], jinja_vars).split(' ')
 
             # load the arg values
             args = []
