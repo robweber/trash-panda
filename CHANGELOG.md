@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 - added a generic network device that allows for custom tcp and udp services
 - allow custom override of device icon
+- added custom yaml !include directive to include other files within main hosts.yaml file
 
 ### Changed
 

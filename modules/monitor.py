@@ -1,6 +1,7 @@
 import datetime
 import importlib
 import logging
+import yaml
 import modules.utils as utils
 from functools import reduce
 from slugify import slugify
@@ -39,6 +40,7 @@ class HostMonitor:
     time_format = "%m-%d-%Y %I:%M%p"
 
     def __init__(self, file, default_interval):
+        yaml.add_constructor('!include', utils.custom_yaml_loader, Loader=yaml.SafeLoader)
         yaml_file = utils.read_yaml(file)
         self.hosts = yaml_file['hosts']
 

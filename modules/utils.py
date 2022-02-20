@@ -18,6 +18,13 @@ HOST_STATUS = "host_status"
 COMMAND_TASK_ID = "command_task_id"
 
 
+# custom YAML loader for !include syntax
+def custom_yaml_loader(loader, node):
+    yaml_file = loader.construct_scalar(node)
+    print(yaml_file)
+    return read_yaml(os.path.join(DIR_PATH, yaml_file))
+
+
 # read JSON formatted file
 def read_json(file):
     result = {}
