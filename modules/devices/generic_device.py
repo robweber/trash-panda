@@ -47,7 +47,7 @@ class GenericDevice(DRDevice):
     def __render_template(self, t_string, jinja_vars):
         template = self._jinja.from_string(t_string)
 
-        return template.render(jinja_vars)
+        return template.render(jinja_vars).strip()
 
     def __create_service_call(self, service):
         result = None
