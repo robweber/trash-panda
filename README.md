@@ -2,6 +2,8 @@
 
 This is a _very_ basic monitoring solution meant for simple home use. It will monitor the status of some basic IP systems and services in a simple dashboard. Some basic service and device type definitions are supplied; however more can be added by altering the YAML configuration files.
 
+## Table of Contents
+
 - [Install](#install)
 - [Usage](#usage)
 - [Dashboard](#dashboard)
