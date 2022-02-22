@@ -87,8 +87,9 @@ class HostMonitor:
 
         if(service['type'] in self.services):
             serviceObj = self.services[service['type']]
+            service_args = service['args'] if 'args' in service else {}
             jinja_vars = {"NAGIOS_PATH": utils.NAGIOS_PATH, "SCRIPTS_PATH": os.path.join(utils.DIR_PATH, 'check_scripts'),
-                          'service': service, 'host': host_config}
+                          'service': service_args, 'host': host_config}
 
             # set the command first and then slot the arg values
             result = self.__render_template(serviceObj['command'], jinja_vars).split(' ')
