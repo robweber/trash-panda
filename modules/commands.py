@@ -1,6 +1,5 @@
 import redis
 from celery import Celery
-from modules.monitor import create_device
 
 celery = Celery("task", broker='redis://localhost:6379/0', backend="redis://localhost:6379/0")
 db = redis.Redis('localhost', decode_responses=True)
@@ -13,7 +12,7 @@ def async_command(self, host, command):
                       meta={'progress': progress, 'message': f"Preparing command on {host['name']}"})
 
     # get the host object
-    host_obj = create_device(host)
+    host_obj = None
 
     # get some information about the command
     command_info = host_obj.find_command(command)

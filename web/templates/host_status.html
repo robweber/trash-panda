@@ -14,15 +14,13 @@
         <h5 class="card-title">Type: <span class="text-primary">{{ host['type'] | capitalize }}</span></h5>
         <p class="card-text">
           Last Check: {{ host['last_check'] }} <br />
-          IP Address: {{ host['ip'] }} <br />
+          IP Address: {{ host['address'] }} <br />
           {% if 'config' in host %}
             {% for c in host['config'].keys() %}
-              {% if host['config'][c] is not mapping and host['config'][c] is not sequence %}
               {% if "password" in c | lower %}
               {{ c | capitalize }}: ***** <br />
               {% else %}
               {{ c | capitalize }}: {{ host['config'][c] }} <br />
-              {% endif %}
               {% endif %}
             {% endfor %}
           {% endif %}

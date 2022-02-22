@@ -5,19 +5,6 @@ import modules.utils as utils
 import modules.jinja_custom as jinja_custom
 from .. device import DRDevice
 
-"""
-list of service types and their commands and arguments
-arguments are set via an array with placeholders the arg_slots definition
-defines which config named values go in which argument slots, if a named config
-value doesn't exist the placeholder value is used
-"""
-SERVICES = {"http": {"command": os.path.join(utils.NAGIOS_PATH, "check_http"),
-                     "args": ['-H', "", '-p', "80", "-u", "/"],
-                     "arg_slots": {1: "hostname", 3: "port", 5: "path"}},
-            "https": {"command": os.path.join(utils.NAGIOS_PATH, "check_http"),
-                      "args": ['-H', "", '-p', "443", "-u", "/", "-S"],
-                      "arg_slots": {1: "hostname", 3: "port", 5: "path"}}}
-
 
 class GenericDevice(DRDevice):
     """
@@ -32,12 +19,6 @@ class GenericDevice(DRDevice):
 
         # load the services definitions
         self._services_def = utils.read_yaml(os.path.join(utils.DIR_PATH, 'conf', 'services.yaml'))
-
-        self.info = ("This is a generic IP network device that by default checks up/down status only. " +
-                     "Services can be configured but are custom per device type.")
-
-        if('services' in config):
-            self._services = config['services']
 
         # load jinja environment
         self._jinja = jinja2.Environment()
