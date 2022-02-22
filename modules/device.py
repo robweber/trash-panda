@@ -39,7 +39,8 @@ class Device:
         """takes the current host configuration and returns it as a dictionary object, which
         can be serialized for JSON output"""
         result = {'type': self.type, 'id': self.id, 'name': self.name, 'address': self.address,
-                  'icon': self.icon, 'info': self.info, 'interval': self.interval, 'last_check': self.last_check}
+                  'icon': self.icon, 'info': self.info, 'interval': self.interval, 'last_check': self.last_check,
+                  'config': self.config }
 
         if(self.management_page is not None):
             result['management_page'] = self.management_page
@@ -89,7 +90,11 @@ class HostType:
             if(self.config[v]['required'] and v not in device_config):
                 # this value is required but missing
                 raise ConfigValueMissingError(device_name, v, self.type)
-            # TODO if not required but missing set the default value
+            elif(not self.config[v]['required'] and v not in device_config and 'default' in self.config[v]):
+                # set default if no value exists
+                device_config[v] = self.config[v]['default']
+
+        return device_config
 
     def create_device(self, device_def):
         result = None
@@ -113,7 +118,7 @@ class HostType:
         else:
             device_def['services'] = self.services
 
-        self.__check_defaults(device_def['name'], device_def['config'])
+        device_def['config'] = self.__check_defaults(device_def['name'], device_def['config'])
 
         result = Device(device_def)
 
