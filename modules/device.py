@@ -35,39 +35,13 @@ class Device:
         self.config['address'] = self.address
 
     def serialize(self):
+        """takes the current host configuration and returns it as a dictionary object, which
+        can be serialized for JSON output"""
         result = {'type': self.type, 'name': self.name, 'address': self.address, 'icon': self.icon,
                   'info': self.info, 'interval': self.interval, 'last_check': self.last_check}
 
         if(self.management_page is not None):
             result['management_page'] = self.management_page
-
-        return result
-
-    def check_host(self, services_def):
-        """
-        Called to run the checks on this host. If the ping check fails all subsequent checks are skipped
-        and a result listing them as Not Attempted (return code of 3) is used.
-        """
-        result = self.__serialize()
-
-        service_results = []
-        if(self._ping()):
-            logging.debug(f"{self.name}: Is Alive")
-
-            # the host is alive, continue checks
-            service_results = self._custom_checks(services_def)
-
-            service_results.append(self._make_service("Alive", 0, "Ping successfull!"))
-        else:
-            logging.debug(f"{self.name}: Is Not Alive")
-
-            # the host is not alive, set "unknown" for all other services
-            for service in self._get_services():
-                service_results.append(self._make_service(service, 3, "Not attempted"))
-
-            service_results.append(self._make_service("Alive", 2, "Ping failed"))
-
-        result['services'] = sorted(service_results, key=lambda s: s['name'])
 
         return result
 

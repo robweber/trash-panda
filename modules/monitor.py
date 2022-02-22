@@ -17,7 +17,7 @@ from modules.exceptions import ServiceNotFoundError
 class HostMonitor:
     """
     Reads in a list of host information from a given JSON file. Will run defined checks on all hosts
-    and return the results. Checks are run based on the loaded DRDevice class.
+    and return the results. Checks are run based on the loaded Device class.
     """
 
     types = None
@@ -53,6 +53,7 @@ class HostMonitor:
             logging.info(f"Loading device {device.name} with check interval every {device.interval} min")
 
     def __create_types(self, types_def, default_interval):
+        """Create devices type definitions based on defined YAML"""
         result = {}
 
         # create a host type for each defined type
@@ -63,6 +64,7 @@ class HostMonitor:
         return result
 
     def __create_device(self, device_def):
+        """Create a host device type based on defined YAML"""
         result = None
 
         if(device_def['type'] in self.types):
@@ -72,11 +74,16 @@ class HostMonitor:
         return result  # TODO - throw an error if it doesn't exist
 
     def __render_template(self, t_string, jinja_vars):
+        """renders template string using Jinja environment and returns the result"""
         template = self._jinja.from_string(t_string)
 
         return template.render(jinja_vars).strip()
 
     def __create_service_call(self, service, host_config):
+        """creates the service call based on the defined service definition and supplied arguments
+        function will run all arguments through Jinja templates to fully expand and then return an array
+        that can be sent to the __run_process function
+        """
         result = None
 
         if(service['type'] in self.services):
@@ -127,15 +134,15 @@ class HostMonitor:
             # the host is alive, continue checks
             service_results = self.__custom_checks(services, host.config)
 
-            service_results.append(self.__make_service("Alive", 0, "Ping successfull!"))
+            service_results.append(self.__make_service_output("Alive", 0, "Ping successfull!"))
         else:
             logging.debug(f"{host.name}: Is Not Alive")
 
             # the host is not alive, set "unknown" for all other services
             for service in services:
-                service_results.append(self.__make_service(service['name'], 3, "Not attempted"))
+                service_results.append(self.__make_service_output(service['name'], 3, "Not attempted"))
 
-            service_results.append(self.__make_service("Alive", 2, "Ping failed"))
+            service_results.append(self.__make_service_output("Alive", 2, "Ping failed"))
 
         result['services'] = sorted(service_results, key=lambda s: s['name'])
 
@@ -154,24 +161,26 @@ class HostMonitor:
         # if over 50% responded return True
         return True if (len(total)/len(responses) > .5) else False
 
-    def __make_service(self, name, return_code, text):
-        """
-        Helper method to take the name, return_code, and output and wrap
+    def __make_service_output(self, name, return_code, text):
+        """Helper method to take the name, return_code, and output and wrap
         it in a Dict.
         """
         return {"name": name, "return_code": return_code, "text": text, "id": slugify(name)}
 
     def __custom_checks(self, services, host_config):
+        """run defined custom service checks from a host given the current host configuration"""
         result = []
 
         for s in services:
             output = self.__run_process(self.__create_service_call(s, host_config), [])
-            result.append(self.__make_service(s['name'], output.returncode, output.stdout))
+            result.append(self.__make_service_output(s['name'], output.returncode, output.stdout))
             time.sleep(1)
 
         return result
 
     def check_hosts(self):
+        """runs host checks on any host currently outside of their check interval
+        the results are returned as an array"""
         now = datetime.datetime.now()
 
         for i in range(0, len(self.hosts)):
