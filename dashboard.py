@@ -93,6 +93,24 @@ def webapp_thread(port_number, debugMode=False, logHandlers=[]):
 
         return jsonify(status)
 
+    @app.route('/api/overall_status', methods=['GET'])
+    def overall_status():
+        overall_status = 0  # 0 is the target, means all is good
+        error_count = 0
+
+        # pull in all the hosts and get their overall status
+        hosts = utils.read_db(db, utils.VALID_HOSTS)
+        for name in hosts:
+            host = utils.read_db(db, f"{utils.HOST_STATUS}.{name}")
+            # set the higher of the two values
+            overall_status = host['overall_status'] if host['overall_status'] > overall_status else overall_status
+
+            if(host['overall_status'] > 0):
+                error_count = error_count + 1
+
+        return jsonify({"total_hosts": len(hosts), "hosts_with_errors": error_count, "overall_status": overall_status,
+                        "overall_status_description": utils.SERVICE_STATUSES[overall_status]})
+
     @app.route('/api/command/status', methods=['GET'])
     def command_status():
         result = {"task": "", "progress": 100, "status": "No Command Running"}

@@ -51,13 +51,15 @@ Clicking on a host name will show you more information about that device. Indivi
 
 ### API
 
-For integration with other systems the API can be used to pull in a JSON listing of all hosts and their statuses. This is available at: `http://server_ip:5000/api/status`. To decode the status return codes use the following:
+For integration with other systems the API can be used. To decode the status return codes use the following:
 
 * 0 - OK, everything normal
 * 1 - Warning, potential problem
 * 2 - Critical, definitely a problem
 
 The status codes are determined by the settings for the device and the output of the various check utilities. See the `check_scripts/` folder for individual scripts that are run.
+
+__/api/status__ - detailed listing of the status of each host
 
 ```
 [
@@ -89,6 +91,17 @@ The status codes are determined by the settings for the device and the output of
     "type": "switch"
   }
 ]
+```
+
+__/api/overall_status__ - a status summary of the overall status of all hosts
+
+```
+{
+  "hosts_with_errors": 0,
+  "overall_status": 0,
+  "overall_status_description": "OK",
+  "total_hosts": 3
+}
 ```
 
 ## Monitor File

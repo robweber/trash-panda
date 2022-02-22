@@ -19,7 +19,7 @@ HOST_STATUS = "host_status"
 COMMAND_TASK_ID = "command_task_id"
 
 # status description
-SERVICES_STATUSES = ["OK", "Warning", "Critical", "Unknown"]
+SERVICE_STATUSES = ["OK", "Warning", "Critical", "Unknown"]
 
 # custom YAML loader for !include syntax
 def custom_yaml_loader(loader, node):
