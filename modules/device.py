@@ -1,13 +1,5 @@
-import jinja2
 import logging
-import os.path
-import subprocess
-import time
-import modules.jinja_custom as jinja_custom
-import modules.utils as utils
-from slugify import slugify
-from pythonping import ping
-from modules.exceptions import ConfigValueMissingError, ServiceNotFoundError
+from modules.exceptions import ConfigValueMissingError
 
 
 class Device:
@@ -42,40 +34,7 @@ class Device:
         # set the address as part of the config
         self.config['address'] = self.address
 
-        # load jinja environment
-        self._jinja = jinja2.Environment()
-        self._jinja.globals['default'] = jinja_custom.load_default
-        self._jinja.globals['path'] = os.path.join
-
-    def __render_template(self, t_string, jinja_vars):
-        template = self._jinja.from_string(t_string)
-
-        return template.render(jinja_vars).strip()
-
-    def __create_service_call(self, service, services_def):
-        result = None
-
-        if(service['type'] in services_def):
-            serviceObj = services_def[service['type']]
-            jinja_vars = {"NAGIOS_PATH": utils.NAGIOS_PATH, "SCRIPTS_PATH": os.path.join(utils.DIR_PATH, 'check_scripts'),
-                          'service': service, 'host': self.config}
-
-            # set the command first and then slot the arg values
-            result = self.__render_template(serviceObj['command'], jinja_vars).split(' ')
-
-            # load the arg values
-            args = []
-            for arg in serviceObj['args']:
-                args.append(self.__render_template(arg, jinja_vars))
-
-            # return everything as one array
-            result = result + args
-        else:
-            raise ServiceNotFoundError(service['type'])
-
-        return result
-
-    def __serialize(self):
+    def serialize(self):
         result = {'type': self.type, 'name': self.name, 'address': self.address, 'icon': self.icon,
                   'info': self.info, 'interval': self.interval, 'last_check': self.last_check}
 
@@ -83,59 +42,6 @@ class Device:
             result['management_page'] = self.management_page
 
         return result
-
-    def _ping(self):
-        """
-        Will attempt to ping the IP address via ICMP and return True or False
-        True will only return if 50% or more pings are responded to
-        """
-        responses = ping(self.address, verbose=False, count=5)
-
-        # get total of "success" responses
-        total = list(filter(lambda x: x.success is True, responses))
-
-        # if over 50% responded return True
-        return True if (len(total)/len(responses) > .5) else False
-
-    # executes a subprocess (python script) and returns the results
-    def _run_process(self, program, args):
-        """
-        Kicks off a subprocess to run the defined program
-        with the given arguments. Returns subprocess output.
-        """
-        command = program + args
-        logging.debug(command)
-        # run process, pipe all output
-        output = subprocess.run(command, encoding="utf-8", stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-        return output
-
-    def _run_python(self, script, args):
-        """
-        Helper method to run python programs specifically
-        """
-        return self._run_process(["python3", script], args)
-
-    def _make_service(self, name, return_code, text):
-        """
-        Helper method to take the name, return_code, and output and wrap
-        it in a Dict.
-        """
-        return {"name": name, "return_code": return_code, "text": text, "id": slugify(name)}
-
-    def _custom_checks(self, services_def):
-        result = []
-
-        for s in self.services:
-            output = self._run_process(self.__create_service_call(s, services_def), [])
-            result.append(self._make_service(s['name'], output.returncode, output.stdout))
-            time.sleep(1)
-
-        return result
-
-    def _get_services(self):
-        # get the names defined in the custom service list
-        return [s['name'] for s in self.services]
 
     def check_host(self, services_def):
         """
@@ -169,7 +75,7 @@ class Device:
         """
         Returns and array of all services this device will check
         """
-        return ["Alive"] + self._get_services()
+        return self.services
 
 
 class HostType:
