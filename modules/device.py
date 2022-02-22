@@ -57,7 +57,8 @@ class DRDevice:
 
         if(service['type'] in services_def):
             serviceObj = services_def[service['type']]
-            jinja_vars = {"NAGIOS_PATH": utils.NAGIOS_PATH, "SCRIPTS_PATH": os.path.join(utils.DIR_PATH, 'check_scripts'), 'service': service, 'host': self.config}
+            jinja_vars = {"NAGIOS_PATH": utils.NAGIOS_PATH, "SCRIPTS_PATH": os.path.join(utils.DIR_PATH, 'check_scripts'),
+                          'service': service, 'host': self.config}
 
             # set the command first and then slot the arg values
             result = self.__render_template(serviceObj['command'], jinja_vars).split(' ')
@@ -197,12 +198,12 @@ class HostType:
         if('services' in type_def):
             self.services = type_def['services']
 
-    def __check_defaults(self, device_config):
+    def __check_defaults(self, device_name, device_config):
 
         for v in self.config:
             if(self.config[v]['required'] and v not in device_config):
                 # this value is required but missing
-                raise ConfigValueMissingError(v, self.type)
+                raise ConfigValueMissingError(device_name, v, self.type)
 
     def create_device(self, device_def):
         result = None
@@ -226,7 +227,7 @@ class HostType:
         else:
             device_def['services'] = self.services
 
-        self.__check_defaults(device_def['config'])
+        self.__check_defaults(device_def['name'], device_def['config'])
 
         result = DRDevice(device_def)
 
