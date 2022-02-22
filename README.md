@@ -2,6 +2,23 @@
 
 This is a _very_ basic monitoring solution meant for simple home use. It will monitor the status of some basic IP systems and services in a simple dashboard. Some basic service and device type definitions are supplied; however more can be added by altering the YAML configuration files.
 
+- [Install](#install)
+- [Usage](#usage)
+- [Dashboard](#dashboard)
+  - [API](#api)
+- [Monitor File](#monitor-file)
+- [Services](#services)
+- [Host Types](#host-types)
+- [Host Definitions](#host-definitions)
+  - [Optional Attributes](#optional-attributes)
+- [Templating](#templating)
+  - [Host](#host)
+  - [Service](#service)
+  - [Script Paths](#script-paths)
+  - [Custom Functions](#custom-functions)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Install
 
 Install the repository according to the instructions in the [Install](install/Install.md) guide. Once this is done you can proceed to the Usage section.
