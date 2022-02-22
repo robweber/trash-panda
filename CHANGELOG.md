@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
-## Unreleased
+## 1.0
 
 ### Added
 
@@ -17,6 +17,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - switch to YAML for the format of the host config file for better readability and easier config
 - device classes are loaded dynamically in monitor class
 - check interval is now per-host with a system wide default. This is set in the host config
+- all host configuration now done in YAML through the use of `services`, `types`, and `hosts` definitions, custom types are removed
+
+### Removed
+
+- removed custom Device class objects, custom types should be created within the `types` area of the YAML config
 
 ## 0.0.2
 
