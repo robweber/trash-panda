@@ -23,7 +23,7 @@ cd dr-dashboard
 PROJECT_DIR=$(pwd)
 
 # install python deps
-sudo pip3 install -r install/requirements.txt
+sudo -H pip3 install -r install/requirements.txt
 ```
 
 ### Celery setup
