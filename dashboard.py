@@ -119,7 +119,7 @@ def webapp_thread(port_number, debugMode=False, logHandlers=[]):
 parser = configargparse.ArgumentParser(description='Simple Monitoring')
 parser.add_argument('-c', '--config', is_config_file=True,
                     help='Path to custom config file')
-parser.add_argument('-f', '--file', default='conf/hosts.yaml',
+parser.add_argument('-f', '--file', default='conf/monitor.yaml',
                     help="Path to the config file for the host data, %(default)s by default")
 parser.add_argument('-p', '--port', default=5000,
                     help="Port number to run the web server on, %(default)d by default")

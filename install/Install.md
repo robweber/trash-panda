@@ -64,11 +64,11 @@ sudo service celeryd start
 
 ### Running the program
 
-A configuration file is needed. This will copy the example config to the default directory for editing. Edit this file according to the instructions in the README document and run the `dashboard.py` file. 
+A configuration file is needed. This will copy the example config to the default directory for editing. Edit this file according to the instructions in the README document and run the `dashboard.py` file.
 
 ```
 
 mkdir conf
-cp install/hosts_example.json conf/hosts.json
+cp install/monitor_example.yaml conf/monitor.yaml
 
 ```
