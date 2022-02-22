@@ -10,10 +10,10 @@ from pythonping import ping
 from modules.exceptions import ConfigValueMissingError, ServiceNotFoundError
 
 
-class DRDevice:
+class Device:
     """
-    Abstract device that represents a specific type of device.
-    Subclasses must implement specific methods or NotImplementedErrors will throw at runtime.
+    Represents a specific host device as defined by the user in the yaml config file
+    This merges in all parent items from the device type, including service checks
     """
     __jinja = None
 
@@ -173,6 +173,10 @@ class DRDevice:
 
 
 class HostType:
+    """Represents a specific HostType definition as defined by the user in the yaml config file
+    A host type defines services for a specific type of device, as well as any required configuration
+    options needed for service checks to work.
+    """
     type = None
     name = None
     info = ""
@@ -229,6 +233,6 @@ class HostType:
 
         self.__check_defaults(device_def['name'], device_def['config'])
 
-        result = DRDevice(device_def)
+        result = Device(device_def)
 
         return result
