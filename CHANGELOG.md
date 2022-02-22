@@ -11,6 +11,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - added a function to get all valid host id slugs from the monitor class
 - added DB key for the current list of valid hosts
 - added nagios plugins as part of base install
+- additional API endpoint `/api/overall_status` to get a summary of overall system statuses for all devices
+- throw an exception if a device type is referenced but doesn't actual exist
 
 ### Changed
 

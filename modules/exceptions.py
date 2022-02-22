@@ -1,3 +1,8 @@
+class DeviceNotFoundError(Exception):
+    """Exeption thrown when a device type definition is referenced but not found within a host config"""
+    def __init__(self, device_name, type):
+        super().__init__(f"There is no device type definition '{type}' referenced in host config for {device_name}")
+
 class ServiceNotFoundError(Exception):
     """Exception thrown when a service definition is referenced but not found within a host config"""
     def __init__(self, service_name):

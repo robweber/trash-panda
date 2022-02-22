@@ -11,7 +11,7 @@ import modules.utils as utils
 from functools import reduce
 from modules.device import HostType
 from pythonping import ping
-from modules.exceptions import ServiceNotFoundError
+from modules.exceptions import DeviceNotFoundError, ServiceNotFoundError
 
 
 class HostMonitor:
@@ -68,8 +68,9 @@ class HostMonitor:
         if(device_def['type'] in self.types):
             result = self.types[device_def['type']].create_device(device_def)
         else:
-            logging.error(f"Device type {device_def['type']} is not defined")
-        return result  # TODO - throw an error if it doesn't exist
+            raise DeviceNotFoundError(device_def['name'], device_def['type'])
+
+        return result
 
     def __render_template(self, t_string, jinja_vars):
         """renders template string using Jinja environment and returns the result"""
