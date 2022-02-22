@@ -72,3 +72,19 @@ mkdir conf
 cp install/monitor_example.yaml conf/monitor.yaml
 
 ```
+
+### Installing as a Service
+
+Install as a service by modifying the paths in the `install/simple-monitoring.service` file.
+
+```
+sudo cp install/simple-monitoring.service /etc/systemd/system/simple-monitoring.service
+sudo chown root:root /etc/systemd/system/simple-monitoring.service
+sudo systemctl enable simple-monitoring
+
+# start the service
+sudo systemctl start simple-monitoring
+
+# stop the Service
+sudo systemctl stop simple-monitoring
+```

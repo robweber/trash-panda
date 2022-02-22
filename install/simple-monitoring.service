@@ -1,0 +1,11 @@
+[Unit]
+Description=Simple Monitoring Service
+Requires=redis-server.service
+
+[Service]
+User=root
+WorkingDirectory=/home/simple-monitoring
+ExecStart=/usr/bin/python3 /home/simple-monitoring/dashboard.py -c /etc/default/simple-monitoring
+
+[Install]
+WantedBy=multi-user.target
