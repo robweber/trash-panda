@@ -1,3 +1,121 @@
+# this is a simple configuration file where all service, type, and host definitions are in one file.
+# These can be separated out as show in the documentation
+services:
+  http:
+    command: "{{ path(NAGIOS_PATH, 'check_http') }}"
+    args:
+      - "-H"
+      - "{{ service.hostname }}"
+      - "-p"
+      - "{{ default(service.port, 80) }}"
+      - "-u"
+      - "{{ default(service.path, '/') }}"
+  https:
+    command: "{{ path(NAGIOS_PATH, 'check_http') }}"
+    args:
+      - "-H"
+      - "{{ service.hostname }}"
+      - "-p"
+      - "{{ default(service.port, 443) }}"
+      - "-u"
+      - "{{ default(service.path, '/') }}"
+      - "-S"
+  mythtv_tuners:
+    command: "python3 {{ path(SCRIPTS_PATH, 'check_mythtv.py') }}"
+    args:
+      - "-H"
+      - "{{ service.hostname }}"
+      - "-p"
+      - "{{ default(service.port, 6544) }}"
+      - "-t"
+      - "tuner"
+  esxi_datastores:
+    command: "python3 {{ path(SCRIPTS_PATH, 'check_esxi.py')}}"
+    args:
+      - "-H"
+      - "{{ host.address }}"
+      - "-p"
+      - "{{ default(host.port, 443) }}"
+      - "-U"
+      - "{{ host.username }}"
+      - "-P"
+      - "{{ host.password }}"
+      - "-c"
+      - "{{ service.critical }}"
+      - "-w"
+      - "{{ service.warning }}"
+      - "-t"
+      - "datastore"
+  esxi_host_status:
+    command: "python3 {{ path(SCRIPTS_PATH, 'check_esxi.py')}}"
+    args:
+      - "-H"
+      - "{{ host.address }}"
+      - "-p"
+      - "{{ default(host.port, 443) }}"
+      - "-U"
+      - "{{ host.username }}"
+      - "-P"
+      - "{{ host.password }}"
+      - "-t"
+      - "status"
+  esxi_vm_status:
+    command: "python3 {{ path(SCRIPTS_PATH, 'check_esxi.py')}}"
+    args:
+      - "-H"
+      - "{{ host.address }}"
+      - "-p"
+      - "{{ default(host.port, 443) }}"
+      - "-U"
+      - "{{ host.username }}"
+      - "-P"
+      - "{{ host.password }}"
+      - "-t"
+      - "vms"
+  switch_uptime:
+    command: "python3 {{ path(SCRIPTS_PATH, 'check_snmp.py') }}"
+    args:
+      - "-H"
+      - "{{ host.address }}"
+      - "-c"
+      - "{{ host.community }}"
+      - "-o"
+      - "1.3.6.1.2.1.1.3.0"
+types:
+  esxi:
+    name: ESXi
+    icon: desktop-tower
+    config:
+      username:
+        required: True
+      password:
+        required: True
+      port:
+        required: False
+        default: 443
+    services:
+      - type: esxi_datastores
+        name: "Datastores"
+        critical: 90
+        warning: 85
+      - type: esxi_host_status
+        name: "Host Status"
+      - type: esxi_vm_status
+        name: "VM Status"
+  server:
+    name: Server
+    icon: server
+  switch:
+    name: Switch
+    icon: router-network
+    info: "This device type will work with generic managed switches. SNMP information must be correct and setup on the switch for services to properly be queried."
+    config:
+      community:
+        required: True
+        default: "public"
+    services:
+      - type: switch_uptime
+        name: "Switch Uptime"
 hosts:
   - type: switch
     name: "Switch 1"
