@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
-## Unreleased
+## 1.1
 
 ### Added
 
@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - added nagios plugins as part of base install
 - additional API endpoint `/api/overall_status` to get a summary of overall system statuses for all devices
 - throw an exception if a device type is referenced but doesn't actual exist
+- added service file and instructions for install
 
 ### Changed
 
