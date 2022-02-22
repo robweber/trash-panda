@@ -207,8 +207,9 @@ config:
 services:
   - type: http
     name: "Admin Page"
-    port: 5000
-    path: "/admin"
+    args:
+      port: 5000
+      path: "/admin"
 ```
 
 The above host will inherit the services from the __web_server__ type above but it also adds an additional http check on port 5000 for a different site. Both of these will be checked at run time.
