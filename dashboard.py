@@ -61,15 +61,12 @@ def webapp_thread(port_number, debugMode=False, logHandlers=[]):
         result = None
 
         # get the host status from the db
-        hosts = utils.read_db(db, utils.HOST_STATUS)
+        host = utils.read_db(db, f"{utils.HOST_STATUS}.{id}")
 
-        # find the one we're looking for
-        result = list(filter(lambda h: 'id' in h and h['id'] == id, hosts))
+        if(len(host) > 0):
+            result = host
 
-        if(len(result) == 1):
-            return result[0]
-        else:
-            return None
+        return result
 
     @app.route('/', methods=["GET"])
     def index():
@@ -88,8 +85,11 @@ def webapp_thread(port_number, debugMode=False, logHandlers=[]):
 
     @app.route('/api/status', methods=['GET'])
     def status():
+        # get a list of hosts
+        hosts = utils.read_db(db, utils.VALID_HOSTS)
+        
         # get the status of all the hosts
-        status = utils.read_db(db, utils.HOST_STATUS)
+        status = [utils.read_db(db, f"{utils.HOST_STATUS}.{h}") for h in hosts]
 
         return jsonify(status)
 
@@ -154,9 +154,15 @@ webAppThread.start()
 logging.info('Starting monitoring check daemon')
 monitor = HostMonitor(args.file, args.interval)
 
+# save a list of all valid host names
+utils.write_db(db, utils.VALID_HOSTS, monitor.get_hosts())
+
 while 1:
     logging.debug("Running host check")
     status = monitor.check_hosts()
-    utils.write_db(db, utils.HOST_STATUS, status)
+
+    for host in status:
+        utils.write_db(db, f"{utils.HOST_STATUS}.{host['id']}", host)
+
 
     time.sleep(60)

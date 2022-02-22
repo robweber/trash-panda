@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## Unreleased
+
+### Added
+
+- added a function to get all valid host id slugs from the monitor class
+- added DB key for the current list of valid hosts
+
+### Changed
+
+- `monitor.check_hosts()` only returns hosts that have changed, status updates are now cached per host in redis
+
 ## 1.0
 
 ### Added

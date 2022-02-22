@@ -14,6 +14,7 @@ DIR_PATH = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 NAGIOS_PATH = "/usr/lib/nagios/plugins/"
 
 # Redis Keys
+VALID_HOSTS = "host_names"
 HOST_STATUS = "host_status"
 COMMAND_TASK_ID = "command_task_id"
 

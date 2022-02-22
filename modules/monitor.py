@@ -5,10 +5,10 @@ import os.path
 import subprocess
 import time
 import yaml
+from slugify import slugify
 import modules.jinja_custom as jinja_custom
 import modules.utils as utils
 from functools import reduce
-from slugify import slugify
 from modules.device import HostType
 from pythonping import ping
 from modules.exceptions import ServiceNotFoundError
@@ -23,7 +23,6 @@ class HostMonitor:
     types = None
     services = None
     hosts = None
-    host_results = None
     time_format = "%m-%d-%Y %I:%M%p"
     __jinja = None
 
@@ -35,7 +34,6 @@ class HostMonitor:
         self.types = self.__create_types(yaml_file['types'], default_interval)
         self.services = yaml_file['services']
         self.hosts = []
-        self.host_results = {}
 
         # load jinja environment
         self._jinja = jinja2.Environment()
@@ -180,7 +178,8 @@ class HostMonitor:
 
     def check_hosts(self):
         """runs host checks on any host currently outside of their check interval
-        the results are returned as an array"""
+        the the updated hosts are returned as an array"""
+        result = []
         now = datetime.datetime.now()
 
         for i in range(0, len(self.hosts)):
@@ -202,16 +201,19 @@ class HostMonitor:
                 host_check['alive'] = host_alive[0]['return_code']
 
                 # create a slug to act as the id for lookups
-                host_check['id'] = slugify(aHost.name)
+                host_check['id'] = aHost.id
 
                 # save the last check date
                 aHost.last_check = now.strftime(self.time_format)
                 host_check['last_check'] = aHost.last_check
 
                 self.hosts[i] = aHost
-                self.host_results[aHost.name] = host_check
+                result.append(host_check)
 
-        return sorted(self.host_results.values(), key=lambda o: o['name'])
+        return sorted(result, key=lambda o: o['name'])
+
+    def get_hosts(self):
+        return sorted([h.id for h in self.hosts])
 
     def get_host(self, id):
         result = None  # return none if not found

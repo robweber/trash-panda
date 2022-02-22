@@ -1,4 +1,5 @@
 import logging
+from slugify import slugify
 from modules.exceptions import ConfigValueMissingError
 
 
@@ -21,6 +22,7 @@ class Device:
 
     def __init__(self, host_def):
         self.type = host_def['type']
+        self.id = slugify(host_def['name'])
         self.name = host_def['name']
         self.address = host_def['address']
         self.management_page = None if 'management_page' not in host_def else host_def['management_page']
@@ -37,8 +39,8 @@ class Device:
     def serialize(self):
         """takes the current host configuration and returns it as a dictionary object, which
         can be serialized for JSON output"""
-        result = {'type': self.type, 'name': self.name, 'address': self.address, 'icon': self.icon,
-                  'info': self.info, 'interval': self.interval, 'last_check': self.last_check}
+        result = {'type': self.type, 'id': self.id, 'name': self.name, 'address': self.address,
+                  'icon': self.icon, 'info': self.info, 'interval': self.interval, 'last_check': self.last_check}
 
         if(self.management_page is not None):
             result['management_page'] = self.management_page
@@ -88,6 +90,7 @@ class HostType:
             if(self.config[v]['required'] and v not in device_config):
                 # this value is required but missing
                 raise ConfigValueMissingError(device_name, v, self.type)
+            #TODO if not required but missing set the default value
 
     def create_device(self, device_def):
         result = None
