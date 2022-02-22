@@ -10,10 +10,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 - added a function to get all valid host id slugs from the monitor class
 - added DB key for the current list of valid hosts
+- added nagios plugins as part of base install
 
 ### Changed
 
 - `monitor.check_hosts()` only returns hosts that have changed, status updates are now cached per host in redis
+
+### Fixed
+
+- fixed address showing up twice on host status page
+- host config wasn't be passed back on /api/status call
 
 ## 1.0
 

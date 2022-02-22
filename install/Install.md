@@ -13,7 +13,7 @@ cd ~
 sudo apt-get update
 
 # install default packages we'll need
-sudo apt-get install apt-transport-https gnupg git python3 python3-pip redis-server wget
+sudo apt-get install apt-transport-https gnupg git nagios-plugins nagios-plugins-basic nagios-plugins-standard python3 python3-pip redis-server wget
 
 # clone repo
 git clone https://github.com/eau-claire-energy-cooperative/dr-dashboard.git
