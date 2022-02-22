@@ -1,0 +1,126 @@
+# schema for the yaml layout, validated at startup
+services:
+  required: True
+  type: dict
+  minlength: 1
+  valueschema:
+    type: dict
+    schema:
+      command:
+        required: True
+        type: string
+      args:
+        required: False
+        type: list
+        schema:
+          type:
+            - string
+            - integer
+types:
+  required: True
+  type: dict
+  minlength: 1
+  valueschema:
+    type: dict
+    schema:
+      name:
+        required: True
+        type: string
+      icon:
+        required: False
+        type: string
+      info:
+        required: False
+        type: string
+      interval:
+        required: False
+        type: integer
+      config:
+        required: False
+        type: dict
+        valueschema:
+          type: dict
+          schema:
+            required:
+              required: True
+              type: boolean
+            default:
+              required: False
+              type:
+                - string
+                - integer
+      services:
+        required: False
+        type: list
+        minlength: 1
+        schema:
+          type: dict
+          schema:
+            type:
+              required: True
+              type: string
+            name:
+              required: True
+              type: string
+            args:
+              required: False
+              type: dict
+              valueschema:
+                type:
+                  - string
+                  - integer
+hosts:
+  required: True
+  type: list
+  minlength: 1
+  schema:
+    type: dict
+    schema:
+      type:
+        required: True
+        type: string
+      name:
+        required: True
+        type: string
+      address:
+        required: True
+        type: string
+      interval:
+        required: False
+        type: integer
+      icon:
+        required: False
+        type: string
+      info:
+        required: False
+        type: string
+      management_page:
+        required: False
+        type: string
+      config:
+        required: False
+        type: dict
+        valueschema:
+          type:
+            - string
+            - integer
+      services:
+        required: False
+        type: list
+        minlength: 1
+        schema:
+          type: dict
+          schema:
+            type:
+              required: True
+              type: string
+            name:
+              required: True
+              type: string
+            args:
+              required: False
+              type: dict
+              valueschema:
+                type:
+                  - string
+                  - integer

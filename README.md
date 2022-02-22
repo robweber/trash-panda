@@ -8,7 +8,7 @@ This is a _very_ basic monitoring solution meant for simple home use. It will mo
 - [Usage](#usage)
 - [Dashboard](#dashboard)
   - [API](#api)
-- [Monitor File](#monitor-file)
+- [Config File](#config-file)
 - [Services](#services)
 - [Host Types](#host-types)
 - [Host Definitions](#host-definitions)
@@ -123,9 +123,9 @@ __/api/overall_status__ - a status summary of the overall status of all hosts
 }
 ```
 
-## Monitor File
+## Config File
 
-The monitor file is where the configuration is set for services, device type, and host definitions which are loaded when the program starts. This config is done using YAML. The sections below are all needed but can be separated into their own files for ease of readability. Look at the example file `install/monitor_example.yaml` for a full example.
+The monitor file is where the configuration is set for services, device type, and host definitions which are loaded when the program starts. This config is done using YAML. The sections below are all needed but can be separated into their own files for ease of readability. Look at the example file `install/monitor_example.yaml` for a full example. Errors in syntax will be flagged on startup.
 
 * services - an array of service definitions that can be included in device types or individual hosts
 * types - definitions for specific device types and required configuration variables needed.

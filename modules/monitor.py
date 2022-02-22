@@ -3,11 +3,13 @@ import jinja2
 import logging
 import os.path
 import subprocess
+import sys
 import time
 import yaml
-from slugify import slugify
 import modules.jinja_custom as jinja_custom
 import modules.utils as utils
+from cerberus import Validator
+from slugify import slugify
 from functools import reduce
 from modules.device import HostType
 from pythonping import ping
@@ -29,6 +31,14 @@ class HostMonitor:
     def __init__(self, file, default_interval):
         yaml.add_constructor('!include', utils.custom_yaml_loader, Loader=yaml.SafeLoader)
         yaml_file = utils.read_yaml(file)
+
+        # validate the config file
+        schema = utils.read_yaml(os.path.join(utils.DIR_PATH, 'install', 'schema.yaml'))
+        v = Validator(schema)
+        if(not v.validate(yaml_file, schema)):
+            logging.error(f"Error reading configuration file")
+            logging.error(str(v.errors))
+            sys.exit(2)
 
         # create the host type and services definitions
         self.types = self.__create_types(yaml_file['types'], default_interval)

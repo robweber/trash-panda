@@ -1,4 +1,5 @@
 celery
+cerberus
 configargparse
 hnmp
 Flask

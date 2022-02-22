@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## Unreleased
 
+### Added
+
+- added schema validator for checking the layout of the yaml file on startup
+
 ### Changed
 
 - service arguments are now under an `args` key
