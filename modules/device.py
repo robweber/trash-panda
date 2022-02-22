@@ -129,7 +129,7 @@ class Device:
         for s in self.services:
             output = self._run_process(self.__create_service_call(s, services_def), [])
             result.append(self._make_service(s['name'], output.returncode, output.stdout))
-            time.sleep(2)
+            time.sleep(1)
 
         return result
 
