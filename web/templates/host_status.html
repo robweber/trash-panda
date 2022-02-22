@@ -17,10 +17,12 @@
           IP Address: {{ host['address'] }} <br />
           {% if 'config' in host %}
             {% for c in host['config'].keys() %}
+              {% if c != 'address' %}
               {% if "password" in c | lower %}
               {{ c | capitalize }}: ***** <br />
               {% else %}
               {{ c | capitalize }}: {{ host['config'][c] }} <br />
+              {% endif %}
               {% endif %}
             {% endfor %}
           {% endif %}
