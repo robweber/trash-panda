@@ -14,6 +14,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 - service arguments are now under an `args` key
 
+### Fixed
+
+- added catch for rare condition where overall status is not available for a particular host
+
 ## 1.1
 
 ### Added
