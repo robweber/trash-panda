@@ -87,7 +87,7 @@ def webapp_thread(port_number, debugMode=False, logHandlers=[]):
     def status():
         # get a list of hosts
         hosts = utils.read_db(db, utils.VALID_HOSTS)
-        
+
         # get the status of all the hosts
         status = [utils.read_db(db, f"{utils.HOST_STATUS}.{h}") for h in hosts]
 
@@ -163,6 +163,5 @@ while 1:
 
     for host in status:
         utils.write_db(db, f"{utils.HOST_STATUS}.{host['id']}", host)
-
 
     time.sleep(60)

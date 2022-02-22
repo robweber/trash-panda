@@ -1,4 +1,3 @@
-import logging
 from slugify import slugify
 from modules.exceptions import ConfigValueMissingError
 
@@ -90,7 +89,7 @@ class HostType:
             if(self.config[v]['required'] and v not in device_config):
                 # this value is required but missing
                 raise ConfigValueMissingError(device_name, v, self.type)
-            #TODO if not required but missing set the default value
+            # TODO if not required but missing set the default value
 
     def create_device(self, device_def):
         result = None
