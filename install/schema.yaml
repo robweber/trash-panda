@@ -117,6 +117,9 @@ hosts:
             name:
               required: True
               type: string
+            service_url:
+              required: False
+              type: string
             args:
               required: False
               type: dict

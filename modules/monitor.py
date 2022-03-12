@@ -171,11 +171,16 @@ class HostMonitor:
         # if over 50% responded return True
         return True if (len(total)/len(responses) > .5) else False
 
-    def __make_service_output(self, name, return_code, text):
+    def __make_service_output(self, name, return_code, text, url=None):
         """Helper method to take the name, return_code, and output and wrap
         it in a Dict.
         """
-        return {"name": name, "return_code": return_code, "text": text, "id": slugify(name)}
+        result = {"name": name, "return_code": return_code, "text": text, "id": slugify(name)}
+
+        if(url is not None):
+            result['service_url'] = url
+
+        return result
 
     def __custom_checks(self, services, host_config):
         """run defined custom service checks from a host given the current host configuration"""
@@ -183,7 +188,7 @@ class HostMonitor:
 
         for s in services:
             output = self.__run_process(self.__create_service_call(s, host_config), [])
-            result.append(self.__make_service_output(s['name'], output.returncode, output.stdout))
+            result.append(self.__make_service_output(s['name'], output.returncode, output.stdout, s['service_url'] if 'service_url' in s else None))
             time.sleep(1)
 
         return result
