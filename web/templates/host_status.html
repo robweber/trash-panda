@@ -39,7 +39,12 @@
 <table class="table table-striped mt-3">
   {% for row in host['services']: %}
   <tr>
-    <td class="{{ current_status[row['return_code']] }}" width="25%">{{ row['name'] }}</td>
+    <td class="{{ current_status[row['return_code']] }}" width="25%">
+      {{ row['name'] }}
+      {% if('service_url' in row) %}
+      <a href="{{ row['service_url'] }}" target="_blank" class="mdi mdi-launch icon-sm icon-inline"></a>
+      {% endif %}
+    </td>
     <td class="{{ status_text[row['return_code']] }}">{{ row['text'].replace("\n", '<br />') | safe }}</td>
   </tr>
   {% endfor %}
