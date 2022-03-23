@@ -4,6 +4,7 @@ config:
   type: dict
   default:
     default_interval: 3
+    check_on_startup: True
   schema:
     default_interval:
       required: False
@@ -11,6 +12,10 @@ config:
       default: 3
       min: 1
       max: 86400
+    check_on_startup:
+      required: False
+      type: boolean
+      default: True
 services:
   required: True
   type: dict

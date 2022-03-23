@@ -152,10 +152,12 @@ Global configuration options are set under the `config` key in the YAML configur
 ```
 config:
   default_interval: 3
+  check_on_startup: True
 
 ```
 
 * default_interval - the default host check interval, in minutes. This will default to 3 unless changed. [Individual hosts](#host-types) can set their own interval if needed.
+* check_on_startup - if hosts should all be checked immediately after startup. Defaults to True. If this is set to False, host checks will start on their normal interval from the program start time. 
 
 ## Services
 
