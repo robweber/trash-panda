@@ -9,6 +9,7 @@ import yaml
 import modules.jinja_custom as jinja_custom
 import modules.utils as utils
 from cerberus import Validator
+from random import randint
 from slugify import slugify
 from functools import reduce
 from modules.device import HostType
@@ -210,9 +211,9 @@ class HostMonitor:
         for i in range(0, len(self.hosts)):
             aHost = self.hosts[i]
 
-            # check if we need to check this host
+            # check if we need to check this host, add or subtract a bit from each check interval to help with system load
             last_check = datetime.datetime.strptime(aHost.last_check, self.time_format)
-            if(last_check < now - datetime.timedelta(minutes=aHost.interval)):
+            if(last_check < now - datetime.timedelta(minutes=(aHost.interval), seconds=randint(-60, 60))):
                 logging.debug(f"Checking {aHost.name}")
 
                 host_check = self.__check_host(aHost)
