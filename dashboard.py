@@ -144,8 +144,6 @@ parser.add_argument('-f', '--file', default='conf/monitor.yaml',
                     help="Path to the config file for the host data, %(default)s by default")
 parser.add_argument('-p', '--port', default=5000,
                     help="Port number to run the web server on, %(default)d by default")
-parser.add_argument('-i', '--interval', default=3, type=int,
-                    help="The host check interval, in minutes. %(default)d by default")
 parser.add_argument('-D', '--debug', action='store_true',
                     help='If the program should run in debug mode')
 
@@ -173,7 +171,7 @@ webAppThread.setDaemon(True)
 webAppThread.start()
 
 logging.info('Starting monitoring check daemon')
-monitor = HostMonitor(args.file, args.interval)
+monitor = HostMonitor(args.file)
 
 # save a list of all valid host names
 utils.write_db(db, utils.VALID_HOSTS, monitor.get_hosts())

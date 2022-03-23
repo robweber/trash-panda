@@ -1,5 +1,8 @@
 # this is a simple configuration file where all service, type, and host definitions are in one file.
 # These can be separated out as show in the documentation
+config:
+  # this is optional and will default to 3 if missing
+  default_interval: 3
 services:
   http:
     command: "{{ path(NAGIOS_PATH, 'check_http') }}"

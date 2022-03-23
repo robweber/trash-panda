@@ -28,7 +28,7 @@ class HostMonitor:
     time_format = "%m-%d-%Y %I:%M%p"
     __jinja = None
 
-    def __init__(self, file, default_interval):
+    def __init__(self, file):
         yaml.add_constructor('!include', utils.custom_yaml_loader, Loader=yaml.SafeLoader)
         yaml_file = utils.read_yaml(file)
 
@@ -40,8 +40,11 @@ class HostMonitor:
             logging.error(str(v.errors))
             sys.exit(2)
 
+        # normalize for missing values
+        yaml_file = v.normalized(yaml_file)
+
         # create the host type and services definitions
-        self.types = self.__create_types(yaml_file['types'], default_interval)
+        self.types = self.__create_types(yaml_file['types'], yaml_file['config']['default_interval'])
         self.services = yaml_file['services']
         self.hosts = []
 

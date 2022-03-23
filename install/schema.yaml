@@ -1,4 +1,16 @@
 # schema for the yaml layout, validated at startup
+config:
+  required: False
+  type: dict
+  default:
+    default_interval: 3
+  schema:
+    default_interval:
+      required: False
+      type: integer
+      default: 3
+      min: 1
+      max: 86400
 services:
   required: True
   type: dict
