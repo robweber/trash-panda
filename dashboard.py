@@ -21,7 +21,6 @@ import threading
 import time
 import modules.utils as utils
 from modules.monitor import HostMonitor
-from modules.commands import async_command
 from flask import Flask, flash, render_template, jsonify, redirect
 
 db = redis.Redis('localhost', decode_responses=True)
@@ -39,10 +38,6 @@ def webapp_thread(port_number, debugMode=False, logHandlers=[]):
 
     # generate random number for session secret key
     app.secret_key = os.urandom(24)
-
-    # setup broker URLs
-    app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
-    app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
 
     # add handlers for this app
     for h in logHandlers:
@@ -113,24 +108,6 @@ def webapp_thread(port_number, debugMode=False, logHandlers=[]):
 
         return jsonify({"total_hosts": len(hosts), "hosts_with_errors": error_count, "overall_status": overall_status,
                         "overall_status_description": utils.SERVICE_STATUSES[overall_status]})
-
-    @app.route('/api/command/status', methods=['GET'])
-    def command_status():
-        result = {"task": "", "progress": 100, "status": "No Command Running"}
-
-        # check if there is a running command
-        task = utils.read_db(db, utils.COMMAND_TASK_ID)
-
-        if('id' in task):
-            # get the task info from the celery broker
-            result['task'] = task['id']
-            task_status = async_command.AsyncResult(task['id'])
-
-            if(task_status.state == "RUNNING"):
-                result['status'] = task_status.info.get('message', '')
-                result['progress'] = task_status.info.get('progress', 0)
-
-        return jsonify(result)
 
     # run the web app
     app.run(debug=debugMode, host='0.0.0.0', port=port_number, use_reloader=False)

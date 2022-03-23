@@ -1,4 +1,3 @@
-celery
 cerberus
 configargparse
 hnmp

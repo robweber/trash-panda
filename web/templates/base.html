@@ -8,38 +8,6 @@
         <script src="/static/js/jquery.min.js"></script>
         <script src="/static/js/popper.min.js"></script>
         <script src="/static/js/bootstrap.min.js"></script>
-        <script type="text/javascript">
-
-        function check_command_running(){
-          // check if there is a system command running async from the browser
-          $.ajax({type: 'GET', url: '/api/command/status', success: function(data, status, request){
-            alertBox = $('#js-command-running');
-
-            // if the command isn't complete, display the status
-            if(data.progress != 100)
-            {
-              //something is running
-              alertBox.text(data.status);
-
-              //show alert if not already visible
-              if(!alertBox.is(":visible"))
-              {
-                alertBox.show();
-              }
-
-              // check again in 15 seconds
-              setTimeout(check_command_running, 15000);
-            }
-            else if(alertBox.is(":visible"))
-            {
-              //the command has completed
-              alertBox.text(data.status);
-              alertBox.toggleClass(["alert-primary", "alert-success"])
-              alertBox.delay(2500).fadeOut();
-            }
-          }});
-        }
-        </script>
         {% block header %}{% endblock %}
     </head>
     <body>
@@ -65,13 +33,9 @@
         {% endfor %}
         <div id="js-success-alert" class="alert alert-success" style="display:none" role="alert"></div>
         <div id="js-error-alert" class="alert alert-danger" style="display:none" role="alert"></div>
-        <div id="js-command-running" class="alert alert-primary" style="display:none" role="alert"></div>
         {% block content %}{% endblock %}
         <script type="text/javascript">
           $(document).ready(function () {
-            //run command check
-            check_command_running();
-
             // unique page functions to load here
             {% block onload_scripts %}{% endblock %}
           });

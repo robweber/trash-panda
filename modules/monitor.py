@@ -54,9 +54,9 @@ class HostMonitor:
         self._jinja.globals['path'] = os.path.join
 
         # if we should force a check on startup
-        logging.info(f"Force check: {yaml_file['config']['check_on_startup']}")
         fake_time = datetime.datetime.now().strftime(self.time_format)
         if(yaml_file['config']['check_on_startup']):
+            logging.info(f"Forcing host check on startup")
             fake_time = (datetime.datetime.now() - datetime.timedelta(weeks=1)).strftime(self.time_format)
 
         # get host description by type
