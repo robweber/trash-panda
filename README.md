@@ -9,6 +9,7 @@ This is a _very_ basic monitoring solution meant for simple home use. It will mo
 - [Dashboard](#dashboard)
   - [API](#api)
 - [Config File](#config-file)
+  - [Global Configuration](#global-configuration)
 - [Services](#services)
 - [Host Types](#host-types)
 - [Host Definitions](#host-definitions)
@@ -44,7 +45,7 @@ A full list of arguments can be found by using the `-h` flag.
 ```
 python3 dashboard.py -h
 
-usage: dashboard.py [-h] [-c CONFIG] [-f FILE] [-p PORT] [-i INTERVAL] [-D]
+usage: dashboard.py [-h] [-c CONFIG] [-f FILE] [-p PORT] [-D]
 
 Simple Monitoring
 
@@ -55,9 +56,6 @@ optional arguments:
   -f FILE, --file FILE  Path to the config file for the host data,
                         conf/monitor.json by default
   -p PORT, --port PORT  Port number to run the web server on, 5000 by default
-  -i INTERVAL, --interval INTERVAL
-                        The host check interval, in minutes. 3 by
-                        default
   -D, --debug           If the program should run in debug mode
 
 ```
@@ -127,12 +125,14 @@ __/api/overall_status__ - a status summary of the overall status of all hosts
 
 The monitor file is where the configuration is set for services, device type, and host definitions which are loaded when the program starts. This config is done using YAML. The sections below are all needed but can be separated into their own files for ease of readability. Look at the example file `install/monitor_example.yaml` for a full example. Errors in syntax will be flagged on startup.
 
+* config - items that control the overall configuration of the monitor service
 * services - an array of service definitions that can be included in device types or individual hosts
 * types - definitions for specific device types and required configuration variables needed.
 * hosts - a list of the actual hosts to be monitored on the network. Each one must inherit a device type but can add their own service checks.
 
 Example file where these are imported from separate files:
 ```
+config: !include conf/config.yaml
 services: !include conf/services.yaml
 types: !include conf/types.yaml
 hosts: !include conf/hosts.yaml
@@ -144,6 +144,18 @@ The following additional options are available depending on the type of device:
 * icon - the icon to use for the device, overrides the default type. Should be found on [Material Design Icons](https://materialdesignicons.com/)
 * interval - how often this host should be checked, in minutes. If not given this is the system default.
 * config - an additional mapping of config options specific to this host type
+
+### Global Configuration
+
+Global configuration options are set under the `config` key in the YAML configuration file. Some have defaults set and can be omitted if not needed.
+
+```
+config:
+  default_interval: 3
+
+```
+
+* default_interval - the default host check interval, in minutes. This will default to 3 unless changed. [Individual hosts](#host-types) can set their own interval if needed.
 
 ## Services
 

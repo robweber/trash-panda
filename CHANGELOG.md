@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Changed
 
 - service arguments are now under an `args` key
+- moved default interval from a command line argument to setting within the yaml file
 
 ### Fixed
 
