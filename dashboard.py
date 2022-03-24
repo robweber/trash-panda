@@ -11,6 +11,7 @@ sudo python3 dashboard.py -h
 """
 
 
+import asyncio
 import configargparse
 import logging
 import os
@@ -19,7 +20,10 @@ import signal
 import sys
 import threading
 import time
+import yaml
 import modules.utils as utils
+import modules.notifications as notifier
+from cerberus import Validator
 from modules.monitor import HostMonitor
 from flask import Flask, flash, render_template, jsonify, redirect
 
@@ -113,6 +117,39 @@ def webapp_thread(port_number, debugMode=False, logHandlers=[]):
     app.run(debug=debugMode, host='0.0.0.0', port=port_number, use_reloader=False)
 
 
+def load_config_file(file):
+    """Load the YAML config file and validate it's structure
+    errors in the file will halt the program
+    """
+    yaml.add_constructor('!include', utils.custom_yaml_loader, Loader=yaml.SafeLoader)
+    yaml_file = utils.read_yaml(file)
+
+    # validate the config file
+    schema = utils.read_yaml(os.path.join(utils.DIR_PATH, 'install', 'schema.yaml'))
+    v = Validator(schema)
+    if(not v.validate(yaml_file, schema)):
+        logging.error("Error reading configuration file")
+        logging.error(str(v.errors))
+        sys.exit(2)
+
+    # normalize for missing values
+    return v.normalized(yaml_file)
+
+
+async def check_notifications(notify, old_host, new_host):
+    """check if any service statuses have changed and send notifications
+    this method will be called asynchronously through asynio
+    """
+    # check if the host is up at all
+    if(len(old_host) >0 and new_host['alive'] != old_host['alive']):
+        notify.notify_host(new_host['name'], new_host['alive'])
+    else:
+        # check the service statuses
+        for i in range(0, len(new_host['services'])):
+            if(len(old_host) > 0 and new_host['services'][i]['return_code'] != old_host['services'][i]['return_code']):
+                # something has changed in this service's status
+                notify.notify_service(new_host['name'], new_host['services'][i])
+
 # parse the CLI args
 parser = configargparse.ArgumentParser(description='Simple Monitoring')
 parser.add_argument('-c', '--config', is_config_file=True,
@@ -141,6 +178,14 @@ logging.basicConfig(datefmt='%m/%d %H:%M',
 # set host list (blank)
 utils.write_db(db, utils.HOST_STATUS, [])
 
+# load the config file
+yaml_file = load_config_file(args.file)
+
+# create the notifier, if needed
+notify = None
+if('notifier' in yaml_file['config']):
+    notify = notifier.create_notifier(yaml_file['config']['notifier'])
+
 # start the web app
 logging.info('Starting DR Dashboard Web Service')
 webAppThread = threading.Thread(name='Web App', target=webapp_thread, args=(args.port, True, logHandlers))
@@ -148,7 +193,7 @@ webAppThread.setDaemon(True)
 webAppThread.start()
 
 logging.info('Starting monitoring check daemon')
-monitor = HostMonitor(args.file)
+monitor = HostMonitor(yaml_file)
 
 # save a list of all valid host names
 utils.write_db(db, utils.VALID_HOSTS, monitor.get_hosts())
@@ -158,6 +203,11 @@ while 1:
     status = monitor.check_hosts()
 
     for host in status:
+        # send notifications, if there are any
+        if(notify is not None):
+            asyncio.run(check_notifications(notify, utils.read_db(db, f"{utils.HOST_STATUS}.{host['id']}"), host))
+
+        # save the updated host
         utils.write_db(db, f"{utils.HOST_STATUS}.{host['id']}", host)
 
     time.sleep(60)

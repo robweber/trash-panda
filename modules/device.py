@@ -40,7 +40,7 @@ class Device:
         can be serialized for JSON output"""
         result = {'type': self.type, 'id': self.id, 'name': self.name, 'address': self.address,
                   'icon': self.icon, 'info': self.info, 'interval': self.interval, 'last_check': self.last_check,
-                  'config': self.config }
+                  'config': self.config}
 
         if(self.management_page is not None):
             result['management_page'] = self.management_page

@@ -3,12 +3,9 @@ import jinja2
 import logging
 import os.path
 import subprocess
-import sys
 import time
-import yaml
 import modules.jinja_custom as jinja_custom
 import modules.utils as utils
-from cerberus import Validator
 from random import randint
 from slugify import slugify
 from functools import reduce
@@ -29,21 +26,7 @@ class HostMonitor:
     time_format = "%m-%d-%Y %I:%M%p"
     __jinja = None
 
-    def __init__(self, file):
-        yaml.add_constructor('!include', utils.custom_yaml_loader, Loader=yaml.SafeLoader)
-        yaml_file = utils.read_yaml(file)
-
-        # validate the config file
-        schema = utils.read_yaml(os.path.join(utils.DIR_PATH, 'install', 'schema.yaml'))
-        v = Validator(schema)
-        if(not v.validate(yaml_file, schema)):
-            logging.error(f"Error reading configuration file")
-            logging.error(str(v.errors))
-            sys.exit(2)
-
-        # normalize for missing values
-        yaml_file = v.normalized(yaml_file)
-
+    def __init__(self, yaml_file):
         # create the host type and services definitions
         self.types = self.__create_types(yaml_file['types'], yaml_file['config']['default_interval'])
         self.services = yaml_file['services']
@@ -57,7 +40,7 @@ class HostMonitor:
         # if we should force a check on startup
         fake_time = datetime.datetime.now().strftime(self.time_format)
         if(yaml_file['config']['check_on_startup']):
-            logging.info(f"Forcing host check on startup")
+            logging.info("Forcing host check on startup")
             fake_time = (datetime.datetime.now() - datetime.timedelta(weeks=1)).strftime(self.time_format)
 
         # get host description by type

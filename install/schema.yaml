@@ -16,6 +16,25 @@ config:
       required: False
       type: boolean
       default: True
+    notifier:
+      required: False
+      type: dict
+      schema:
+        type:
+          required: True
+          type: string
+          allowed:
+            - log
+        args:
+          required: False
+          type: dict
+          valueschema:
+            type:
+              - string
+              - integer
+              - boolean
+          default:
+            args: none
 services:
   required: True
   type: dict
