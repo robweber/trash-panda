@@ -142,7 +142,7 @@ class HostMonitor:
 
             # the host is not alive, set "unknown" for all other services
             for service in services:
-                service_results.append(self.__make_service_output(service['name'], 3, "Not attempted"))
+                service_results.append(self.__make_service_output(service['name'], 3, "Not attempted", service['service_url']))
 
             service_results.append(self.__make_service_output("Alive", 2, "Ping failed"))
 
@@ -163,13 +163,13 @@ class HostMonitor:
         # if over 50% responded return True
         return True if (len(total)/len(responses) > .5) else False
 
-    def __make_service_output(self, name, return_code, text, url=None):
+    def __make_service_output(self, name, return_code, text, url=""):
         """Helper method to take the name, return_code, and output and wrap
         it in a Dict.
         """
         result = {"name": name, "return_code": return_code, "text": text, "id": slugify(name)}
 
-        if(url is not None):
+        if(url.strip() != ""):
             result['service_url'] = url
 
         return result
@@ -180,7 +180,7 @@ class HostMonitor:
 
         for s in services:
             output = self.__run_process(self.__create_service_call(s, host_config), [])
-            result.append(self.__make_service_output(s['name'], output.returncode, output.stdout, s['service_url'] if 'service_url' in s else None))
+            result.append(self.__make_service_output(s['name'], output.returncode, output.stdout, s['service_url']))
             time.sleep(1)
 
         return result

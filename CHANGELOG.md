@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 - catch for if services are added/removed from a host when checking notifications. For now just skip the notification check until the next run
 
+### Changed
+
+- used the default setting of the schema document to set the service_url so that something always exists in that field instead of checking for None all the time
+
 ## 2.0
 
 ### Added

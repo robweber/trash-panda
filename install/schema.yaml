@@ -99,6 +99,10 @@ types:
             name:
               required: True
               type: string
+            service_url:
+              required: False
+              type: string
+              default: ""
             args:
               required: False
               type: dict
@@ -157,6 +161,7 @@ hosts:
             service_url:
               required: False
               type: string
+              default: ""
             args:
               required: False
               type: dict
