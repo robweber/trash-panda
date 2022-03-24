@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## Unreleased
+
+### Fixed
+
+- catch for if services are added/removed from a host when checking notifications. For now just skip the notification check until the next run
+
 ## 2.0
 
 ### Added

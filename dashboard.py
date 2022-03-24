@@ -140,15 +140,20 @@ async def check_notifications(notify, old_host, new_host):
     """check if any service statuses have changed and send notifications
     this method will be called asynchronously through asynio
     """
-    # check if the host is up at all
-    if(len(old_host) > 0 and new_host['alive'] != old_host['alive']):
-        notify.notify_host(new_host['name'], new_host['alive'])
-    else:
-        # check the service statuses
-        for i in range(0, len(new_host['services'])):
-            if(len(old_host) > 0 and new_host['services'][i]['return_code'] != old_host['services'][i]['return_code']):
-                # something has changed in this service's status
-                notify.notify_service(new_host['name'], new_host['services'][i])
+    # make sure old host has values
+    if(len(old_host) > 0):
+        # check if the host is up at all
+        if(new_host['alive'] != old_host['alive']):
+            notify.notify_host(new_host['name'], new_host['alive'])
+        else:
+            # if service list isn't the same just skip checking for now
+            if(len(new_host['services']) == len(old_host['services'])):
+                # check the service statuses
+                for i in range(0, len(new_host['services'])):
+                    # check that old host is available and that the service list
+                    if(new_host['services'][i]['return_code'] != old_host['services'][i]['return_code']):
+                        # something has changed in this service's status
+                        notify.notify_service(new_host['name'], new_host['services'][i])
 
 # parse the CLI args
 parser = configargparse.ArgumentParser(description='Simple Monitoring')
