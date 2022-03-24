@@ -45,13 +45,13 @@ function load_status(){
       row.append(td.clone().text(h.last_check));
 
       if(h.overall_status == 0){
-        row.append(td.clone().text("Ready").addClass('text-success'));
+        row.append(td.clone().text("OK").addClass('text-success'));
       }
       else if(h.overall_status == 1){
         row.append(td.clone().text("Warning").addClass('text-warning'));
       }
       else {
-        row.append(td.clone().text("Error").addClass('text-danger'));
+        row.append(td.clone().text("Critical").addClass('text-danger'));
       }
 
       table.append(row);
