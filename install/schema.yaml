@@ -25,6 +25,7 @@ config:
           type: string
           allowed:
             - log
+            - pushover
         args:
           required: False
           type: dict

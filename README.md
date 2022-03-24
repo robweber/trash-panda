@@ -175,6 +175,16 @@ config:
     type: log
 ```
 
+__Pushover Notifier__ - sends messages through the [Pushover Notification Service](https://pushover.net/). A valid application key and user key are needed for your account and can be generated using [their instructions](https://pushover.net/api). 
+```
+config:
+  notifier:
+    type: pushover
+    args:
+      api_key: pushover_api_key
+      user_key: pushover_user_key
+```
+
 ## Services
 
 Services are defined in the __services__ section of the `monitor.yaml` file, or included as a separate file. Each service listed needs to include a name, path to the service check command, and a list of arguments that will be sent at runtime to perform the check. [Jinja templates](https://jinja.palletsprojects.com/en/3.0.x/templates/) can be used to expand variables from the host config. An example config to check a web service would be:

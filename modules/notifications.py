@@ -1,4 +1,5 @@
 import logging
+from pushover import Client
 
 
 def create_notifier(notifier):
@@ -7,6 +8,8 @@ def create_notifier(notifier):
 
     if(notifier['type'] == 'log'):
         result = LogNotification(notifier['args'])
+    elif(notifier['type'] == 'pushover'):
+        result = PushoverNotification(notifier['args'])
 
     return result
 
@@ -55,3 +58,21 @@ class LogNotification(MonitorNotification):
 
     def _send_message(self, message):
         logging.info(f"Notification: {message}")
+
+
+class PushoverNotification(MonitorNotification):
+    """Sends notification messages through the Pushover messenger service
+    https://pushover.net/
+    https://pypi.org/project/python-pushover/
+
+    Both application and user identification keys are needed
+    """
+    client = None
+
+    def __init__(self, args):
+        super().__init__('pushover')
+
+        self.client = Client(args['user_key'], api_token=args['api_key'])
+
+    def _send_message(self, message):
+        self.client.send_message(message, title="Monitoring Notification")

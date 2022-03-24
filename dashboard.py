@@ -141,7 +141,7 @@ async def check_notifications(notify, old_host, new_host):
     this method will be called asynchronously through asynio
     """
     # check if the host is up at all
-    if(len(old_host) >0 and new_host['alive'] != old_host['alive']):
+    if(len(old_host) > 0 and new_host['alive'] != old_host['alive']):
         notify.notify_host(new_host['name'], new_host['alive'])
     else:
         # check the service statuses

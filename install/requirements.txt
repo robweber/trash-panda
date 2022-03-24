@@ -3,6 +3,7 @@ cerberus
 configargparse
 hnmp
 Flask
+python-pushover
 pythonping
 python-slugify
 pyvmomi
