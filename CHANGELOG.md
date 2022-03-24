@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 - added schema validator for checking the layout of the yaml file on startup
 - ability to toggle if host check should be forced on startup via the `check_on_startup` config value, default is True
+- support for sending notifications on host or service status changes. Notifiers are setup via the YAML config
 
 ### Changed
 

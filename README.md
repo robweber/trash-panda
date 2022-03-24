@@ -10,6 +10,7 @@ This is a _very_ basic monitoring solution meant for simple home use. It will mo
   - [API](#api)
 - [Config File](#config-file)
   - [Global Configuration](#global-configuration)
+  - [Notifications](#notifications)
 - [Services](#services)
 - [Host Types](#host-types)
 - [Host Definitions](#host-definitions)
@@ -153,11 +154,26 @@ Global configuration options are set under the `config` key in the YAML configur
 config:
   default_interval: 3
   check_on_startup: True
-
+  notify:
+    type: log
 ```
 
 * default_interval - the default host check interval, in minutes. This will default to 3 unless changed. [Individual hosts](#host-types) can set their own interval if needed.
-* check_on_startup - if hosts should all be checked immediately after startup. Defaults to True. If this is set to False, host checks will start on their normal interval from the program start time. 
+* check_on_startup - if hosts should all be checked immediately after startup. Defaults to True. If this is set to False, host checks will start on their normal interval from the program start time.
+* notifier - defines a notification channel, see more below
+
+### Notifications
+
+By default the system will not send any notifications, but there is support for some built-in notification methods. These can be defined in the `config` section of the YAML file by creating a `notifier` option. A notifier is loaded at startup and will send notifications on host status (up/down) changes or service status changes each time a check is run.
+
+Additional notification methods can be defined by extending the `MonitorNotification` class. Built-in notification types are listed below.
+
+__Log Notifier__ - writes all notification messages directly to the log
+```
+config:
+  notifier:
+    type: log
+```
 
 ## Services
 
