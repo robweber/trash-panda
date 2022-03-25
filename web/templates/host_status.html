@@ -11,7 +11,7 @@
   <div class="col-md-4" align="right">
     <div class="card" style="width: 18rem;">
       <div class="card-body">
-        <h5 class="card-title">Type: <span class="text-primary">{{ host['type'] | capitalize }}</span></h5>
+        <h5 class="card-title">Type: <span class="text-primary">{{ host['type'] | replace('_',' ') | title }}</span></h5>
         <p class="card-text">
           Last Check: {{ host['last_check'] }} <br />
           IP Address: {{ host['address'] }} <br />
