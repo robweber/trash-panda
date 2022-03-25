@@ -156,12 +156,15 @@ Global configuration options are set under the `config` key in the YAML configur
 config:
   default_interval: 3
   check_on_startup: True
+  jinja_constants:
+    CUSTOM_PATH: /path/
   notify:
     type: log
 ```
 
 * default_interval - the default host check interval, in minutes. This will default to 3 unless changed. [Individual hosts](#host-types) can set their own interval if needed.
 * check_on_startup - if hosts should all be checked immediately after startup. Defaults to True. If this is set to False, host checks will start on their normal interval from the program start time.
+* jinja_constants - a list of key:value pairs that will be passed to the [Jinja templating engine](#templating). These can be things like commonly used system paths or refernced names used in defining host or service value.
 * notifier - defines a notification channel, see more below
 
 ### Notifications
@@ -266,7 +269,7 @@ The following attributes are useful, but not necessary, for any host definition:
 
 ## Templating
 
-When expanding templates for service variables there are a few global variables and custom functions available.
+When expanding templates for service variables there are a few global variables and custom functions available. Global variables can be added to by setting values in the `jinja_constants` section of the [global config](#global-configuration). Check the [example config file](https://github.com/robweber/simple-monitoring/blob/main/install/monitor_example.yaml) to see how these can be used within host and service configurations.
 
 ### Host
 
@@ -287,7 +290,7 @@ The OS path to both the Nagios default scripts and the `custom_scripts` director
 
 The following custom functions are available in addition to any standard [Jinja templating functions](https://jinja.palletsprojects.com/en/3.0.x/templates/#list-of-global-functions).
 
-* `path()` - this is a shortcut for the Python os.path.join() method to easily join paths togehter.
+* `path()` - this is a shortcut for the Python os.path.join() method to easily join paths together.
 * `default()` - allows for setting a default in cases where the user may or may not set a variable. If the user variable doesn't exist the default is used.
 
 
