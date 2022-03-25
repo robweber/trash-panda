@@ -24,6 +24,7 @@ class HostMonitor:
     services = None
     hosts = None
     time_format = "%m-%d-%Y %I:%M%p"
+    custom_jinja_constants = {}
     __jinja = None
 
     def __init__(self, yaml_file):
@@ -36,6 +37,10 @@ class HostMonitor:
         self._jinja = jinja2.Environment()
         self._jinja.globals['default'] = jinja_custom.load_default
         self._jinja.globals['path'] = os.path.join
+
+        # if any global paths were set for the jinja environment
+        if('jinja_constants' in yaml_file['config']):
+            self.custom_jinja_constants = yaml_file['config']['jinja_constants']
 
         # if we should force a check on startup
         fake_time = datetime.datetime.now().strftime(self.time_format)
@@ -93,13 +98,15 @@ class HostMonitor:
             jinja_vars = {"NAGIOS_PATH": utils.NAGIOS_PATH, "SCRIPTS_PATH": os.path.join(utils.DIR_PATH, 'check_scripts'),
                           'service': service_args, 'host': host_config}
 
+            jinja_vars.update(self.custom_jinja_constants)  # add any custom paths
+
             # set the command first and then slot the arg values
             result = self.__render_template(serviceObj['command'], jinja_vars).split(' ')
 
             # load the arg values
             args = []
-            for arg in serviceObj['args']:
-                args.append(self.__render_template(arg, jinja_vars))
+            if('args' in serviceObj):
+                args = [self.__render_template(arg, jinja_vars) for arg in serviceObj['args']]
 
             # return everything as one array
             result = result + args

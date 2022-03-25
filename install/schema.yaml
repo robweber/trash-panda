@@ -16,6 +16,12 @@ config:
       required: False
       type: boolean
       default: True
+    jinja_constants:
+      required: False
+      type: dict
+      valueschema:
+        required: True
+        type: string
     notifier:
       required: False
       type: dict
