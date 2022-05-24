@@ -10,6 +10,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 - added config value `jinja_constants` to define a list of values that can be passed to the Jinja templating engine. These can be paths or just general constants.
 
+- added services list to overall status to list all services currently in an error state
+
 ### Fixed
 
 - catch for if services are added/removed from a host when checking notifications. For now just skip the notification check until the next run

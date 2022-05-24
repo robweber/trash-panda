@@ -99,6 +99,7 @@ def webapp_thread(port_number, debugMode=False, logHandlers=[]):
 
         # pull in all the hosts and get their overall status
         hosts = utils.read_db(db, utils.VALID_HOSTS)
+        services = []
         for name in hosts:
             host = utils.read_db(db, f"{utils.HOST_STATUS}.{name}")
 
@@ -110,8 +111,15 @@ def webapp_thread(port_number, debugMode=False, logHandlers=[]):
                 if(host['overall_status'] > 0):
                     error_count = error_count + 1
 
+                    # find services in error
+                    for s in host['services']:
+                        if(s['return_code'] > 0):
+                            # add host name to dict
+                            s['host'] = host['name']
+                            services.append(s)
+
         return jsonify({"total_hosts": len(hosts), "hosts_with_errors": error_count, "overall_status": overall_status,
-                        "overall_status_description": utils.SERVICE_STATUSES[overall_status]})
+                        "overall_status_description": utils.SERVICE_STATUSES[overall_status], "services": services})
 
     # run the web app
     app.run(debug=debugMode, host='0.0.0.0', port=port_number, use_reloader=False)
