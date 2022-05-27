@@ -173,6 +173,16 @@ function checkConfig(){
   editor.setOption("maxLines", 40);
   editor.setOption("minLines", 40);
   editor.session.setMode("ace/mode/yaml");
+
+  //add the save key binding
+  editor.commands.addCommand({
+    name: 'save-yaml-file',
+    bindKey: {win: 'Ctrl-S',  mac: 'Command-S'},
+    exec: function(editor) {
+        saveFile()
+    },
+    readOnly: false // false if this command should not apply in readOnly mode
+  });
 </script>
 {% endblock %}
 {% block onload_scripts %}
