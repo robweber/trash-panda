@@ -9,8 +9,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ## Added
 
 - added config value `jinja_constants` to define a list of values that can be passed to the Jinja templating engine. These can be paths or just general constants.
-
 - added services list to overall status to list all services currently in an error state
+- added web based configuration file editor - can load YAML files, save files, and check currently loaded config
 
 ### Fixed
 
