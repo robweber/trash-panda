@@ -93,10 +93,36 @@ function loadEditor(){
 
 function saveFile(){
     $.post('/api/save_file', {'file_path': $('#config_path').html(), "file_contents":editor.getValue()}, function(data){
-        //show message
-        $('#js-success-alert').html(data.message);
-        $('#js-success-alert').show().delay(3000).fadeOut();
+        //show success
+        if(data.success)
+        {
+          //show message
+          $('#js-success-alert').html(data.message);
+          $('#js-success-alert').show().delay(3000).fadeOut();
+        }
     });
+}
+
+function checkConfig(){
+  $.get('/api/check_config', function(data){
+    //show success or failure
+    if(data.success)
+    {
+      //show message
+      $('#js-success-alert').html(data.message);
+      $('#js-success-alert').show().delay(3000).fadeOut();
+
+      $('#validation_errors').html('');
+    }
+    else
+    {
+      //show message
+      $('#js-error-alert').html(data.message);
+      $('#js-error-alert').show().delay(3000).fadeOut();
+
+      $('#validation_errors').html('Errors: ' + data.errors);
+    }
+  });
 }
 
 </script>
@@ -104,11 +130,12 @@ function saveFile(){
 {% block content %}
 <p>Modify individual YAML config files for the monitoring system. Keep in mind that a restart of the service will be needed to make-live any changes. </p>
 <div class="row my-1">
-  <div class="col-md-10">
+  <div class="col-md-8">
     <h3><a href="#" onClick="return toggleFileBrowser()" id="config_path">{{ config_file }}</a></h3>
   </div>
-  <div class="col-md-2" align="right">
-    <button class="btn btn-success" onClick="saveFile()">Save</button>
+  <div class="col-md-4" align="right">
+    <button class="btn btn-success mr-1" onClick="saveFile()">Save</button>
+    <button class="btn btn-primary" onClick="checkConfig()">Check Config</button>
   </div>
 </div>
 
@@ -132,6 +159,8 @@ function saveFile(){
     </div>
   </div>
 </div>
+
+<p id="validation_errors" class="text-danger"></p>
 
 <textarea class="my-1" id="editor" style="height:200px">
 </textarea>

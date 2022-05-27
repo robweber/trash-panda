@@ -166,14 +166,30 @@ def webapp_thread(port_number, config_file, debugMode=False, logHandlers=[]):
 
         return jsonify({'success': True, 'message': f"Saved {file_path}"})
 
+    @app.route('/api/check_config', methods=['GET'])
+    def check_config():
+        result = {'success': True, 'message': 'Config is valid'}
+
+        # check the config and see if it validates
+        yaml_check = load_config_file(config_file)
+
+        if(not yaml_check['valid']):
+            result['success'] = False
+            result['message'] = 'Configuration file is not valid'
+            result['errors'] = yaml_check['errors']
+
+        return jsonify(result)
+
     # run the web app
     app.run(debug=debugMode, host='0.0.0.0', port=port_number, use_reloader=False)
 
 
 def load_config_file(file):
     """Load the YAML config file and validate it's structure
-    errors in the file will halt the program
+    errors in the file will be added to the result
     """
+    result = {'valid': True}
+
     yaml.add_constructor('!include', utils.custom_yaml_loader, Loader=yaml.SafeLoader)
     yaml_file = utils.read_yaml(file)
 
@@ -181,12 +197,13 @@ def load_config_file(file):
     schema = utils.read_yaml(os.path.join(utils.DIR_PATH, 'install', 'schema.yaml'))
     v = Validator(schema)
     if(not v.validate(yaml_file, schema)):
-        logging.error("Error reading configuration file")
-        logging.error(str(v.errors))
-        sys.exit(2)
+        result['valid'] = False
+        result['errors'] = str(v.errors)
 
     # normalize for missing values
-    return v.normalized(yaml_file)
+    result['yaml'] = v.normalized(yaml_file)
+
+    return result
 
 
 async def check_notifications(notify, old_host, new_host):
@@ -237,7 +254,14 @@ logging.basicConfig(datefmt='%m/%d %H:%M',
 utils.write_db(db, utils.HOST_STATUS, [])
 
 # load the config file
-yaml_file = load_config_file(args.file)
+yaml_check = load_config_file(args.file)
+
+if(yaml_check['valid']):
+    yaml_file = yaml_check['yaml']
+else:
+    logging.error("Error reading configuration file")
+    logging.error(yaml_check['errors'])
+    sys.exit(2)
 
 # create the notifier, if needed
 notify = None
