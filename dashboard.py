@@ -14,7 +14,6 @@ sudo python3 dashboard.py -h
 import asyncio
 import configargparse
 import logging
-import os
 import redis
 import signal
 import sys
