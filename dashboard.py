@@ -157,6 +157,15 @@ def webapp_thread(port_number, config_file, debugMode=False, logHandlers=[]):
 
         return Response(file_contents, mimetype='text/plain')
 
+    @app.route('/api/save_file', methods=["POST"])
+    def save_file():
+        file_path = request.form['file_path']
+
+        with open(file_path, 'w') as f:
+            f.write(request.form['file_contents'])
+
+        return jsonify({'success': True, 'message': f"Saved {file_path}"})
+
     # run the web app
     app.run(debug=debugMode, host='0.0.0.0', port=port_number, use_reloader=False)
 

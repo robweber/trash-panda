@@ -87,6 +87,14 @@ function loadEditor(){
   }});
 }
 
+function saveFile(){
+    $.post('/api/save_file', {'file_path': $('#config_path').html(), "file_contents":editor.getValue()}, function(data){
+        //show message
+        $('#js-success-alert').html(data.message);
+        $('#js-success-alert').show().delay(3000).fadeOut();
+    });
+}
+
 </script>
 {% endblock %}
 {% block content %}
@@ -96,7 +104,7 @@ function loadEditor(){
     <h3><a href="#" onClick="return toggleFileBrowser()" id="config_path">{{ config_file }}</a></h3>
   </div>
   <div class="col-md-2" align="right">
-    <button class="btn btn-success" onClick="">Save</button>
+    <button class="btn btn-success" onClick="saveFile()">Save</button>
   </div>
 </div>
 
