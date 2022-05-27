@@ -3,6 +3,7 @@ cerberus
 configargparse
 hnmp
 Flask
+natsort
 python-pushover
 pythonping
 python-slugify

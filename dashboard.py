@@ -21,11 +21,14 @@ import sys
 import threading
 import time
 import yaml
+import os
+import os.path
 import modules.utils as utils
 import modules.notifications as notifier
+from natsort import natsorted
 from cerberus import Validator
 from modules.monitor import HostMonitor
-from flask import Flask, flash, render_template, jsonify, redirect
+from flask import Flask, flash, render_template, jsonify, redirect, request, Response
 
 db = redis.Redis('localhost', decode_responses=True)
 
@@ -36,7 +39,7 @@ def signal_handler(signum, frame):
     sys.exit(0)
 
 
-def webapp_thread(port_number, debugMode=False, logHandlers=[]):
+def webapp_thread(port_number, config_file, debugMode=False, logHandlers=[]):
     app = Flask(import_name="dr-dashboard", static_folder=os.path.join(utils.DIR_PATH, 'web', 'static'),
                 template_folder=os.path.join(utils.DIR_PATH, 'web', 'templates'))
 
@@ -121,6 +124,39 @@ def webapp_thread(port_number, debugMode=False, logHandlers=[]):
         return jsonify({"total_hosts": len(hosts), "hosts_with_errors": error_count, "overall_status": overall_status,
                         "overall_status_description": utils.SERVICE_STATUSES[overall_status], "services": services})
 
+    @app.route('/files', methods=['GET'])
+    def files():
+        return render_template("files.html", config_file=config_file)
+
+    @app.route('/api/browse_files/', methods=['GET'], defaults={'browse_path': utils.DIR_PATH})
+    @app.route('/api/browse_files/<path:browse_path>', methods=['GET'])
+    def list_directory(browse_path):
+        if(not browse_path.startswith('/')):
+            browse_path = f"/{browse_path}"
+
+        # if path is a file, get directory
+        if(os.path.isfile(browse_path)):
+            browse_path = os.path.dirname(browse_path)
+
+        # get a list of all the directories
+        dirs = sorted([name for name in os.listdir(browse_path) if os.path.isdir(os.path.join(browse_path, name))])
+
+        # get a list of all the files, filter on valid yaml
+        files = natsorted(filter(lambda f: f.endswith('.yaml'), os.listdir(browse_path)))
+
+        return jsonify({'success': True, 'dirs': dirs, 'files': files, 'path': browse_path})
+
+    @app.route('/api/load_file', methods=['POST'])
+    def load_file():
+        file_path = request.form['file_path']
+
+        file_contents = ''
+        if(file_path.endswith('.yaml') and os.path.isfile(file_path)):
+            with open(file_path) as f:
+                file_contents = f.readlines()
+
+        return Response(file_contents, mimetype='text/plain')
+
     # run the web app
     app.run(debug=debugMode, host='0.0.0.0', port=port_number, use_reloader=False)
 
@@ -201,7 +237,7 @@ if('notifier' in yaml_file['config']):
 
 # start the web app
 logging.info('Starting DR Dashboard Web Service')
-webAppThread = threading.Thread(name='Web App', target=webapp_thread, args=(args.port, True, logHandlers))
+webAppThread = threading.Thread(name='Web App', target=webapp_thread, args=(args.port, args.file, True, logHandlers))
 webAppThread.setDaemon(True)
 webAppThread.start()
 
