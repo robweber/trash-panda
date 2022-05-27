@@ -15,6 +15,10 @@ function toggleFileBrowser(){
   return false;
 }
 
+function createFile(){
+  selectPath($('#new_file_name').val());
+}
+
 function selectPath(path){
 
   // set path in form input
@@ -117,6 +121,14 @@ function saveFile(){
       Path: <span id="file_path"></span>
     </div>
     <div id="file_list" class="m-2 p-2 border border-secondary">
+    </div>
+    <div class="row p-2">
+      <div class="col-sm-8">
+      <input type="text" class="form-control" id="new_file_name" />
+      </div>
+      <div class="col-sm-4" align="right">
+        <button class="btn btn-primary" onClick="createFile()">Create File</button>
+      </div>
     </div>
   </div>
 </div>
