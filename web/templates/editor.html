@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block header %}
+<script src="/static/js/ace/ace.js" type="text/javascript"></script>
+<script type="text/javascript">
+function toggleFileBrowser(){
+  if($('#file_browser').is(':visible'))
+  {
+    $('#file_browser').hide();
+  }
+  else
+  {
+    $('#file_browser').show();
+  }
+
+  return false;
+}
+
+function selectPath(path){
+
+  // set path in form input
+  $('#config_path').html(path);
+
+  // close the file browser
+  toggleFileBrowser();
+}
+
+function toggleDirSelect(){
+  $('#directory_select_button').toggle();
+
+  if($('#file_browser').is(':visible')){
+    // if currently browsing, refresh the file list
+    loadFiles($('#file_path').html());
+  }
+}
+
+// creates an onClick method based on a file path and name, optionally can change javascript function
+function makePathLink(path, name, funcName = 'loadFiles'){
+  return '<a href="#" onClick="return ' + funcName + '(\'' + path + '\')">' + name + '</a><br />';
+}
+
+function loadFiles(path){
+
+  // send request to load file listings
+  $.ajax({type: 'GET', contentType: 'application/json', url: '/api/browse_files/' + path, success: function(data, status, request){
+
+    if(data.success)
+    {
+
+      // set the current full path
+      $('#file_path').html(data.path)
+
+      fileList = "";  // string with html to display contents of directory
+
+      //create the UP Level icon, if not at root
+      if(data.path != '/'){
+        splitPath = data.path.split('/');
+        splitPath.pop();
+
+        fileList = makePathLink(splitPath.join('/'), '<i class="bi bi-arrow-90deg-up"></i> ..');
+      }
+
+      //build the html list
+      for(i = 0; i < data.dirs.length; i++)
+      {
+        fileList = fileList + makePathLink(data.path + '/' + data.dirs[i], data.dirs[i]);
+      }
+
+      //build the html list
+      for(i = 0; i < data.files.length; i++)
+      {
+        fileList = fileList + makePathLink(data.path + '/' + data.files[i], data.files[i], 'selectPath');
+      }
+
+      $('#file_list').html(fileList);
+    }
+  }});
+
+  return false;
+}
+
+function loadEditor(){
+  $.ajax({type: 'POST', url: '/api/load_file', data: {'file_path': $('#config_path').html()}, success: function(data, status, request){
+    editor.setValue(data,1);
+  }});
+}
+
+</script>
+{% endblock %}
+{% block content %}
+<p>Modify individual YAML config files for the monitoring system. Keep in mind that a restart of the service will be needed to make-live any changes. </p>
+<div class="row my-1">
+  <div class="col-md-10">
+    <h3><a href="#" onClick="return toggleFileBrowser()" id="config_path">{{ config_file }}</a></h3>
+  </div>
+  <div class="col-md-2">
+    <button class="btn btn-primary mr-2" onClick="loadEditor()">Load</button>
+    <button class="btn btn-success" onClick="">Save</button>
+  </div>
+</div>
+
+<div class="row my-1" id="file_browser" style="display:none">
+  <div class="col-md-2">
+    <!-- nothing here -->
+  </div>
+  <div class="col-md-8">
+    <div class="p-2 font-weight-bold">
+      Path: <span id="file_path"></span>
+    </div>
+    <div id="file_list" class="m-2 p-2 border border-secondary">
+    </div>
+  </div>
+</div>
+
+<textarea class="my-1" id="editor" style="height:200px">
+</textarea>
+
+<script type="text/javascript">
+  // load ace editor
+  ace.require("ace/ext/language_tools");
+  var editor = ace.edit("editor");
+  editor.setTheme("ace/theme/chrome");
+  editor.setOption("maxLines", 40);
+  editor.setOption("minLines", 40);
+  editor.session.setMode("ace/mode/yaml");
+</script>
+{% endblock %}
+{% block onload_scripts %}
+loadFiles("");
+loadEditor();
+{% endblock %}
