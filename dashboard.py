@@ -124,9 +124,9 @@ def webapp_thread(port_number, config_file, debugMode=False, logHandlers=[]):
         return jsonify({"total_hosts": len(hosts), "hosts_with_errors": error_count, "overall_status": overall_status,
                         "overall_status_description": utils.SERVICE_STATUSES[overall_status], "services": services})
 
-    @app.route('/files', methods=['GET'])
-    def files():
-        return render_template("files.html", config_file=config_file)
+    @app.route('/editor', methods=['GET'])
+    def editor():
+        return render_template("editor.html", config_file=config_file)
 
     @app.route('/api/browse_files/', methods=['GET'], defaults={'browse_path': utils.DIR_PATH})
     @app.route('/api/browse_files/<path:browse_path>', methods=['GET'])
