@@ -22,6 +22,9 @@ function selectPath(path){
 
   // close the file browser
   toggleFileBrowser();
+
+  // load the chosen file
+  loadEditor();
 }
 
 function toggleDirSelect(){
@@ -92,8 +95,7 @@ function loadEditor(){
   <div class="col-md-10">
     <h3><a href="#" onClick="return toggleFileBrowser()" id="config_path">{{ config_file }}</a></h3>
   </div>
-  <div class="col-md-2">
-    <button class="btn btn-primary mr-2" onClick="loadEditor()">Load</button>
+  <div class="col-md-2" align="right">
     <button class="btn btn-success" onClick="">Save</button>
   </div>
 </div>
