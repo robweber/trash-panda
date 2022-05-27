@@ -84,6 +84,23 @@ function loadFiles(path){
 function loadEditor(){
   $.ajax({type: 'POST', url: '/api/load_file', data: {'file_path': $('#config_path').html()}, success: function(data, status, request){
     editor.setValue(data,1);
+
+    fileInfo = pathInfo($('#config_path').html());
+
+    //set the mode based on the extension
+    if(fileInfo['ext'] == '.yaml')
+    {
+      editor.session.setMode("ace/mode/yaml");
+    }
+    else if(fileInfo['ext'] == '.py')
+    {
+      editor.session.setMode("ace/mode/python");
+    }
+    else
+    {
+      editor.session.setMode("ace/mode/plaintext");
+    }
+
   }});
 }
 
@@ -119,4 +136,9 @@ function checkConfig(){
       $('#validation_errors').html('Errors: ' + data.errors);
     }
   });
+}
+
+function pathInfo(s) {
+    s=s.match(/(.*?\/)?(([^/]*?)(\.[^/.]+?)?)(?:[?#].*)?$/);
+    return {path:s[1],file:s[2],name:s[3],ext:s[4]};
 }

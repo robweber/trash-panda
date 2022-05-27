@@ -141,7 +141,7 @@ def webapp_thread(port_number, config_file, debugMode=False, logHandlers=[]):
         dirs = sorted([name for name in os.listdir(browse_path) if os.path.isdir(os.path.join(browse_path, name))])
 
         # get a list of all the files, filter on valid yaml
-        files = natsorted(filter(lambda f: f.endswith('.yaml'), os.listdir(browse_path)))
+        files = natsorted(filter(lambda f: f.endswith(utils.ALLOWED_EDITOR_TYPES), os.listdir(browse_path)))
 
         return jsonify({'success': True, 'dirs': dirs, 'files': files, 'path': browse_path})
 
@@ -150,7 +150,7 @@ def webapp_thread(port_number, config_file, debugMode=False, logHandlers=[]):
         file_path = request.form['file_path']
 
         file_contents = ''
-        if(file_path.endswith('.yaml') and os.path.isfile(file_path)):
+        if(file_path.endswith(utils.ALLOWED_EDITOR_TYPES) and os.path.isfile(file_path)):
             with open(file_path) as f:
                 file_contents = f.readlines()
 

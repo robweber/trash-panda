@@ -21,6 +21,8 @@ COMMAND_TASK_ID = "command_task_id"
 # status description
 SERVICE_STATUSES = ["OK", "Warning", "Critical", "Unknown"]
 
+# allowed file types for web editor
+ALLOWED_EDITOR_TYPES = ('.yaml', '.py')
 
 # custom YAML loader for !include syntax
 def custom_yaml_loader(loader, node):
