@@ -65,7 +65,6 @@ elif(args.type == 'guide'):
         result = 2
 
     print(f"There are {guide_days} guide days available")
-    print(f"{guide.firstChild.nodeValue}")
 elif(args.type == 'storage'):
     # check available disk storage
     machineInfo = get_single_element('MachineInfo', status)
