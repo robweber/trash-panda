@@ -11,16 +11,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - added config value `jinja_constants` to define a list of values that can be passed to the Jinja templating engine. These can be paths or just general constants.
 - added services list to overall status to list all services currently in an error state
 - added web based configuration file editor - can load YAML and Python files, save files, and check currently loaded config
+- added check script for Gitlab services
 
 ### Fixed
 
 - catch for if services are added/removed from a host when checking notifications. For now just skip the notification check until the next run
 - device type name displayed funny when it contained spaces on the host status page
 - fixed `notifications.py` file defining it's own Statuses list, use one from `utils.py` instead for consistency
+- catch errors when YAML files can't be loaded due to parsing errors
 
 ### Changed
 
 - used the default setting of the schema document to set the service_url so that something always exists in that field instead of checking for None all the time
+- changed last references form "dr dashboard" to "simple monitoring"
 
 ### Removed
 
