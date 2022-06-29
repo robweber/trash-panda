@@ -39,7 +39,7 @@ def signal_handler(signum, frame):
 
 
 def webapp_thread(port_number, config_file, debugMode=False, logHandlers=[]):
-    app = Flask(import_name="dr-dashboard", static_folder=os.path.join(utils.DIR_PATH, 'web', 'static'),
+    app = Flask(import_name="simple-monitoring", static_folder=os.path.join(utils.DIR_PATH, 'web', 'static'),
                 template_folder=os.path.join(utils.DIR_PATH, 'web', 'templates'))
 
     # generate random number for session secret key
@@ -272,7 +272,7 @@ if('notifier' in yaml_file['config']):
     notify = notifier.create_notifier(yaml_file['config']['notifier'])
 
 # start the web app
-logging.info('Starting DR Dashboard Web Service')
+logging.info('Starting Simple Monitoring Web Service')
 webAppThread = threading.Thread(name='Web App', target=webapp_thread, args=(args.port, args.file, True, logHandlers))
 webAppThread.setDaemon(True)
 webAppThread.start()
