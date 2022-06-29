@@ -192,15 +192,19 @@ def load_config_file(file):
     yaml.add_constructor('!include', utils.custom_yaml_loader, Loader=yaml.SafeLoader)
     yaml_file = utils.read_yaml(file)
 
-    # validate the config file
-    schema = utils.read_yaml(os.path.join(utils.DIR_PATH, 'install', 'schema.yaml'))
-    v = Validator(schema)
-    if(not v.validate(yaml_file, schema)):
-        result['valid'] = False
-        result['errors'] = str(v.errors)
+    if(yaml_file):
+        # validate the config file
+        schema = utils.read_yaml(os.path.join(utils.DIR_PATH, 'install', 'schema.yaml'))
+        v = Validator(schema)
+        if(not v.validate(yaml_file, schema)):
+            result['valid'] = False
+            result['errors'] = str(v.errors)
 
-    # normalize for missing values
-    result['yaml'] = v.normalized(yaml_file)
+        # normalize for missing values
+        result['yaml'] = v.normalized(yaml_file)
+    else:
+        result['valid'] = False
+        result['errors'] = 'Error parsing YAML file'
 
     return result
 

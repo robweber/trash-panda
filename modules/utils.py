@@ -47,8 +47,11 @@ def read_json(file):
 def read_yaml(file):
     result = {}
 
-    with open(file, 'r') as file:
-        result = yaml.safe_load(file)
+    try:
+        with open(file, 'r') as f:
+            result = yaml.safe_load(f)
+    except Exception:
+        logging.error(f"Error parsing YAML file {file}")
 
     return result
 
