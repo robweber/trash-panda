@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 - catch for if services are added/removed from a host when checking notifications. For now just skip the notification check until the next run
 - device type name displayed funny when it contained spaces on the host status page
+- fixed `notifications.py` file defining it's own Statuses list, use one from `utils.py` instead for consistency
 
 ### Changed
 
