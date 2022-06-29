@@ -1,4 +1,5 @@
 import logging
+import modules.utils as utils
 from pushover import Client
 
 
@@ -19,7 +20,6 @@ class MonitorNotification:
     Implementing classes will implement the logic of actually sending a message through
     a notification channel
     """
-    STATUSES = ["OK", "Warning", "Critical"]
     name = None
 
     def __init__(self, name):
@@ -45,7 +45,7 @@ class MonitorNotification:
         to the implementing class via the _send_message() function
         """
         # create the message
-        message = f"{service['name']} on host {host} is {self.STATUSES[service['return_code']]}"
+        message = f"{service['name']} on host {host} is {utils.SERVICE_STATUSES[service['return_code']]}"
 
         # send message
         self._send_message(message)
