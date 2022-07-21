@@ -226,7 +226,8 @@ class HostMonitor:
 
                 #  add or subtract a bit from each check interval to help with system load
                 next_check = now + datetime.timedelta(minutes=(aHost.interval), seconds=randint(-60, 60))
-                host_check['next_check'] = next_check.strftime(self.time_format)
+                aHost.next_check = next_check.strftime(self.time_format)
+                host_check['next_check'] = aHost.next_check
 
                 self.hosts[i] = aHost
                 result.append(host_check)
