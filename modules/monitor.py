@@ -219,9 +219,11 @@ class HostMonitor:
                 # create a slug to act as the id for lookups
                 host_check['id'] = aHost.id
 
-                # save the last check date
+                # save the last and next check date
                 aHost.last_check = now.strftime(self.time_format)
                 host_check['last_check'] = aHost.last_check
+                next_check = now + datetime.timedelta(minutes=(aHost.interval))
+                host_check['next_check'] = next_check.strftime(self.time_format)
 
                 self.hosts[i] = aHost
                 result.append(host_check)
