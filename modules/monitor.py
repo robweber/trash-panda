@@ -42,18 +42,19 @@ class HostMonitor:
         if('jinja_constants' in yaml_file['config']):
             self.custom_jinja_constants = yaml_file['config']['jinja_constants']
 
-        # if we should force a check on startup
-        fake_time = datetime.datetime.now().strftime(self.time_format)
+        next_check = datetime.datetime.now()
         if(yaml_file['config']['check_on_startup']):
+            # set to 10 minute ago if we are forcing a check on startup
             logging.info("Forcing host check on startup")
-            fake_time = (datetime.datetime.now() - datetime.timedelta(weeks=1)).strftime(self.time_format)
+            next_check = next_check - datetime.timedelta(minutes=10)
 
         # get host description by type
         for i in range(0, len(yaml_file['hosts'])):
             device = self.__create_device(yaml_file['hosts'][i])
 
-            # set the last check to way back to trigger an update
-            device.last_check = fake_time
+            # set the next check time - randomize a bit to save on load
+            next_check_random = next_check + datetime.timedelta(seconds=randint(-60, 60))
+            device.next_check = next_check_random.strftime(self.time_format)
             self.hosts.append(device)
             logging.info(f"Loading device {device.name} with check interval every {device.interval} min")
 
@@ -201,9 +202,9 @@ class HostMonitor:
         for i in range(0, len(self.hosts)):
             aHost = self.hosts[i]
 
-            # check if we need to check this host, add or subtract a bit from each check interval to help with system load
-            last_check = datetime.datetime.strptime(aHost.last_check, self.time_format)
-            if(last_check < now - datetime.timedelta(minutes=(aHost.interval), seconds=randint(-60, 60))):
+            # check if we need to check this host,
+            next_check = datetime.datetime.strptime(aHost.next_check, self.time_format)
+            if(next_check < now ):
                 logging.debug(f"Checking {aHost.name}")
 
                 host_check = self.__check_host(aHost)
@@ -219,10 +220,12 @@ class HostMonitor:
                 # create a slug to act as the id for lookups
                 host_check['id'] = aHost.id
 
-                # save the last and next check date
+                # save the last and caclulate next check date
                 aHost.last_check = now.strftime(self.time_format)
                 host_check['last_check'] = aHost.last_check
-                next_check = now + datetime.timedelta(minutes=(aHost.interval))
+
+                #  add or subtract a bit from each check interval to help with system load
+                next_check = now + datetime.timedelta(minutes=(aHost.interval), seconds=randint(-60, 60))
                 host_check['next_check'] = next_check.strftime(self.time_format)
 
                 self.hosts[i] = aHost

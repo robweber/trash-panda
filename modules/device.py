@@ -31,6 +31,7 @@ class Device:
         self.config = host_def['config']
         self.services = host_def['services']
         self.last_check = 0
+        self.next_check = 0
 
         # set the address as part of the config
         self.config['address'] = self.address
