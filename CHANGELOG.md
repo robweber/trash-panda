@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - added services list to overall status to list all services currently in an error state
 - added web based configuration file editor - can load YAML and Python files, save files, and check currently loaded config
 - added check script for Gitlab services
+- added the next check time to the returned host information as well as display on host status page. This value reflects some randomness to help spread load (check interval +/- 60 seconds)
 
 ### Fixed
 

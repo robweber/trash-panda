@@ -14,6 +14,7 @@
         <h5 class="card-title">Type: <span class="text-primary">{{ host['type'] | replace('_',' ') | title }}</span></h5>
         <p class="card-text">
           Last Check: {{ host['last_check'] }} <br />
+          Next Check: {{ host['next_check'] }} <br />
           IP Address: {{ host['address'] }} <br />
           {% if 'config' in host %}
             {% for c in host['config'].keys() %}

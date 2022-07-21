@@ -94,6 +94,9 @@ __/api/status__ - detailed listing of the status of each host
     "ip": "192.168.0.1",
     "name": "Switch 1",
     "overall_status": 1,
+    "interval": 3,
+    "last_check": "07-21-2022 11:01AM",
+    "next_check": "07-21-2022 11:04AM",
     "services": [
       {
         "id": "alive",
@@ -145,7 +148,7 @@ The following additional options are available depending on the type of device:
 
 * management_page - a link to the local management page of the host, if there is one. This will be displayed in the dashboard
 * icon - the icon to use for the device, overrides the default type. Should be found on [Material Design Icons](https://materialdesignicons.com/)
-* interval - how often this host should be checked, in minutes. If not given this is the system default.
+* interval - how often this host should be checked, in minutes. If not given this is the system default. At runtime this value is randomly adjusted +/- 60 seconds to help spread load.
 * config - an additional mapping of config options specific to this host type
 
 ### Global Configuration
@@ -162,7 +165,7 @@ config:
     type: log
 ```
 
-* default_interval - the default host check interval, in minutes. This will default to 3 unless changed. [Individual hosts](#host-types) can set their own interval if needed.
+* default_interval - the default host check interval, in minutes. This will default to 3 unless changed. [Individual hosts](#host-types) can set their own interval if needed. At runtime this value is randomly adjusted +/- 60 seconds to help spread load.
 * check_on_startup - if hosts should all be checked immediately after startup. Defaults to True. If this is set to False, host checks will start on their normal interval from the program start time.
 * jinja_constants - a list of key:value pairs that will be passed to the [Jinja templating engine](#templating). These can be things like commonly used system paths or refernced names used in defining host or service value.
 * notifier - defines a notification channel, see more below
@@ -209,9 +212,6 @@ http:
 Breaking this down the __command__ statement points to the path of the Nagios `check_http` command. The __args__ section defines arguments to be passed to this executable.
 
 Within the arguments several custom variable placeholders and methods used. These are available for all service definitions and are listed in the [Templating section](#templating). You can see that the host address is used; which is expanded at runtime. A default of port 80 is given but can be changed if the user sets the `service.port` variable on the host. Similarly the web path of `/` is given as a default but could be changed to something liked `/login` if the `services.path` variable is set.
-
-
-
 
 ## Host Types
 
