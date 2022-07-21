@@ -104,7 +104,6 @@ def snapshots(vmList, warn, crit):
 
     for VM in vmList.view:
         # check if this vm has a snapshot
-        print(VM)
         if(VM.snapshot is not None):
             for aSnap in VM.snapshot.rootSnapshotList:
                 # get the difference between these two days
