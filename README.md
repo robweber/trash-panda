@@ -293,6 +293,16 @@ The following custom functions are available in addition to any standard [Jinja 
 * `path()` - this is a shortcut for the Python os.path.join() method to easily join paths together.
 * `default()` - allows for setting a default in cases where the user may or may not set a variable. If the user variable doesn't exist the default is used.
 
+## Credits
+
+The following projects are used within this project and contributed most of the heavy lifting in getting it completed.
+
+* [Flask](https://flask.palletsprojects.com/en/2.1.x/#) - a micro web framework for Python
+* [Jinja](https://palletsprojects.com/p/jinja/) - templating engine
+* [Cerebrus](https://docs.python-cerberus.org/en/stable/) - used for YAML data validation
+* [Bootstrap](https://getbootstrap.com/) - web frontend toolkit
+* [JQuery](https://jquery.com/) - Javascript library
+* [Material Design Icons](https://materialdesignicons.com/) - open source web icons
 
 ## License
 
