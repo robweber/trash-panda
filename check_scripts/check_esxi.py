@@ -99,7 +99,8 @@ def datastores(host, warn, crit):
 
 
 def snapshots(vmList, warn, crit):
-    outOfDate = []
+    warning = []
+    critical = []
     now = datetime.datetime.now(UTC())
 
     for VM in vmList.view:
@@ -110,11 +111,16 @@ def snapshots(vmList, warn, crit):
                 tdelta = now - aSnap.createTime
 
                 if(tdelta.days >= crit):
-                    outOfDate.append(VM.name + " - " + str(tdelta.days) + " days")
+                    critical.append(VM.name + " - " + str(tdelta.days) + " days")
+                elif(tdelta.days >= warn):
+                    warning.append(VM.name + " - " + str(tdelta.days) + " days")
 
-    if(len(outOfDate) > 0):
-        print(outOfDate)
+    if(len(critical) > 0):
+        print(critical)
         sys.exit(CRITICAL)
+    elif(len(warning) > 0):
+        print(warning)
+        sys.exit(WARNING)
     else:
         print("Snapshots OK")
         sys.exit(OK)
