@@ -15,6 +15,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 - updated `dashboard.py` to use history class instead of direct Redis db access
 - notifications only go out on CONFIRMED states
+- removed showing all config entries on the host status page - these can be viewed in the config area
+
+## Fixed
+
+- don't show debug messages from `asyncio` package
 
 ## 2.1
 
