@@ -21,6 +21,28 @@ class HostHistory:
         """
         return self.__read_db(f"{DBKeys.HOST_STATUS.value}.{host_id}")
 
+    def get_service(self, host_id, service_id):
+        """ get information on a specific service from a specific host
+
+        :param host_id: a valid host
+        :param service_id: a valid service
+
+        :returns: a dict with the service information, empty if not found
+        """
+        result = {}
+
+        host = self.get_host(host_id)
+
+        # find the service in the list
+        if('services' in host):
+            service_list = list(filter(lambda x: x['id'] == service_id, host['services']))
+
+            # should only have one result
+            if(len(service_list) > 0):
+                result = service_list[0]
+
+        return result
+
     def set_hosts(self, names):
         """ saves a list of valid host names """
         self.__write_db(DBKeys.VALID_HOSTS.value, names)

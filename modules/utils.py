@@ -13,8 +13,12 @@ import yaml
 DIR_PATH = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 NAGIOS_PATH = "/usr/lib/nagios/plugins/"
 
-# status description
+# valid status descriptions
 SERVICE_STATUSES = ["OK", "Warning", "Critical", "Unknown"]
+
+# valid service state statuses
+CONFIRMED_STATE = "CONFIRMED"
+UNCONFIRMED_STATE = "UNCONFIRMED"
 
 # allowed file types for web editor
 ALLOWED_EDITOR_TYPES = ('.yaml', '.py')

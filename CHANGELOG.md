@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ## Added
 
 - added `HostHistory` class to encapsulate Redis db activity
+- can specify a number of check attempts before confirming critical/warning states
 
 ## Changed
 

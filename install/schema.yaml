@@ -16,6 +16,10 @@ config:
       required: False
       type: boolean
       default: True
+    service_check_attempts:
+      required: False
+      type: integer
+      default: 3
     jinja_constants:
       required: False
       type: dict
