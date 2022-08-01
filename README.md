@@ -22,7 +22,7 @@ This is a _very_ basic monitoring solution meant for simple home use. It will mo
   - [Service](#service)
   - [Script Paths](#script-paths)
   - [Custom Functions](#custom-functions)
-- [Contributing](#contributing)
+- [Credits](#credits)
 - [License](#license)
 
 ## Install
