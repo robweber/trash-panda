@@ -34,10 +34,6 @@ class HostHistory:
 
         self.__write_db(f"{DBKeys.HOST_STATUS.value}.{host_id}", host_status)
 
-    def reset(self):
-        """ resets host data in the database """
-        self.__write_db(DBKeys.VALID_HOSTS.value, [])
-
     def __read_db(self, db_key):
         """ read a value from the Redis DB based on the given key
         read values are returned as a JSON parsed value

@@ -11,6 +11,7 @@ from slugify import slugify
 from functools import reduce
 from modules.device import HostType
 from pythonping import ping
+from modules.history import HostHistory
 from modules.exceptions import DeviceNotFoundError, ServiceNotFoundError
 
 
@@ -23,15 +24,17 @@ class HostMonitor:
     types = None
     services = None
     hosts = None
+    history = None
     time_format = "%m-%d-%Y %I:%M%p"
     custom_jinja_constants = {}
     __jinja = None
 
     def __init__(self, yaml_file):
-        # create the host type and services definitions
+        # create the host type and services definitions, load history
         self.types = self.__create_types(yaml_file['types'], yaml_file['config']['default_interval'])
         self.services = yaml_file['services']
         self.hosts = []
+        self.history = HostHistory()
 
         # load jinja environment
         self._jinja = jinja2.Environment()
@@ -57,6 +60,9 @@ class HostMonitor:
             device.next_check = next_check_random.strftime(self.time_format)
             self.hosts.append(device)
             logging.info(f"Loading device {device.name} with check interval every {device.interval} min")
+
+        # save a list of all valid host names
+        self.history.set_hosts(self.get_hosts())
 
     def __create_types(self, types_def, default_interval):
         """Create devices type definitions based on defined YAML"""

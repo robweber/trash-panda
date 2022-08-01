@@ -253,9 +253,6 @@ logging.basicConfig(datefmt='%m/%d %H:%M',
                     level=getattr(logging, logLevel),
                     handlers=logHandlers)
 
-# reset the host list (blank)
-history.reset()
-
 # load the config file
 yaml_check = load_config_file(args.file)
 
@@ -279,9 +276,6 @@ webAppThread.start()
 
 logging.info('Starting monitoring check daemon')
 monitor = HostMonitor(yaml_file)
-
-# save a list of all valid host names
-history.set_hosts(monitor.get_hosts())
 
 while 1:
     logging.debug("Running host check")
