@@ -42,6 +42,9 @@
   <tr>
     <td class="{{ current_status[row['return_code']] }}" width="25%">
       {{ row['name'] }}
+      {% if(row['state'] == 'UNCONFIRMED') %}
+      (check {{ row['check_attempt'] }}/{{ host['service_check_attempts'] }})
+      {% endif %}
       {% if('service_url' in row) %}
       <a href="{{ row['service_url'] }}" target="_blank" class="mdi mdi-launch icon-sm icon-inline"></a>
       {% endif %}

@@ -14,7 +14,6 @@ sudo python3 dashboard.py -h
 import asyncio
 import configargparse
 import logging
-import redis
 import signal
 import sys
 import threading
@@ -27,9 +26,10 @@ import modules.notifications as notifier
 from natsort import natsorted
 from cerberus import Validator
 from modules.monitor import HostMonitor
+from modules.history import HostHistory
 from flask import Flask, flash, render_template, jsonify, redirect, request, Response
 
-db = redis.Redis('localhost', decode_responses=True)
+history = HostHistory()
 
 
 # function to handle when the is killed and exit gracefully
@@ -62,7 +62,7 @@ def webapp_thread(port_number, config_file, debugMode=False, logHandlers=[]):
         result = None
 
         # get the host status from the db
-        host = utils.read_db(db, f"{utils.HOST_STATUS}.{id}")
+        host = history.get_host(id)
 
         if(len(host) > 0):
             result = host
@@ -87,10 +87,10 @@ def webapp_thread(port_number, config_file, debugMode=False, logHandlers=[]):
     @app.route('/api/status', methods=['GET'])
     def status():
         # get a list of hosts
-        hosts = utils.read_db(db, utils.VALID_HOSTS)
+        hosts = history.list_hosts()
 
         # get the status of all the hosts
-        status = [utils.read_db(db, f"{utils.HOST_STATUS}.{h}") for h in hosts]
+        status = [history.get_host(h) for h in hosts]
 
         return jsonify(status)
 
@@ -100,10 +100,10 @@ def webapp_thread(port_number, config_file, debugMode=False, logHandlers=[]):
         error_count = 0
 
         # pull in all the hosts and get their overall status
-        hosts = utils.read_db(db, utils.VALID_HOSTS)
+        hosts = history.list_hosts()
         services = []
         for name in hosts:
-            host = utils.read_db(db, f"{utils.HOST_STATUS}.{name}")
+            host = history.get_host(name)
 
             # catch for rare cases where host status hasn't been calculated yet
             if('overall_status' in host):
@@ -221,10 +221,12 @@ async def check_notifications(notify, old_host, new_host):
         else:
             # if service list isn't the same just skip checking for now
             if(len(new_host['services']) == len(old_host['services'])):
-                # check the service statuses
                 for i in range(0, len(new_host['services'])):
-                    # check that old host is available and that the service list
-                    if(new_host['services'][i]['return_code'] != old_host['services'][i]['return_code']):
+                    # # check the service statuses - make sure it's confirmed before notifying
+                    if((new_host['services'][i]['return_code'] != old_host['services'][i]['return_code'] and
+                        new_host['services'][i]['state'] == utils.CONFIRMED_STATE) or
+                       (old_host['services'][i]['state'] == utils.UNCONFIRMED_STATE and
+                       new_host['services'][i]['state'] == utils.CONFIRMED_STATE)):
                         # something has changed in this service's status
                         notify.notify_service(new_host['name'], new_host['services'][i])
 
@@ -253,9 +255,6 @@ logging.basicConfig(datefmt='%m/%d %H:%M',
                     level=getattr(logging, logLevel),
                     handlers=logHandlers)
 
-# set host list (blank)
-utils.write_db(db, utils.HOST_STATUS, [])
-
 # load the config file
 yaml_check = load_config_file(args.file)
 
@@ -280,9 +279,6 @@ webAppThread.start()
 logging.info('Starting monitoring check daemon')
 monitor = HostMonitor(yaml_file)
 
-# save a list of all valid host names
-utils.write_db(db, utils.VALID_HOSTS, monitor.get_hosts())
-
 while 1:
     logging.debug("Running host check")
     status = monitor.check_hosts()
@@ -290,9 +286,9 @@ while 1:
     for host in status:
         # send notifications, if there are any
         if(notify is not None):
-            asyncio.run(check_notifications(notify, utils.read_db(db, f"{utils.HOST_STATUS}.{host['id']}"), host))
+            asyncio.run(check_notifications(notify, history.get_host(host['id']), host))
 
         # save the updated host
-        utils.write_db(db, f"{utils.HOST_STATUS}.{host['id']}", host)
+        history.save_host(host['id'], host)
 
     time.sleep(60)

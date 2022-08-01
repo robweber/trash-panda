@@ -22,7 +22,7 @@ This is a _very_ basic monitoring solution meant for simple home use. It will mo
   - [Service](#service)
   - [Script Paths](#script-paths)
   - [Custom Functions](#custom-functions)
-- [Contributing](#contributing)
+- [Credits](#credits)
 - [License](#license)
 
 ## Install
@@ -95,19 +95,24 @@ __/api/status__ - detailed listing of the status of each host
     "name": "Switch 1",
     "overall_status": 1,
     "interval": 3,
+    "service_check_attempts": 2,
     "last_check": "07-21-2022 11:01AM",
     "next_check": "07-21-2022 11:04AM",
     "services": [
       {
+        "check_attempt": 1,
         "id": "alive",
         "name": "Alive",
         "return_code": 0,
+        "state": "CONFIRMED",
         "text": "Ping successfull!"
       },
       {
+	    "check_attempt": 1,
         "id": "switch-uptime",
         "name": "Switch Uptime",
         "return_code": 1,
+        "state": "UNCONFIRMED",
         "text": "11 days, 2:09:34\n"
       }
     ],
@@ -144,11 +149,12 @@ types: !include conf/types.yaml
 hosts: !include conf/hosts.yaml
 ```
 
-The following additional options are available depending on the type of device:
+The following additional options are available for every configured device:
 
 * management_page - a link to the local management page of the host, if there is one. This will be displayed in the dashboard
 * icon - the icon to use for the device, overrides the default type. Should be found on [Material Design Icons](https://materialdesignicons.com/)
 * interval - how often this host should be checked, in minutes. If not given this is the system default. At runtime this value is randomly adjusted +/- 60 seconds to help spread load.
+* service_check_attempts - how many times a service should be checked before confirming a warning or critical state. Default is 3, set this to 1 to automatically confirm state changes.
 * config - an additional mapping of config options specific to this host type
 
 ### Global Configuration
@@ -158,6 +164,7 @@ Global configuration options are set under the `config` key in the YAML configur
 ```
 config:
   default_interval: 3
+  service_check_attempts: 3
   check_on_startup: True
   jinja_constants:
     CUSTOM_PATH: /path/
@@ -166,13 +173,14 @@ config:
 ```
 
 * default_interval - the default host check interval, in minutes. This will default to 3 unless changed. [Individual hosts](#host-types) can set their own interval if needed. At runtime this value is randomly adjusted +/- 60 seconds to help spread load.
+* service_check_attempts: how many times a service should be checked before confirming a warning or critical state. [Individual hosts](#host-types). Default is 3, set this to 1 to automatically confirm state changes.
 * check_on_startup - if hosts should all be checked immediately after startup. Defaults to True. If this is set to False, host checks will start on their normal interval from the program start time.
 * jinja_constants - a list of key:value pairs that will be passed to the [Jinja templating engine](#templating). These can be things like commonly used system paths or refernced names used in defining host or service value.
 * notifier - defines a notification channel, see more below
 
 ### Notifications
 
-By default the system will not send any notifications, but there is support for some built-in notification methods. These can be defined in the `config` section of the YAML file by creating a `notifier` option. A notifier is loaded at startup and will send notifications on host status (up/down) changes or service status changes each time a check is run.
+By default the system will not send any notifications, but there is support for some built-in notification methods. These can be defined in the `config` section of the YAML file by creating a `notifier` option. A notifier is loaded at startup and will send notifications on host status (up/down) changes or service status changes each time a check is run. Services must be in a CONFIRMED state before a notification is sent. Services are in an UNCONFIRMED state when either a warning or critical state has not reached the `service_check_attempts` threshold described above.
 
 Additional notification methods can be defined by extending the `MonitorNotification` class. Built-in notification types are listed below.
 
@@ -224,6 +232,7 @@ web_server:
   name: Web Server
   icon: server
   interval: 10
+  service_check_attempts: 2
   config:
     virtual_host:
       required: True
@@ -266,6 +275,7 @@ The following attributes are useful, but not necessary, for any host definition:
 * info - any additional information on this device you want displayed on the Dashboard page.
 * management_page - the full URL to web management for this device, if it exists
 * interval - the check interval, if different than the global value
+* service_check_attempts - how many service checks to confirm warning/critical states. Only needed if different than the global value.
 
 ## Templating
 

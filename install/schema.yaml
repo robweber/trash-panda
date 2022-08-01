@@ -16,6 +16,10 @@ config:
       required: False
       type: boolean
       default: True
+    service_check_attempts:
+      required: False
+      type: integer
+      default: 3
     jinja_constants:
       required: False
       type: dict
@@ -78,6 +82,9 @@ types:
       interval:
         required: False
         type: integer
+      service_check_attempts:
+        required: False
+        type: integer
       config:
         required: False
         type: dict
@@ -133,6 +140,9 @@ hosts:
         required: True
         type: string
       interval:
+        required: False
+        type: integer
+      service_check_attempts:
         required: False
         type: integer
       icon:

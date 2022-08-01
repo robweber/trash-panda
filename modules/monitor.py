@@ -11,6 +11,7 @@ from slugify import slugify
 from functools import reduce
 from modules.device import HostType
 from pythonping import ping
+from modules.history import HostHistory
 from modules.exceptions import DeviceNotFoundError, ServiceNotFoundError
 
 
@@ -23,15 +24,17 @@ class HostMonitor:
     types = None
     services = None
     hosts = None
+    history = None
     time_format = "%m-%d-%Y %I:%M%p"
     custom_jinja_constants = {}
     __jinja = None
 
     def __init__(self, yaml_file):
-        # create the host type and services definitions
-        self.types = self.__create_types(yaml_file['types'], yaml_file['config']['default_interval'])
+        # create the host type and services definitions, load history
+        self.types = self.__create_types(yaml_file['types'], yaml_file['config']['default_interval'], yaml_file['config']['service_check_attempts'])
         self.services = yaml_file['services']
         self.hosts = []
+        self.history = HostHistory()
 
         # load jinja environment
         self._jinja = jinja2.Environment()
@@ -58,14 +61,17 @@ class HostMonitor:
             self.hosts.append(device)
             logging.info(f"Loading device {device.name} with check interval every {device.interval} min")
 
-    def __create_types(self, types_def, default_interval):
+        # save a list of all valid host names
+        self.history.set_hosts(self.get_hosts())
+
+    def __create_types(self, types_def, default_interval, default_attempts):
         """Create devices type definitions based on defined YAML"""
         result = {}
 
         # create a host type for each defined type
         for t in types_def:
             logging.info(f"Loading host type {t}")
-            result[t] = HostType(t, types_def[t], default_interval)
+            result[t] = HostType(t, types_def[t], default_interval, default_attempts)
 
         return result
 
@@ -138,21 +144,22 @@ class HostMonitor:
 
         services = host.get_services()
         service_results = []
+
         if(self._ping(host.address)):
             logging.debug(f"{host.name}: Is Alive")
 
             # the host is alive, continue checks
-            service_results = self.__custom_checks(services, host.config)
+            service_results = self.__custom_checks(services, host)
 
-            service_results.append(self.__make_service_output("Alive", 0, "Ping successfull!"))
+            service_results.append(self.__make_service_output(host, "Alive", 0, "Ping successfull!"))
         else:
             logging.debug(f"{host.name}: Is Not Alive")
 
             # the host is not alive, set "unknown" for all other services
             for service in services:
-                service_results.append(self.__make_service_output(service['name'], 3, "Not attempted", service['service_url']))
+                service_results.append(self.__make_service_output(host, service['name'], 3, "Not attempted", service['service_url']))
 
-            service_results.append(self.__make_service_output("Alive", 2, "Ping failed"))
+            service_results.append(self.__make_service_output(host, "Alive", 2, "Ping failed"))
 
         result['services'] = sorted(service_results, key=lambda s: s['name'])
 
@@ -171,24 +178,39 @@ class HostMonitor:
         # if over 50% responded return True
         return True if (len(total)/len(responses) > .5) else False
 
-    def __make_service_output(self, name, return_code, text, url=""):
+    def __make_service_output(self, host, name, return_code, text, url=""):
         """Helper method to take the name, return_code, and output and wrap
         it in a Dict.
         """
-        result = {"name": name, "return_code": return_code, "text": text, "id": slugify(name)}
+        service_id = slugify(name)
+        result = {"name": name, "return_code": return_code, "text": text, "id": service_id, "check_attempt": 1, "state": utils.CONFIRMED_STATE}
 
         if(url.strip() != ""):
             result['service_url'] = url
 
+        # determine check attempts and service state (skip OK and Unknown states)
+        old_service = self.history.get_service(host.id, service_id)
+        if(old_service and return_code not in [0, 3]):
+            # check if return code has changed to non-OK state - if max_check is = 1 skip unconfirmed states
+            if(old_service['return_code'] != result['return_code'] and host.check_attempts > 1):
+                # we're in an unconfirmed state
+                result['state'] = utils.UNCONFIRMED_STATE
+            # if already in unconfirmed state
+            elif(old_service['state'] == utils.UNCONFIRMED_STATE):
+                # decide if we should keep checking
+                if(old_service['check_attempt'] + 1 < host.check_attempts):
+                    result['state'] = utils.UNCONFIRMED_STATE
+                    result['check_attempt'] = old_service['check_attempt'] + 1
+
         return result
 
-    def __custom_checks(self, services, host_config):
+    def __custom_checks(self, services, host):
         """run defined custom service checks from a host given the current host configuration"""
         result = []
 
         for s in services:
-            output = self.__run_process(self.__create_service_call(s, host_config), [])
-            result.append(self.__make_service_output(s['name'], output.returncode, output.stdout, s['service_url']))
+            output = self.__run_process(self.__create_service_call(s, host.config), [])
+            result.append(self.__make_service_output(host, s['name'], output.returncode, output.stdout, s['service_url']))
             time.sleep(1)
 
         return result
@@ -204,7 +226,7 @@ class HostMonitor:
 
             # check if we need to check this host,
             next_check = datetime.datetime.strptime(aHost.next_check, self.time_format)
-            if(next_check < now ):
+            if(next_check < now):
                 logging.debug(f"Checking {aHost.name}")
 
                 host_check = self.__check_host(aHost)
