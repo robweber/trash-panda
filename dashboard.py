@@ -254,6 +254,7 @@ logging.basicConfig(datefmt='%m/%d %H:%M',
                     format="%(levelname)s %(asctime)s: %(message)s",
                     level=getattr(logging, logLevel),
                     handlers=logHandlers)
+logging.getLogger('asyncio').setLevel(logging.WARNING)  # only show warning or above from this module
 
 # load the config file
 yaml_check = load_config_file(args.file)
