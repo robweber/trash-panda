@@ -4,6 +4,8 @@ from enum import Enum
 
 
 class HostHistory:
+    """ Encapulates reading/writing to the Redis database"""
+    
     db = None
 
     def __init__(self):

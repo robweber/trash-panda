@@ -25,17 +25,15 @@ class HostMonitor:
     services = None
     hosts = None
     history = None
-    max_check_attempts = 3
     time_format = "%m-%d-%Y %I:%M%p"
     custom_jinja_constants = {}
     __jinja = None
 
     def __init__(self, yaml_file):
         # create the host type and services definitions, load history
-        self.types = self.__create_types(yaml_file['types'], yaml_file['config']['default_interval'])
+        self.types = self.__create_types(yaml_file['types'], yaml_file['config']['default_interval'], yaml_file['config']['service_check_attempts'])
         self.services = yaml_file['services']
         self.hosts = []
-        self.max_check_attempts = yaml_file['config']['service_check_attempts']
         self.history = HostHistory()
 
         # load jinja environment
@@ -66,14 +64,14 @@ class HostMonitor:
         # save a list of all valid host names
         self.history.set_hosts(self.get_hosts())
 
-    def __create_types(self, types_def, default_interval):
+    def __create_types(self, types_def, default_interval, default_attempts):
         """Create devices type definitions based on defined YAML"""
         result = {}
 
         # create a host type for each defined type
         for t in types_def:
             logging.info(f"Loading host type {t}")
-            result[t] = HostType(t, types_def[t], default_interval)
+            result[t] = HostType(t, types_def[t], default_interval, default_attempts)
 
         return result
 
@@ -153,15 +151,15 @@ class HostMonitor:
             # the host is alive, continue checks
             service_results = self.__custom_checks(services, host)
 
-            service_results.append(self.__make_service_output(host.id, "Alive", 0, "Ping successfull!"))
+            service_results.append(self.__make_service_output(host, "Alive", 0, "Ping successfull!"))
         else:
             logging.debug(f"{host.name}: Is Not Alive")
 
             # the host is not alive, set "unknown" for all other services
             for service in services:
-                service_results.append(self.__make_service_output(host.id, service['name'], 3, "Not attempted", service['service_url']))
+                service_results.append(self.__make_service_output(host, service['name'], 3, "Not attempted", service['service_url']))
 
-            service_results.append(self.__make_service_output(host.id, "Alive", 2, "Ping failed"))
+            service_results.append(self.__make_service_output(host, "Alive", 2, "Ping failed"))
 
         result['services'] = sorted(service_results, key=lambda s: s['name'])
 
@@ -180,7 +178,7 @@ class HostMonitor:
         # if over 50% responded return True
         return True if (len(total)/len(responses) > .5) else False
 
-    def __make_service_output(self, host_id, name, return_code, text, url=""):
+    def __make_service_output(self, host, name, return_code, text, url=""):
         """Helper method to take the name, return_code, and output and wrap
         it in a Dict.
         """
@@ -191,16 +189,16 @@ class HostMonitor:
             result['service_url'] = url
 
         # determine check attempts and service state (skip OK and Unknown states)
-        old_service = self.history.get_service(host_id, service_id)
+        old_service = self.history.get_service(host.id, service_id)
         if(old_service and return_code not in [0, 3]):
             # check if return code has changed to non-OK state - if max_check is = 1 skip unconfirmed states
-            if(old_service['return_code'] != result['return_code'] and self.max_check_attempts > 1):
+            if(old_service['return_code'] != result['return_code'] and host.check_attempts > 1):
                 # we're in an unconfirmed state
                 result['state'] = utils.UNCONFIRMED_STATE
             # if already in unconfirmed state
             elif(old_service['state'] == utils.UNCONFIRMED_STATE):
                 # decide if we should keep checking
-                if(old_service['check_attempt'] + 1 < self.max_check_attempts):
+                if(old_service['check_attempt'] + 1 < host.check_attempts):
                     result['state'] = utils.UNCONFIRMED_STATE
                     result['check_attempt'] = old_service['check_attempt'] + 1
 
@@ -212,7 +210,7 @@ class HostMonitor:
 
         for s in services:
             output = self.__run_process(self.__create_service_call(s, host.config), [])
-            result.append(self.__make_service_output(host.id, s['name'], output.returncode, output.stdout, s['service_url']))
+            result.append(self.__make_service_output(host, s['name'], output.returncode, output.stdout, s['service_url']))
             time.sleep(1)
 
         return result

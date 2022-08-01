@@ -9,11 +9,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ## Added
 
 - added `HostHistory` class to encapsulate Redis db activity
-- can specify a number of check attempts before confirming critical/warning states
+- can specify a number of check attempts before confirming critical/warning states. global, device type, and specific host definitions available
 
 ## Changed
 
 - updated `dashboard.py` to use history class instead of direct Redis db access
+- notifications only go out on CONFIRMED states
 
 ## 2.1
 
