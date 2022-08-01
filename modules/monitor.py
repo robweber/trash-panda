@@ -204,7 +204,7 @@ class HostMonitor:
 
             # check if we need to check this host,
             next_check = datetime.datetime.strptime(aHost.next_check, self.time_format)
-            if(next_check < now ):
+            if(next_check < now):
                 logging.debug(f"Checking {aHost.name}")
 
                 host_check = self.__check_host(aHost)

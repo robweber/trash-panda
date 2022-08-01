@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## Unreleased
+
+## Added
+
+- added `HostHistory` class to encapsulate Redis db activity
+
+## Changed
+
+- updated `dashboard.py` to use history class instead of direct Redis db access
+
 ## 2.1
 
 ## Added
