@@ -42,7 +42,7 @@ class Device:
         """takes the current host configuration and returns it as a dictionary object, which
         can be serialized for JSON output"""
         result = {'type': self.type, 'id': self.id, 'name': self.name, 'address': self.address,
-                  'icon': self.icon, 'info': self.info, 'interval': self.interval, 'service_check_attempts': self.check_attempts, 
+                  'icon': self.icon, 'info': self.info, 'interval': self.interval, 'service_check_attempts': self.check_attempts,
                   'last_check': self.last_check, 'config': self.config}
 
         if(self.management_page is not None):

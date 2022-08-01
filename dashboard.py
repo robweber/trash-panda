@@ -223,8 +223,10 @@ async def check_notifications(notify, old_host, new_host):
             if(len(new_host['services']) == len(old_host['services'])):
                 for i in range(0, len(new_host['services'])):
                     # # check the service statuses - make sure it's confirmed before notifying
-                    if((new_host['services'][i]['return_code'] != old_host['services'][i]['return_code'] and new_host['services'][i]['state'] == utils.CONFIRMED_STATE) or
-                       (old_host['services'][i]['state'] == utils.UNCONFIRMED_STATE and new_host['services'][i]['state'] == utils.CONFIRMED_STATE)):
+                    if((new_host['services'][i]['return_code'] != old_host['services'][i]['return_code'] and
+                        new_host['services'][i]['state'] == utils.CONFIRMED_STATE) or
+                       (old_host['services'][i]['state'] == utils.UNCONFIRMED_STATE and
+                       new_host['services'][i]['state'] == utils.CONFIRMED_STATE)):
                         # something has changed in this service's status
                         notify.notify_service(new_host['name'], new_host['services'][i])
 
