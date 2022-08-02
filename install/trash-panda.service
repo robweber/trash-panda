@@ -1,0 +1,11 @@
+[Unit]
+Description=Trash Panda Monitoring Service
+Requires=redis-server.service
+
+[Service]
+User=root
+WorkingDirectory=/home/trash-panda
+ExecStart=/usr/bin/python3 /home/trash-panda/dashboard.py -c /etc/default/trash-panda
+
+[Install]
+WantedBy=multi-user.target

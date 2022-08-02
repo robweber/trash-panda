@@ -1,4 +1,4 @@
-# Simple Monitoring
+# Trash Panda
 [![PEP8](https://img.shields.io/badge/code%20style-pep8-orange.svg)](https://www.python.org/dev/peps/pep-0008/)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg)](https://github.com/RichardLitt/standard-readme)
 
@@ -50,7 +50,7 @@ python3 dashboard.py -h
 
 usage: dashboard.py [-h] [-c CONFIG] [-f FILE] [-p PORT] [-D]
 
-Simple Monitoring
+Trash Panda
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -291,7 +291,7 @@ The `service` variable is a dictionary containing any configuration listed for t
 
 ### Script Paths
 
-The OS path to both the Nagios default scripts and the `custom_scripts` directory of the simple-monitoring repo are available as shortcuts to defined command paths. These are:
+The OS path to both the Nagios default scripts and the `custom_scripts` directory of the trash-panda repo are available as shortcuts to defined command paths. These are:
 
 * NAGIOS_PATH
 * SCRIPTS_PATH

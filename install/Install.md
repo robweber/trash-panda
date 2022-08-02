@@ -39,16 +39,16 @@ cp install/monitor_example.yaml conf/monitor.yaml
 
 ### Installing as a Service
 
-Install as a service by modifying the paths in the `install/simple-monitoring.service` file.
+Install as a service by modifying the paths in the `install/trash-panda.service` file.
 
 ```
-sudo cp install/simple-monitoring.service /etc/systemd/system/simple-monitoring.service
-sudo chown root:root /etc/systemd/system/simple-monitoring.service
-sudo systemctl enable simple-monitoring
+sudo cp install/trash-panda.service /etc/systemd/system/trash-panda.service
+sudo chown root:root /etc/systemd/system/trash-panda.service
+sudo systemctl enable trash-panda
 
 # start the service
-sudo systemctl start simple-monitoring
+sudo systemctl start trash-panda
 
 # stop the Service
-sudo systemctl stop simple-monitoring
+sudo systemctl stop trash-panda
 ```
