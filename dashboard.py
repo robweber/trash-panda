@@ -39,7 +39,7 @@ def signal_handler(signum, frame):
 
 
 def webapp_thread(port_number, config_file, debugMode=False, logHandlers=[]):
-    app = Flask(import_name="simple-monitoring", static_folder=os.path.join(utils.DIR_PATH, 'web', 'static'),
+    app = Flask(import_name="trash-panda", static_folder=os.path.join(utils.DIR_PATH, 'web', 'static'),
                 template_folder=os.path.join(utils.DIR_PATH, 'web', 'templates'))
 
     # generate random number for session secret key
@@ -79,7 +79,7 @@ def webapp_thread(port_number, config_file, debugMode=False, logHandlers=[]):
         result = _get_host(id)
 
         if(result is not None):
-            return render_template("host_status.html", host=result)
+            return render_template("host_status.html", host=result, page_title='Host Status')
         else:
             flash('Host page not found', 'warning')
             return redirect('/')
@@ -125,7 +125,7 @@ def webapp_thread(port_number, config_file, debugMode=False, logHandlers=[]):
 
     @app.route('/editor', methods=['GET'])
     def editor():
-        return render_template("editor.html", config_file=config_file)
+        return render_template("editor.html", config_file=config_file, page_title='Config Editor')
 
     @app.route('/api/browse_files/', methods=['GET'], defaults={'browse_path': utils.DIR_PATH})
     @app.route('/api/browse_files/<path:browse_path>', methods=['GET'])
@@ -231,7 +231,7 @@ async def check_notifications(notify, old_host, new_host):
                         notify.notify_service(new_host['name'], new_host['services'][i])
 
 # parse the CLI args
-parser = configargparse.ArgumentParser(description='Simple Monitoring')
+parser = configargparse.ArgumentParser(description='Trash Panda')
 parser.add_argument('-c', '--config', is_config_file=True,
                     help='Path to custom config file')
 parser.add_argument('-f', '--file', default='conf/monitor.yaml',
@@ -272,7 +272,7 @@ if('notifier' in yaml_file['config']):
     notify = notifier.create_notifier(yaml_file['config']['notifier'])
 
 # start the web app
-logging.info('Starting Simple Monitoring Web Service')
+logging.info('Starting Trash Panda Web Service')
 webAppThread = threading.Thread(name='Web App', target=webapp_thread, args=(args.port, args.file, True, logHandlers))
 webAppThread.setDaemon(True)
 webAppThread.start()

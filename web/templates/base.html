@@ -1,6 +1,7 @@
+{% set page_title = page_title | default('Dashboard') %}
 <html>
     <head>
-        <title>Simple Monitoring</title>
+        <title>Trash Panda</title>
         <link rel="stylesheet" href="/static/css/bootstrap.min.css" />
         <link rel="stylesheet" href="/static/css/bootstrap-theme.min.css" />
         <link rel="stylesheet" href="/static/css/materialdesignicons.min.css" />
@@ -19,7 +20,7 @@
           <a class="btn btn-secondary float-right" href="/" role="button" id="statusMenu" aria-haspopup="false" aria-expanded="false">
             Status
           </a>
-        <h3 class="text-muted"><span class="text-danger">Monitor</span> Dashboard</h3>
+        <h3 class="text-muted"><span class="text-danger">Trash Panda</span> - {{ page_title }}</h3>
         </div>
         {% for category,message in get_flashed_messages(with_categories=true) %}
         <div class="alert alert-{{ category }}" role="alert">
