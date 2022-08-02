@@ -186,11 +186,14 @@ By default the system will not send any notifications, but there is support for 
 
 Additional notification methods can be defined by extending the `MonitorNotification` class. Built-in notification types are listed below.
 
-__Log Notifier__ - writes all notification messages directly to the log
+__Log Notifier__ - writes all notification messages directly to the log. Optionally the `path` argument can be used to specify a custom log path for notification messages.
 ```
 config:
   notifier:
     type: log
+    args:
+      path: /path/to/custom.log
+      propagate: True  # controls if notifications also written to root logger
 ```
 
 __Pushover Notifier__ - sends messages through the [Pushover Notification Service](https://pushover.net/). A valid application key and user key are needed for your account and can be generated using [their instructions](https://pushover.net/api).
