@@ -102,14 +102,16 @@ __/api/status__ - detailed listing of the status of each host
       {
         "check_attempt": 1,
         "id": "alive",
+        "last_state_change": "07-02-2022 11:40AM",
         "name": "Alive",
         "return_code": 0,
         "state": "CONFIRMED",
         "text": "Ping successfull!"
       },
       {
-	    "check_attempt": 1,
+	      "check_attempt": 1,
         "id": "switch-uptime",
+        "last_state_change": "07-02-2022 11:40AM",
         "name": "Switch Uptime",
         "return_code": 1,
         "state": "UNCONFIRMED",

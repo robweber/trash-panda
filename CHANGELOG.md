@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 - added `HostHistory` class to encapsulate Redis db activity
 - can specify a number of check attempts before confirming critical/warning states. global, device type, and specific host definitions available
+- services now have a `last_state_change` attribute that has the date/time of the last confirmed state change
 
 ## Changed
 
