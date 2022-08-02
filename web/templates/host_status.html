@@ -29,7 +29,7 @@
 <table class="table table-striped mt-3">
   {% for row in host['services']: %}
   <tr>
-    <td class="{{ current_status[row['return_code']] }}" width="25%">
+    <td class="{{ current_status[row['return_code']] }}" width="20%">
       {{ row['name'] }}
       {% if(row['state'] == 'UNCONFIRMED') %}
       (check {{ row['check_attempt'] }}/{{ host['service_check_attempts'] }})
@@ -38,7 +38,8 @@
       <a href="{{ row['service_url'] }}" target="_blank" class="mdi mdi-launch icon-sm icon-inline"></a>
       {% endif %}
     </td>
-    <td class="{{ status_text[row['return_code']] }}">{{ row['text'].replace("\n", '<br />') | safe }}</td>
+    <td class="{{ status_text[row['return_code']] }}" width="60%">{{ row['text'].replace("\n", '<br />') | safe }}</td>
+    <td class="{{ status_text[row['return_code']] }}">{{ row['last_state_change'] }}</td>
   </tr>
   {% endfor %}
 </table>
