@@ -52,12 +52,33 @@ class MonitorNotification:
 
 
 class LogNotification(MonitorNotification):
-    """Logs all notification methods using the logging.info() function"""
+    """Logs all notifications to the application log. A custom log file location
+    can also be specified.
+
+    Custom config:
+    * path - path to where a custom log file should go
+    * propagate - if log messages should be in both the root and custom log (default True)
+    """
+    notify_logger = None
+
     def __init__(self, args):
         super().__init__('log')
 
+        # create the logger and specify the log location
+        self.notify_logger = logging.getLogger("trash-panda-notify")
+
+        # if a custom file path is given
+        if('path' in args):
+            logging.info(f"Setting notification log to {args['path']}")
+
+            file_handler = logging.FileHandler(args['path'])
+            file_handler.setFormatter(logging.Formatter(fmt="%(asctime)s: %(message)s", datefmt="%Y-%m-%d %H:%M"))
+            self.notify_logger.addHandler(file_handler)
+
+            self.notify_logger.propagate = args['propagate'] if 'propagate' in args else True
+
     def _send_message(self, message):
-        logging.info(f"Notification: {message}")
+        self.notify_logger.info(f"Notification: {message}")
 
 
 class PushoverNotification(MonitorNotification):
