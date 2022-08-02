@@ -183,16 +183,18 @@ class HostMonitor:
         it in a Dict.
         """
         service_id = slugify(name)
-        result = {"name": name, "return_code": return_code, "text": text, "id": service_id, "check_attempt": 1, "state": utils.CONFIRMED_STATE}
+        now = datetime.datetime.now()
+        result = {"name": name, "return_code": return_code, "text": text, "id": service_id,
+                 "check_attempt": 1, "state": utils.CONFIRMED_STATE, "last_state_change": now.strftime(self.time_format)}
 
         if(url.strip() != ""):
             result['service_url'] = url
 
         # determine check attempts and service state (skip OK and Unknown states)
         old_service = self.history.get_service(host.id, service_id)
-        if(old_service and return_code not in [0, 3]):
+        if(old_service):
             # check if return code has changed to non-OK state - if max_check is = 1 skip unconfirmed states
-            if(old_service['return_code'] != result['return_code'] and host.check_attempts > 1):
+            if(old_service['return_code'] != return_code and return_code in [1, 2] and host.check_attempts > 1):
                 # we're in an unconfirmed state
                 result['state'] = utils.UNCONFIRMED_STATE
             # if already in unconfirmed state
@@ -201,6 +203,10 @@ class HostMonitor:
                 if(old_service['check_attempt'] + 1 < host.check_attempts):
                     result['state'] = utils.UNCONFIRMED_STATE
                     result['check_attempt'] = old_service['check_attempt'] + 1
+
+            # if the state hasn't changed or hasn't been confirmed
+            if((old_service['return_code'] == return_code and old_service['state'] == result['state']) or result['state'] == utils.UNCONFIRMED_STATE):
+                result['last_state_change'] = old_service['last_state_change']
 
         return result
 
