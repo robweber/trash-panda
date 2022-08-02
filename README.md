@@ -279,7 +279,7 @@ The following attributes are useful, but not necessary, for any host definition:
 
 ## Templating
 
-When expanding templates for service variables there are a few global variables and custom functions available. Global variables can be added to by setting values in the `jinja_constants` section of the [global config](#global-configuration). Check the [example config file](https://github.com/robweber/simple-monitoring/blob/main/install/monitor_example.yaml) to see how these can be used within host and service configurations.
+When expanding templates for service variables there are a few global variables and custom functions available. Global variables can be added to by setting values in the `jinja_constants` section of the [global config](#global-configuration). Check the [example config file](https://github.com/robweber/trash-panda/blob/main/install/monitor_example.yaml) to see how these can be used within host and service configurations.
 
 ### Host
 
@@ -316,4 +316,4 @@ The following projects are used within this project and contributed most of the 
 
 ## License
 
-[GPLv3](https://github.com/robweber/simple-monitoring/blob/main/LICENSE)
+[GPLv3](https://github.com/robweber/trash-panda/blob/main/LICENSE)

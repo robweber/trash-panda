@@ -16,10 +16,10 @@ sudo apt-get update
 sudo apt-get install apt-transport-https gnupg git nagios-plugins nagios-plugins-basic nagios-plugins-standard python3 python3-pip redis-server wget
 
 # clone repo
-git clone https://github.com/eau-claire-energy-cooperative/dr-dashboard.git
+git clone https://github.com/robweber/trash-panda.git
 
 # go into the project dir and set directory as a variable
-cd dr-dashboard
+cd trash-panda
 PROJECT_DIR=$(pwd)
 
 # install python deps
