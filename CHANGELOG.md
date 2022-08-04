@@ -6,37 +6,45 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## Unreleased
 
-## Added
+### Added
 
 - screenshot to README
 
-## Fixed
+### Changed
+
+- `SCRIPTS_PATH` template variable now points to [trash-panda-scripts](https://github.com/robweber/trash-panda-scripts) repo. Default location is same parent folder containing main repo. 
+
+### Fixed
 
 - minor spelling and syntax in the README
 
+### Removed
+
+- moved all scripts from the `check_scripts` directory to their own repo
+
 ## 3.0
 
-## Added
+### Added
 
 - added `HostHistory` class to encapsulate Redis db activity
 - can specify a number of check attempts before confirming critical/warning states. global, device type, and specific host definitions available
 - services now have a `last_state_change` attribute that has the date/time of the last confirmed state change
 - __log__ type notifier can now optionally log to a separate file as defined by the `path` argument
 
-## Changed
+### Changed
 
 - updated `dashboard.py` to use history class instead of direct Redis db access
 - notifications only go out on CONFIRMED states
 - removed showing all config entries on the host status page - these can be viewed in the config area
 - rebranded to __Trash Panda__
 
-## Fixed
+### Fixed
 
 - don't show debug messages from `asyncio` package
 
 ## 2.1
 
-## Added
+### Added
 
 - added config value `jinja_constants` to define a list of values that can be passed to the Jinja templating engine. These can be paths or just general constants.
 - added services list to overall status to list all services currently in an error state
