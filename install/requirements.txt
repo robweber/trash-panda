@@ -1,13 +1,11 @@
 asyncio
 cerberus
 configargparse
-hnmp
 Flask
 natsort
 python-pushover
 pythonping
 python-slugify
-pyvmomi
 redis
 pyyaml
 Jinja2
