@@ -3,7 +3,7 @@
 [![PEP8](https://img.shields.io/badge/code%20style-pep8-orange.svg)](https://www.python.org/dev/peps/pep-0008/)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg)](https://github.com/RichardLitt/standard-readme)
 
-This is a _very_ basic monitoring solution meant for simple home use. It will monitor the status of some basic IP systems and services in a simple dashboard. Some basic service and device type definitions are supplied; however more can be added by altering the YAML configuration files.
+This is a _very_ basic monitoring solution meant for simple home use. It will monitor the status of some basic IP systems and services in a simple dashboard. Some basic service and device type definitions are supplied; however more can be added by altering the YAML configuration files. 
 
 ## Table of Contents
 
@@ -30,7 +30,7 @@ This is a _very_ basic monitoring solution meant for simple home use. It will mo
 
 Install the repository according to the instructions in the [Install](install/Install.md) guide. Once this is done you can proceed to the Usage section.
 
-### Usage
+## Usage
 
 Before the program can be used services, device types, and hosts need to be configured in the `monitor.yaml` file created during the install. Detailed instructions for how to do this are below. Running the program must be done with `sudo` as root privileges are needed to bind to a socket. Once running the dashboard page will be available at `http://server_ip:5000/`. _Note the port may be different if you change it using the arguments below._
 
@@ -300,7 +300,7 @@ The `service` variable is a dictionary containing any configuration listed for t
 The OS path to both the Nagios default scripts and the `check_scripts` directory of the trash-panda repo are available as shortcuts to defined command paths. A default is set but you can override these by using the same name as `jinja_constants` values in the [global config](#global-configuration).
 
 * NAGIOS_PATH - default is `/usr/lib/nagios/plugins/`
-* SCRIPTS_PATH - default is the `check_scripts/` directory of the repo
+* SCRIPTS_PATH - path to [trash-panda-scripts](https://github.com/robweber/trash-panda-scripts) directory, default is `../trash-panda-scripts`
 
 ### Custom Functions
 

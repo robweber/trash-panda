@@ -18,6 +18,9 @@ sudo apt-get install apt-transport-https gnupg git nagios-plugins nagios-plugins
 # clone repo
 git clone https://github.com/robweber/trash-panda.git
 
+# optionally clone the scripts repo (needed for examples to run)
+git clone https://github.com/robweber/trash-panda-scripts.git
+
 # go into the project dir and set directory as a variable
 cd trash-panda
 PROJECT_DIR=$(pwd)
