@@ -1,10 +1,9 @@
 # Trash Panda
+![alt text](https://github.com/robweber/trash-panda/raw/main/install/monitor_dashboard.png "Dashboard Screen")
 [![PEP8](https://img.shields.io/badge/code%20style-pep8-orange.svg)](https://www.python.org/dev/peps/pep-0008/)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg)](https://github.com/RichardLitt/standard-readme)
 
 This is a _very_ basic monitoring solution meant for simple home use. It will monitor the status of some basic IP systems and services in a simple dashboard. Some basic service and device type definitions are supplied; however more can be added by altering the YAML configuration files.
-
-![alt text](https://github.com/robweber/trash-panda/raw/main/install/monitor_dashboard.png "Dashboard Screen")
 
 ## Table of Contents
 
