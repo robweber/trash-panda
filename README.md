@@ -296,10 +296,10 @@ The `service` variable is a dictionary containing any configuration listed for t
 
 ### Script Paths
 
-The OS path to both the Nagios default scripts and the `check_scripts` directory of the trash-panda repo are available as shortcuts to defined command paths. These are:
+The OS path to both the Nagios default scripts and the `check_scripts` directory of the trash-panda repo are available as shortcuts to defined command paths. A default is set but you can override these by using the same name as `jinja_constants` values in the [global config](#global-configuration).
 
-* NAGIOS_PATH
-* SCRIPTS_PATH
+* NAGIOS_PATH - default is `/usr/lib/nagios/plugins/`
+* SCRIPTS_PATH - default is the `check_scripts/` directory of the repo
 
 ### Custom Functions
 
