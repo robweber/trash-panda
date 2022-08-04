@@ -177,7 +177,7 @@ config:
 * default_interval - the default host check interval, in minutes. This will default to 3 unless changed. [Individual hosts](#host-types) can set their own interval if needed. At runtime this value is randomly adjusted +/- 60 seconds to help spread load.
 * service_check_attempts: how many times a service should be checked before confirming a warning or critical state. [Individual hosts](#host-types). Default is 3, set this to 1 to automatically confirm state changes.
 * check_on_startup - if hosts should all be checked immediately after startup. Defaults to True. If this is set to False, host checks will start on their normal interval from the program start time.
-* jinja_constants - a list of key:value pairs that will be passed to the [Jinja templating engine](#templating). These can be things like commonly used system paths or refernced names used in defining host or service value.
+* jinja_constants - a list of key:value pairs that will be passed to the [Jinja templating engine](#templating). These can be things like commonly used system paths or referenced names used in defining host or service values.
 * notifier - defines a notification channel, see more below
 
 ### Notifications
@@ -296,7 +296,7 @@ The `service` variable is a dictionary containing any configuration listed for t
 
 ### Script Paths
 
-The OS path to both the Nagios default scripts and the `custom_scripts` directory of the trash-panda repo are available as shortcuts to defined command paths. These are:
+The OS path to both the Nagios default scripts and the `check_scripts` directory of the trash-panda repo are available as shortcuts to defined command paths. These are:
 
 * NAGIOS_PATH
 * SCRIPTS_PATH
