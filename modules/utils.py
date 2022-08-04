@@ -8,6 +8,7 @@ import json
 import logging
 import os
 import yaml
+from cerberus import Validator
 
 # full path to the running directory of the program
 DIR_PATH = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
@@ -28,6 +29,32 @@ ALLOWED_EDITOR_TYPES = ('.yaml', '.py')
 def custom_yaml_loader(loader, node):
     yaml_file = loader.construct_scalar(node)
     return read_yaml(os.path.join(DIR_PATH, yaml_file))
+
+
+def load_config_file(file):
+    """Load the YAML config file and validate it's structure
+    errors in the file will be added to the result
+    """
+    result = {'valid': True}
+
+    yaml.add_constructor('!include', custom_yaml_loader, Loader=yaml.SafeLoader)
+    yaml_file = read_yaml(file)
+
+    if(yaml_file):
+        # validate the config file
+        schema = read_yaml(os.path.join(DIR_PATH, 'install', 'schema.yaml'))
+        v = Validator(schema)
+        if(not v.validate(yaml_file, schema)):
+            result['valid'] = False
+            result['errors'] = str(v.errors)
+
+        # normalize for missing values
+        result['yaml'] = v.normalized(yaml_file)
+    else:
+        result['valid'] = False
+        result['errors'] = 'Error parsing YAML file'
+
+    return result
 
 
 # read JSON formatted file
