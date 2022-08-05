@@ -240,7 +240,7 @@ signal.signal(signal.SIGINT, signal_handler)
 # setup the logger
 logLevel = 'INFO' if not args.debug else 'DEBUG'
 logHandlers = [logging.StreamHandler(sys.stdout)]
-logging.basicConfig(datefmt='%m/%d %H:%M',
+logging.basicConfig(datefmt='%m/%d %H:%M:%S',
                     format="%(levelname)s %(asctime)s: %(message)s",
                     level=getattr(logging, logLevel),
                     handlers=logHandlers)
@@ -288,4 +288,4 @@ while 1:
 
     # record the last time this loop ran
     history.save_last_check()
-    time.sleep(60)
+    time.sleep(60-datetime.datetime.now().second)  # sleep until the top of the next minute
