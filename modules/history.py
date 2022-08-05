@@ -1,5 +1,7 @@
+import datetime
 import json
 import redis
+import modules.utils as utils
 from enum import Enum
 
 
@@ -10,6 +12,21 @@ class HostHistory:
 
     def __init__(self):
         self.db = redis.Redis('localhost', decode_responses=True)
+
+    def save_last_check(self):
+        """sets the last check time using the current time as a unix timestamp"""
+        now = datetime.datetime.now()
+
+        self.__write_db(DBKeys.LAST_CHECK.value, datetime.datetime.timestamp(now))
+
+    def get_last_check(self):
+        """returns the last check time saved in the DB
+
+        :returns: the last update time as a datetime object
+        """
+        last_update = datetime.datetime.fromtimestamp(self.__read_db(DBKeys.LAST_CHECK.value))
+
+        return last_update
 
     def list_hosts(self):
         return self.__read_db(DBKeys.VALID_HOSTS.value)
@@ -78,3 +95,4 @@ class DBKeys(Enum):
     """Enum that holds the keys for Redis data lookups"""
     VALID_HOSTS = "host_names"
     HOST_STATUS = "host_status"
+    LAST_CHECK = "last_check_timestamp"
