@@ -23,6 +23,7 @@ This is a _very_ basic monitoring solution meant for simple home use. It will mo
   - [Service](#service)
   - [Script Paths](#script-paths)
   - [Custom Functions](#custom-functions)
+- [Watchdog](#watchdog)
 - [Credits](#credits)
 - [License](#license)
 
@@ -318,6 +319,16 @@ The following custom functions are available in addition to any standard [Jinja 
 
 * `path()` - this is a shortcut for the Python os.path.join() method to easily join paths together.
 * `default()` - allows for setting a default in cases where the user may or may not set a variable. If the user variable doesn't exist the default is used.
+
+## Watchdog
+
+Trash Panda will check if defined hosts and services are running, but what keeps track of Trash Panda? The `watchdog.py` script can be used to externally check the Trash Panda web service via the [health api](#api) endpoint. This script should be setup to run via a cron job and can read in the same YAML config file to trigger monitoring notifications. If the health service is either not running, or it reports that the monitoring system checker is not running, a notification will be sent using the configured notifier from the YAML file.
+
+```
+python3 watchdog.py -c conf/monitor.yaml
+```
+
+Once a notification is sent a flag file is created in the Trash Panda repo directory named `.service_down`. This file prevents further notifications and will be deleted when the Trash Panda service is restarted. 
 
 ## Credits
 

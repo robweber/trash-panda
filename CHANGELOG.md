@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 - screenshot to README
 - added `/api/health` endpoint to determine the running status of the main program loop. Returns _Offline_ if the main check loop hasn't run in 2 minutes - in theory this should run once every 60 seconds
+- `watchdog.py` script that can be used to externally check if the service is healthy
 
 ### Changed
 
