@@ -27,6 +27,13 @@
 
 {% if('services' in host): %}
 <table class="table table-striped mt-3">
+  <thead>
+    <tr>
+      <th>Service</th>
+      <th>Output</th>
+      <th>Last Change</th>
+    </tr>
+  </thead>
   {% for row in host['services']: %}
   <tr>
     <td class="{{ current_status[row['return_code']] }}" width="20%">
