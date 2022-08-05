@@ -24,6 +24,8 @@ UNCONFIRMED_STATE = "UNCONFIRMED"
 # allowed file types for web editor
 ALLOWED_EDITOR_TYPES = ('.yaml', '.py')
 
+# time format when converting datetime objects
+TIME_FORMAT = "%m-%d-%Y %I:%M%p"
 
 # custom YAML loader for !include syntax
 def custom_yaml_loader(loader, node):
