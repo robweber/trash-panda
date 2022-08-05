@@ -83,6 +83,21 @@ def webapp_thread(port_number, config_file, debugMode=False, logHandlers=[]):
             flash('Host page not found', 'warning')
             return redirect('/')
 
+    @app.route('/api/health', methods=['GET'])
+    def health():
+        """calculate the monitoring system health by making sure the main program
+        loop is running properly"""
+        last_check = history.get_last_check()
+        status = {"status": "Online", 'last_check_time': last_check.strftime(utils.TIME_FORMAT)}
+
+        # check if the main program loop is running
+        now = datetime.datetime.now()
+        if(now > last_check + datetime.timedelta(minutes=1)):
+            # program is offline if it hasn't run in a minute
+            status['status'] = 'Offline'
+
+        return jsonify(status)
+
     @app.route('/api/status', methods=['GET'])
     def status():
         # get a list of hosts
