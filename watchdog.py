@@ -15,8 +15,10 @@ python3 watchdog.py -h
 
 """
 import argparse
+import datetime
 import json
 import logging
+import os.path
 import requests
 import sys
 import modules.utils as utils
@@ -74,7 +76,7 @@ else:
     logging.info("Trash Panda is down")
 
 # attempt to send notifications if configured
-if(args.config and return_code > 0):
+if(args.config and return_code > 0 and not os.path.exists(utils.WATCHDOG_FILE)):
     # load the config file
     yaml_check = utils.load_config_file(args.config)
 
@@ -88,6 +90,7 @@ if(args.config and return_code > 0):
     # create the notifier, if defined
     if('notifier' in yaml_file['config']):
         send_notification(yaml_file['config']['notifier'])
+        utils.write_file(utils.WATCHDOG_FILE, datetime.datetime.now())
 
 # exit
 sys.exit(return_code)

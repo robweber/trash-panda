@@ -267,6 +267,10 @@ webAppThread = threading.Thread(name='Web App', target=webapp_thread, args=(args
 webAppThread.setDaemon(True)
 webAppThread.start()
 
+# check if the watchdog file was created
+if(os.path.exists(utils.WATCHDOG_FILE)):
+    os.remove(utils.WATCHDOG_FILE)
+
 logging.info('Starting monitoring check daemon')
 monitor = HostMonitor(yaml_file)
 

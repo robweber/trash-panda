@@ -13,6 +13,7 @@ from cerberus import Validator
 # full path to the running directory of the program
 DIR_PATH = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 NAGIOS_PATH = "/usr/lib/nagios/plugins/"
+WATCHDOG_FILE = os.path.join(DIR_PATH, '.service_down')
 
 # valid status descriptions
 SERVICE_STATUSES = ["OK", "Warning", "Critical", "Unknown"]
