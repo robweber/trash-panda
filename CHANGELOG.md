@@ -9,10 +9,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Added
 
 - screenshot to README
+- added `/api/health` endpoint to determine the running status of the main program loop. Returns _Offline_ if the main check loop hasn't run in 2 minutes - in theory this should run once every 60 seconds
 
 ### Changed
 
-- `SCRIPTS_PATH` template variable now points to [trash-panda-scripts](https://github.com/robweber/trash-panda-scripts) repo. Default location is same parent folder containing main repo. 
+- `SCRIPTS_PATH` template variable now points to [trash-panda-scripts](https://github.com/robweber/trash-panda-scripts) repo. Default location is same parent folder containing main repo.
 
 ### Fixed
 
