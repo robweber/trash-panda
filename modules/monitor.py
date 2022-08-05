@@ -25,7 +25,6 @@ class HostMonitor:
     services = None
     hosts = None
     history = None
-    time_format = "%m-%d-%Y %I:%M%p"
     custom_jinja_constants = {}
     __jinja = None
 
@@ -57,7 +56,7 @@ class HostMonitor:
 
             # set the next check time - randomize a bit to save on load
             next_check_random = next_check + datetime.timedelta(seconds=randint(-60, 60))
-            device.next_check = next_check_random.strftime(self.time_format)
+            device.next_check = next_check_random.strftime(utils.TIME_FORMAT)
             self.hosts.append(device)
             logging.info(f"Loading device {device.name} with check interval every {device.interval} min")
 
@@ -185,7 +184,7 @@ class HostMonitor:
         service_id = slugify(name)
         now = datetime.datetime.now()
         result = {"name": name, "return_code": return_code, "text": text, "id": service_id,
-                 "check_attempt": 1, "state": utils.CONFIRMED_STATE, "last_state_change": now.strftime(self.time_format)}
+                 "check_attempt": 1, "state": utils.CONFIRMED_STATE, "last_state_change": now.strftime(utils.TIME_FORMAT)}
 
         if(url.strip() != ""):
             result['service_url'] = url
@@ -231,7 +230,7 @@ class HostMonitor:
             aHost = self.hosts[i]
 
             # check if we need to check this host,
-            next_check = datetime.datetime.strptime(aHost.next_check, self.time_format)
+            next_check = datetime.datetime.strptime(aHost.next_check, utils.TIME_FORMAT)
             if(next_check < now):
                 logging.debug(f"Checking {aHost.name}")
 
@@ -249,12 +248,12 @@ class HostMonitor:
                 host_check['id'] = aHost.id
 
                 # save the last and caclulate next check date
-                aHost.last_check = now.strftime(self.time_format)
+                aHost.last_check = now.strftime(utils.TIME_FORMAT)
                 host_check['last_check'] = aHost.last_check
 
                 #  add or subtract a bit from each check interval to help with system load
                 next_check = now + datetime.timedelta(minutes=(aHost.interval), seconds=randint(-60, 60))
-                aHost.next_check = next_check.strftime(self.time_format)
+                aHost.next_check = next_check.strftime(utils.TIME_FORMAT)
                 host_check['next_check'] = aHost.next_check
 
                 self.hosts[i] = aHost

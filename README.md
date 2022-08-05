@@ -3,7 +3,7 @@
 [![PEP8](https://img.shields.io/badge/code%20style-pep8-orange.svg)](https://www.python.org/dev/peps/pep-0008/)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg)](https://github.com/RichardLitt/standard-readme)
 
-This is a _very_ basic monitoring solution meant for simple home use. It will monitor the status of some basic IP systems and services in a simple dashboard. Some basic service and device type definitions are supplied; however more can be added by altering the YAML configuration files. 
+This is a _very_ basic monitoring solution meant for simple home use. It will monitor the status of some basic IP systems and services in a simple dashboard. Some basic service and device type definitions are supplied; however more can be added by altering the YAML configuration files.
 
 ## Table of Contents
 
@@ -23,6 +23,7 @@ This is a _very_ basic monitoring solution meant for simple home use. It will mo
   - [Service](#service)
   - [Script Paths](#script-paths)
   - [Custom Functions](#custom-functions)
+- [Watchdog](#watchdog)
 - [Credits](#credits)
 - [License](#license)
 
@@ -132,6 +133,16 @@ __/api/overall_status__ - a status summary of the overall status of all hosts
   "overall_status": 0,
   "overall_status_description": "OK",
   "total_hosts": 3
+}
+```
+
+__/api/health__ - basic program health. Status is set to _Offline_ if the main system checking loop hasn't run in over 2 minutes. This should look for services to check every 60 seconds when running properly.
+
+```
+{
+  "last_check_time": "07-05-2022 12:00PM",
+  "text": "Online",
+  "return_code": 0
 }
 ```
 
@@ -308,6 +319,16 @@ The following custom functions are available in addition to any standard [Jinja 
 
 * `path()` - this is a shortcut for the Python os.path.join() method to easily join paths together.
 * `default()` - allows for setting a default in cases where the user may or may not set a variable. If the user variable doesn't exist the default is used.
+
+## Watchdog
+
+Trash Panda will check if defined hosts and services are running, but what keeps track of Trash Panda? The `watchdog.py` script can be used to externally check the Trash Panda web service via the [health api](#api) endpoint. This script should be setup to run via a cron job and can read in the same YAML config file to trigger monitoring notifications. If the health service is either not running, or it reports that the monitoring system checker is not running, a notification will be sent using the configured notifier from the YAML file.
+
+```
+python3 watchdog.py -c conf/monitor.yaml
+```
+
+Once a notification is sent a flag file is created in the Trash Panda repo directory named `.service_down`. This file prevents further notifications and will be deleted when the Trash Panda service is restarted. 
 
 ## Credits
 

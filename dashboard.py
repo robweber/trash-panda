@@ -13,18 +13,17 @@ sudo python3 dashboard.py -h
 
 import asyncio
 import configargparse
+import datetime
 import logging
 import signal
 import sys
 import threading
 import time
-import yaml
 import os
 import os.path
 import modules.utils as utils
 import modules.notifications as notifier
 from natsort import natsorted
-from cerberus import Validator
 from modules.monitor import HostMonitor
 from modules.history import HostHistory
 from flask import Flask, flash, render_template, jsonify, redirect, request, Response
@@ -83,6 +82,23 @@ def webapp_thread(port_number, config_file, debugMode=False, logHandlers=[]):
         else:
             flash('Host page not found', 'warning')
             return redirect('/')
+
+    @app.route('/api/health', methods=['GET'])
+    def health():
+        """calculate the monitoring system health by making sure the main program
+        loop is running properly"""
+        last_check = history.get_last_check()
+        status = {"text": "Online", "return_code": 0,
+                  'last_check_time': last_check.strftime(utils.TIME_FORMAT)}
+
+        # check if the main program loop is running
+        now = datetime.datetime.now()
+        if(now > last_check + datetime.timedelta(minutes=2)):
+            # program is offline if it hasn't run in 2 minutes (grace time for checks)
+            status['text'] = 'Offline'
+            status['return_code'] = 2  # Critical status
+
+        return jsonify(status)
 
     @app.route('/api/status', methods=['GET'])
     def status():
@@ -170,7 +186,7 @@ def webapp_thread(port_number, config_file, debugMode=False, logHandlers=[]):
         result = {'success': True, 'message': 'Config is valid'}
 
         # check the config and see if it validates
-        yaml_check = load_config_file(config_file)
+        yaml_check = utils.load_config_file(config_file)
 
         if(not yaml_check['valid']):
             result['success'] = False
@@ -181,32 +197,6 @@ def webapp_thread(port_number, config_file, debugMode=False, logHandlers=[]):
 
     # run the web app
     app.run(debug=debugMode, host='0.0.0.0', port=port_number, use_reloader=False)
-
-
-def load_config_file(file):
-    """Load the YAML config file and validate it's structure
-    errors in the file will be added to the result
-    """
-    result = {'valid': True}
-
-    yaml.add_constructor('!include', utils.custom_yaml_loader, Loader=yaml.SafeLoader)
-    yaml_file = utils.read_yaml(file)
-
-    if(yaml_file):
-        # validate the config file
-        schema = utils.read_yaml(os.path.join(utils.DIR_PATH, 'install', 'schema.yaml'))
-        v = Validator(schema)
-        if(not v.validate(yaml_file, schema)):
-            result['valid'] = False
-            result['errors'] = str(v.errors)
-
-        # normalize for missing values
-        result['yaml'] = v.normalized(yaml_file)
-    else:
-        result['valid'] = False
-        result['errors'] = 'Error parsing YAML file'
-
-    return result
 
 
 async def check_notifications(notify, old_host, new_host):
@@ -257,7 +247,7 @@ logging.basicConfig(datefmt='%m/%d %H:%M',
 logging.getLogger('asyncio').setLevel(logging.WARNING)  # only show warning or above from this module
 
 # load the config file
-yaml_check = load_config_file(args.file)
+yaml_check = utils.load_config_file(args.file)
 
 if(yaml_check['valid']):
     yaml_file = yaml_check['yaml']
@@ -277,6 +267,10 @@ webAppThread = threading.Thread(name='Web App', target=webapp_thread, args=(args
 webAppThread.setDaemon(True)
 webAppThread.start()
 
+# check if the watchdog file was created
+if(os.path.exists(utils.WATCHDOG_FILE)):
+    os.remove(utils.WATCHDOG_FILE)
+
 logging.info('Starting monitoring check daemon')
 monitor = HostMonitor(yaml_file)
 
@@ -292,4 +286,6 @@ while 1:
         # save the updated host
         history.save_host(host['id'], host)
 
+    # record the last time this loop ran
+    history.save_last_check()
     time.sleep(60)
