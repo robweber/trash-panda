@@ -92,8 +92,8 @@ def webapp_thread(port_number, config_file, debugMode=False, logHandlers=[]):
 
         # check if the main program loop is running
         now = datetime.datetime.now()
-        if(now > last_check + datetime.timedelta(minutes=1)):
-            # program is offline if it hasn't run in a minute
+        if(now > last_check + datetime.timedelta(minutes=2)):
+            # program is offline if it hasn't run in 2 minutes (grace time for checks)
             status['status'] = 'Offline'
 
         return jsonify(status)
