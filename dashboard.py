@@ -88,13 +88,15 @@ def webapp_thread(port_number, config_file, debugMode=False, logHandlers=[]):
         """calculate the monitoring system health by making sure the main program
         loop is running properly"""
         last_check = history.get_last_check()
-        status = {"status": "Online", 'last_check_time': last_check.strftime(utils.TIME_FORMAT)}
+        status = {"text": "Online", "return_code": 0,
+                  'last_check_time': last_check.strftime(utils.TIME_FORMAT)}
 
         # check if the main program loop is running
         now = datetime.datetime.now()
         if(now > last_check + datetime.timedelta(minutes=2)):
             # program is offline if it hasn't run in 2 minutes (grace time for checks)
-            status['status'] = 'Offline'
+            status['text'] = 'Offline'
+            status['return_code'] = 2  # Critical status
 
         return jsonify(status)
 
