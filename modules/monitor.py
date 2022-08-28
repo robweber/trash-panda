@@ -44,19 +44,24 @@ class HostMonitor:
         if('jinja_constants' in yaml_file['config']):
             self.custom_jinja_constants = yaml_file['config']['jinja_constants']
 
-        next_check = datetime.datetime.now()
         if(yaml_file['config']['check_on_startup']):
-            # set to 10 minute ago if we are forcing a check on startup
+            # set to 1 hour day if we are forcing a check on startup
             logging.info("Forcing host check on startup")
-            next_check = next_check - datetime.timedelta(minutes=10)
 
         # get host description by type
+        now = datetime.datetime.now()
         for i in range(0, len(yaml_file['hosts'])):
             device = self.__create_device(yaml_file['hosts'][i])
 
-            # set the next check time - randomize a bit to save on load
-            next_check_random = next_check + datetime.timedelta(seconds=randint(-60, 60))
-            device.next_check = next_check_random.strftime(utils.TIME_FORMAT)
+            from_history = self.history.get_host(device.id)
+            if(from_history and not yaml_file['config']['check_on_startup']):
+                # use the saved next check time
+                device.next_check = from_history['next_check']
+            else:
+                # set the next check time to now
+                next_check_now = now + datetime.timedelta(minutes=-1)
+                device.next_check = next_check_now.strftime(utils.TIME_FORMAT)
+
             self.hosts.append(device)
             logging.info(f"Loading device {device.name} with check interval every {device.interval} min")
 
