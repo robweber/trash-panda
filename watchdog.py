@@ -31,6 +31,7 @@ def send_notification(notify_type):
     # send as critical notification
     notify.notify_host("Trash Panda Service", 2)
 
+
 # parse the CLI args
 parser = argparse.ArgumentParser(description='Trash Panda Watchdog')
 parser.add_argument('-c', '--config', required=False,
@@ -68,6 +69,7 @@ try:
 
 except Exception as e:
     # any error set return code to Critical
+    logging.error(e.message)
     return_code = 2
 
 if(return_code == 0):

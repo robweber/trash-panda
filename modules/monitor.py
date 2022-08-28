@@ -184,7 +184,7 @@ class HostMonitor:
         service_id = slugify(name)
         now = datetime.datetime.now()
         result = {"name": name, "return_code": return_code, "text": text, "id": service_id,
-                 "check_attempt": 1, "state": utils.CONFIRMED_STATE, "last_state_change": now.strftime(utils.TIME_FORMAT)}
+                  "check_attempt": 1, "state": utils.CONFIRMED_STATE, "last_state_change": now.strftime(utils.TIME_FORMAT)}
 
         if(url.strip() != ""):
             result['service_url'] = url

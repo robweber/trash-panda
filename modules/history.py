@@ -1,7 +1,6 @@
 import datetime
 import json
 import redis
-import modules.utils as utils
 from enum import Enum
 
 

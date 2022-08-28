@@ -28,8 +28,9 @@ ALLOWED_EDITOR_TYPES = ('.yaml', '.py')
 # time format when converting datetime objects
 TIME_FORMAT = "%m-%d-%Y %I:%M%p"
 
-# custom YAML loader for !include syntax
+
 def custom_yaml_loader(loader, node):
+    """custom YAML loader for !include syntax"""
     yaml_file = loader.construct_scalar(node)
     return read_yaml(os.path.join(DIR_PATH, yaml_file))
 
