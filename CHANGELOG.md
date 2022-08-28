@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## Unreleased
 
+### Added
+
+- added `services_with_errors` count to the `/api/overall_status` endpoint
+
 ### Fixed
 
 - minor grammar mistakes on dashboard pages

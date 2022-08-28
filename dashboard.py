@@ -136,8 +136,9 @@ def webapp_thread(port_number, config_file, debugMode=False, logHandlers=[]):
                             s['host'] = host['name']
                             services.append(s)
 
-        return jsonify({"total_hosts": len(hosts), "hosts_with_errors": error_count, "overall_status": overall_status,
-                        "overall_status_description": utils.SERVICE_STATUSES[overall_status], "services": services})
+        return jsonify({"total_hosts": len(hosts), "hosts_with_errors": error_count, "services_with_errors": len(services),
+                        "overall_status": overall_status, "overall_status_description": utils.SERVICE_STATUSES[overall_status],
+                        "services": services})
 
     @app.route('/editor', methods=['GET'])
     def editor():

@@ -132,7 +132,8 @@ __/api/overall_status__ - a status summary of the overall status of all hosts
   "hosts_with_errors": 0,
   "overall_status": 0,
   "overall_status_description": "OK",
-  "total_hosts": 3
+  "total_hosts": 3,
+  "services_with_errors": 0
 }
 ```
 
@@ -328,7 +329,7 @@ Trash Panda will check if defined hosts and services are running, but what keeps
 python3 watchdog.py -c conf/monitor.yaml
 ```
 
-Once a notification is sent a flag file is created in the Trash Panda repo directory named `.service_down`. This file prevents further notifications and will be deleted when the Trash Panda service is restarted. 
+Once a notification is sent a flag file is created in the Trash Panda repo directory named `.service_down`. This file prevents further notifications and will be deleted when the Trash Panda service is restarted.
 
 ## Credits
 
