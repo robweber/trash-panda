@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 - minor grammar mistakes on dashboard pages
 - fixed logic for getting the `next_check` value on startup, attempt to use the previously set value if host has one
+- removed some deprecated variables
 
 ## 3.1
 
