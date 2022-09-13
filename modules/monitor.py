@@ -26,7 +26,7 @@ class HostMonitor:
     hosts = None
     history = None
     custom_jinja_constants = {}
-    __jinja = None
+    _jinja = None
 
     def __init__(self, yaml_file):
         # create the host type and services definitions, load history
