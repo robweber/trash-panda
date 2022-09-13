@@ -7,8 +7,6 @@ class Device:
     Represents a specific host device as defined by the user in the yaml config file
     This merges in all parent items from the device type, including service checks
     """
-    __jinja = None
-
     type = None
     name = None
     address = None
