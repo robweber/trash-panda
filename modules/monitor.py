@@ -32,7 +32,7 @@ class HostMonitor:
         # create the host type and services definitions, load history
         self.types = self.__create_types(yaml_file['types'], yaml_file['config']['default_interval'], yaml_file['config']['service_check_attempts'])
         self.services = yaml_file['services']
-        self.hosts = []
+        self.hosts = {}
         self.history = HostHistory()
 
         # load jinja environment
@@ -62,7 +62,7 @@ class HostMonitor:
                 next_check_now = now + datetime.timedelta(minutes=-1)
                 device.next_check = next_check_now.strftime(utils.TIME_FORMAT)
 
-            self.hosts.append(device)
+            self.hosts[device.id] = device
             logging.info(f"Loading device {device.name} with check interval every {device.interval} min")
 
         # save a list of all valid host names
@@ -231,9 +231,7 @@ class HostMonitor:
         result = []
         now = datetime.datetime.now()
 
-        for i in range(0, len(self.hosts)):
-            aHost = self.hosts[i]
-
+        for id, aHost in self.hosts.items():
             # check if we need to check this host,
             next_check = datetime.datetime.strptime(aHost.next_check, utils.TIME_FORMAT)
             if(next_check < now):
@@ -261,19 +259,13 @@ class HostMonitor:
                 aHost.next_check = next_check.strftime(utils.TIME_FORMAT)
                 host_check['next_check'] = aHost.next_check
 
-                self.hosts[i] = aHost
+                self.hosts[id] = aHost
                 result.append(host_check)
 
         return sorted(result, key=lambda o: o['name'])
 
     def get_hosts(self):
-        return sorted([h.id for h in self.hosts])
+        return sorted([h.id for h in self.hosts.values()])
 
     def get_host(self, id):
-        result = None  # return none if not found
-
-        for aHost in self.hosts:
-            if('id' in aHost and aHost['id'] == id):
-                result = aHost
-
-        return result
+        return self.hosts[id] if id in self.hosts else None

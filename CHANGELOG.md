@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 - added `services_with_errors` count to the `/api/overall_status` endpoint
 
+### Changed
+
+- `monitor.py` stores hosts in a dict instead of an array, easier to find specific host information when needed
+
 ### Fixed
 
 - minor grammar mistakes on dashboard pages
