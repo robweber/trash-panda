@@ -125,7 +125,7 @@ __/api/status__ - detailed listing of the status of each host
 ]
 ```
 
-__/api/overall_status__ - a status summary of the overall status of all hosts
+__/api/overall_status__ - a status summary of the overall status of all hosts. The `services` array is a list of all services currently in an error state.
 
 ```
 {
@@ -133,7 +133,8 @@ __/api/overall_status__ - a status summary of the overall status of all hosts
   "overall_status": 0,
   "overall_status_description": "OK",
   "total_hosts": 3,
-  "services_with_errors": 0
+  "services_with_errors": 0,
+  "services": []
 }
 ```
 
@@ -144,6 +145,15 @@ __/api/health__ - basic program health. Status is set to _Offline_ if the main s
   "last_check_time": "07-05-2022 12:00PM",
   "text": "Online",
   "return_code": 0
+}
+```
+
+__/api/check_now/<host_id>__ - updates a given host's next check time to the current time. This forces a service check instead of waiting for the normal update interval. The host id can be found via the `/api/status` endpoint for each host.
+
+```
+{
+  "success": True
+  "next_check": "09-14-2022 09:44AM"
 }
 ```
 
