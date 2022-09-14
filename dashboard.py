@@ -140,6 +140,11 @@ def webapp_thread(port_number, config_file, debugMode=False, logHandlers=[]):
                         "overall_status": overall_status, "overall_status_description": utils.SERVICE_STATUSES[overall_status],
                         "services": services})
 
+    @app.route('/api/check_now/<id>', methods=['GET'])
+    def check_host_now(id):
+        result = monitor.check_now(id)
+        return jsonify({"success": result})
+
     @app.route('/editor', methods=['GET'])
     def editor():
         return render_template("editor.html", config_file=config_file, page_title='Config Editor')

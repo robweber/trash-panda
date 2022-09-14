@@ -269,3 +269,17 @@ class HostMonitor:
 
     def get_host(self, id):
         return self.hosts[id] if id in self.hosts else None
+
+    def check_now(self, id):
+        result = False
+
+        aHost = self.get_host(id)
+
+        if(aHost is not None):
+            # reset the next check time and update the host
+            aHost.next_check = datetime.datetime.now().strftime(utils.TIME_FORMAT)
+            self.hosts[id] = aHost
+            logging.debug(f"Setting next check for {aHost.name} to now")
+            result = True
+
+        return result
