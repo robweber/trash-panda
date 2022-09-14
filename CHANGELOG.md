@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 - added `services_with_errors` count to the `/api/overall_status` endpoint
 - added new endpoint `/api/check_now/<id>` to reset a given hosts next check time to now
+- "Check Now" button available in web interface to update host next check time
 
 ### Changed
 

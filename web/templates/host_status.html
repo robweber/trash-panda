@@ -1,4 +1,23 @@
 {% extends "base.html" %}
+{% block header %}
+<script type="text/javascript">
+function check_now(id){
+  //set the host next check time to now to force an update
+  $.post('/api/check_now/' + id, {}, function(data, status, request){
+    if(data.success){
+      $('#js-success-alert').html("Host check time updated to " + data.next_check);
+      $('#js-success-alert').show().delay(3000).fadeOut();
+
+      $('#host-next-check').html(data.next_check);
+    }
+    else {
+      $('#js-error-alert').html("Error forcing host update");
+      $('#js-error-alert').show().delay(3000).fadeOut();
+    }
+  });
+}
+</script>
+{% endblock %}
 {% block content %}
 {% set current_status = ['text-success', 'text-warning', 'text-danger', 'text-secondary'] %}
 {% set status_text = ['', '', '', 'text-secondary'] %}
@@ -14,7 +33,7 @@
         <h5 class="card-title">Type: <span class="text-primary">{{ host['type'] | replace('_',' ') | title }}</span></h5>
         <p class="card-text">
           Last Check: {{ host['last_check'] }} <br />
-          Next Check: {{ host['next_check'] }} <br />
+          Next Check: <span id="host-next-check">{{ host['next_check'] }}</span> <br />
           IP Address: {{ host['address'] }}
         </p>
         {% if('management_page' in host): %}
@@ -26,6 +45,9 @@
 </div>
 
 {% if('services' in host): %}
+<div class="mt-2 pt-1" align="right">
+  <button class="btn btn-primary" onclick="check_now('{{host['id']}}')">Check Now</button>
+</div>
 <table class="table table-striped mt-3">
   <thead>
     <tr>
