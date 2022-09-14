@@ -143,7 +143,14 @@ def webapp_thread(port_number, config_file, debugMode=False, logHandlers=[]):
     @app.route('/api/check_now/<id>', methods=['GET'])
     def check_host_now(id):
         result = monitor.check_now(id)
-        return jsonify({"success": result})
+
+        if(result['success']):
+            # update the next check time in the DB as well
+            aHost = history.get_host(id)
+            aHost['next_check'] = result['next_check']
+            history.save_host(id, aHost)
+
+        return jsonify(result)
 
     @app.route('/editor', methods=['GET'])
     def editor():
