@@ -262,18 +262,18 @@ notify = None
 if('notifier' in yaml_file['config']):
     notify = notifier.create_notifier(yaml_file['config']['notifier'])
 
-# start the web app
-logging.info('Starting Trash Panda Web Service')
-webAppThread = threading.Thread(name='Web App', target=webapp_thread, args=(args.port, args.file, True, logHandlers))
-webAppThread.setDaemon(True)
-webAppThread.start()
-
 # check if the watchdog file was created
 if(os.path.exists(utils.WATCHDOG_FILE)):
     os.remove(utils.WATCHDOG_FILE)
 
 logging.info('Starting monitoring check daemon')
 monitor = HostMonitor(yaml_file)
+
+# start the web app
+logging.info('Starting Trash Panda Web Service')
+webAppThread = threading.Thread(name='Web App', target=webapp_thread, args=(args.port, args.file, True, logHandlers))
+webAppThread.setDaemon(True)
+webAppThread.start()
 
 while 1:
     logging.debug("Running host check")
