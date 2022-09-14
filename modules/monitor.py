@@ -8,6 +8,7 @@ import modules.jinja_custom as jinja_custom
 import modules.utils as utils
 from random import randint
 from slugify import slugify
+from threading import Lock
 from functools import reduce
 from modules.device import HostType
 from pythonping import ping
@@ -27,6 +28,7 @@ class HostMonitor:
     history = None
     custom_jinja_constants = {}
     _jinja = None
+    lock = Lock()  # lock for host updating functions
 
     def __init__(self, yaml_file):
         # create the host type and services definitions, load history
@@ -231,36 +233,37 @@ class HostMonitor:
         result = []
         now = datetime.datetime.now()
 
-        for id, aHost in self.hosts.items():
-            # check if we need to check this host,
-            next_check = datetime.datetime.strptime(aHost.next_check, utils.TIME_FORMAT)
-            if(next_check < now):
-                logging.debug(f"Checking {aHost.name}")
+        with self.lock:
+            for id, aHost in self.hosts.items():
+                # check if we need to check this host,
+                next_check = datetime.datetime.strptime(aHost.next_check, utils.TIME_FORMAT)
+                if(next_check < now):
+                    logging.debug(f"Checking {aHost.name}")
 
-                host_check = self.__check_host(aHost)
+                    host_check = self.__check_host(aHost)
 
-                # figure out the overall worst status
-                overall_status = reduce(lambda x, y: x if x['return_code'] > y['return_code'] else y, host_check['services'])
-                host_check['overall_status'] = overall_status['return_code']
+                    # figure out the overall worst status
+                    overall_status = reduce(lambda x, y: x if x['return_code'] > y['return_code'] else y, host_check['services'])
+                    host_check['overall_status'] = overall_status['return_code']
 
-                # figure out if the host is alive at all
-                host_alive = list(filter(lambda x: x['id'] == 'alive', host_check['services']))
-                host_check['alive'] = host_alive[0]['return_code']
+                    # figure out if the host is alive at all
+                    host_alive = list(filter(lambda x: x['id'] == 'alive', host_check['services']))
+                    host_check['alive'] = host_alive[0]['return_code']
 
-                # create a slug to act as the id for lookups
-                host_check['id'] = aHost.id
+                    # create a slug to act as the id for lookups
+                    host_check['id'] = aHost.id
 
-                # save the last and caclulate next check date
-                aHost.last_check = now.strftime(utils.TIME_FORMAT)
-                host_check['last_check'] = aHost.last_check
+                    # save the last and caclulate next check date
+                    aHost.last_check = now.strftime(utils.TIME_FORMAT)
+                    host_check['last_check'] = aHost.last_check
 
-                #  add or subtract a bit from each check interval to help with system load
-                next_check = now + datetime.timedelta(minutes=(aHost.interval), seconds=randint(-60, 60))
-                aHost.next_check = next_check.strftime(utils.TIME_FORMAT)
-                host_check['next_check'] = aHost.next_check
+                    #  add or subtract a bit from each check interval to help with system load
+                    next_check = now + datetime.timedelta(minutes=(aHost.interval), seconds=randint(-60, 60))
+                    aHost.next_check = next_check.strftime(utils.TIME_FORMAT)
+                    host_check['next_check'] = aHost.next_check
 
-                self.hosts[id] = aHost
-                result.append(host_check)
+                    self.hosts[id] = aHost
+                    result.append(host_check)
 
         return sorted(result, key=lambda o: o['name'])
 
@@ -276,11 +279,12 @@ class HostMonitor:
         aHost = self.get_host(id)
 
         if(aHost is not None):
-            # reset the next check time and update the host
-            aHost.next_check = datetime.datetime.now().strftime(utils.TIME_FORMAT)
-            self.hosts[id] = aHost
+            with self.lock:
+                # reset the next check time and update the host
+                aHost.next_check = datetime.datetime.now().strftime(utils.TIME_FORMAT)
+                self.hosts[id] = aHost
 
-            result['next_check'] = aHost.next_check
-            result['success'] = True
+                result['next_check'] = aHost.next_check
+                result['success'] = True
 
         return result
