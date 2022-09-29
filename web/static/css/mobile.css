@@ -1,3 +1,16 @@
+.navbar-brand {
+  font-size: 1.75rem;
+}
+
+/* moves menu to right */
+.navbar-expand-lg .navbar-collapse {
+  justify-content: end;
+}
+
+.nav-btn {
+  float: right;
+}
+
 .host-status-card{
   text-align: right;
 }
@@ -24,6 +37,10 @@
 		display:none;
 	}
 
+  .navbar-brand {
+    font-size: 1.50rem;
+  }
+
   #service_status td.row_1 {
     width: 50%;
   }
@@ -32,11 +49,15 @@
     width: 0%;
   }
 
+  .nav-btn {
+    margin-top: 5px;
+  }
+
   .host-status-card{
     text-align: left;
   }
 
-  .service_check_btn, .create-file-btn{
+  .service_check_btn, .create-file-btn, .nav-btn{
     display: block;
     width: 100%;
   }
