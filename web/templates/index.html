@@ -42,8 +42,8 @@ function load_status(){
         row.append(td.clone().text(h.address));
       }
 
-      row.append(td.clone().text(h.last_check));
-      row.append(td.clone().text(h.next_check));
+      row.append(td.clone().text(h.last_check).addClass('hide-md'));
+      row.append(td.clone().text(h.next_check).addClass('hide-md'));
 
       if(h.overall_status == 0){
         row.append(td.clone().text("OK").addClass('text-success'));
@@ -68,15 +68,15 @@ function load_status(){
 </script>
 {% endblock %}
 {% block content %}
-<p>The overall status of each host is listed below. Click the name to see additional details. If a management page is configured it can be launched with the <i class="mdi mdi-launch icon-sm icon-inline"></i> icon.</p>
 <div class="container">
+  <p>The overall status of each host is listed below. Click the name to see additional details. If a management page is configured it can be launched with the <i class="mdi mdi-launch icon-sm icon-inline"></i> icon.</p>
   <table class="table table-striped" id="host_info">
     <thead>
       <tr>
         <th>Host</th>
         <th>IP</th>
-        <th>Last Check</th>
-        <th>Next Check</th>
+        <th class="hide-md">Last Check</th>
+        <th class="hide-md">Next Check</th>
         <th>Overall Status</th>
       </tr>
     </thead>

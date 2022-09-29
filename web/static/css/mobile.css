@@ -1,0 +1,64 @@
+.host-status-card{
+  text-align: right;
+}
+
+#service_status td.row_1 {
+  width: 20%;
+}
+
+#service_status td.row_2 {
+  width: 60%;
+}
+
+@media screen and (max-width: 1199px) and (min-width: 991px) {
+	.hide-lg{
+		display:none;
+	}
+}
+
+@media screen and (max-width: 991px) and (min-width: 300px) {
+	.hide-lg{
+		display:none;
+	}
+	.hide-md{
+		display:none;
+	}
+
+  #service_status td.row_1 {
+    width: 50%;
+  }
+
+  #service_status td.row_2 {
+    width: 0%;
+  }
+
+  .host-status-card{
+    text-align: left;
+  }
+
+  .service_check_btn, .create-file-btn{
+    display: block;
+    width: 100%;
+  }
+
+  .create-file-btn {
+    margin-top: 5px;
+  }
+}
+
+@media screen and (max-width: 300px) {
+	.hide-lg{
+		display:none;
+	}
+	.hide-md{
+		display:none;
+	}
+	.hide-sm{
+		display:none;
+  }
+
+  .host-status-card{
+    text-align: left;
+  }
+
+}

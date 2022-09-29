@@ -22,56 +22,59 @@ function check_now(id){
 {% set current_status = ['text-success', 'text-warning', 'text-danger', 'text-secondary'] %}
 {% set status_text = ['', '', '', 'text-secondary'] %}
 
-<div class="row">
-  <div class="col-md-8">
-    <h2 class="mb-3"><i class="mdi mdi-{{ host['icon'] }} icon-2x"></i> {{ host['name'] }}</h2>
-    <p>{{ host['info'] }}</p>
-  </div>
-  <div class="col-md-4" align="right">
-    <div class="card" style="width: 18rem;">
-      <div class="card-body">
-        <h5 class="card-title">Type: <span class="text-primary">{{ host['type'] | replace('_',' ') | title }}</span></h5>
-        <p class="card-text">
-          Last Check: {{ host['last_check'] }} <br />
-          Next Check: <span id="host-next-check">{{ host['next_check'] }}</span> <br />
-          IP Address: {{ host['address'] }}
-        </p>
-        {% if('management_page' in host): %}
-        <a href="{{ host['management_page'] }}" class="card-link" target="_blank"> Launch Management <i class="mdi mdi-launch icon-sm icon-inline"></i></a>
-        {% endif %}
+<div class="container">
+  <div class="row">
+    <div class="col-lg-8">
+      <h2 class="mb-3"><i class="mdi mdi-{{ host['icon'] }} icon-2x"></i> {{ host['name'] }}</h2>
+      <p>{{ host['info'] }}</p>
+    </div>
+    <div class="col-lg-4 host-status-card">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Type: <span class="text-primary">{{ host['type'] | replace('_',' ') | title }}</span></h5>
+          <p class="card-text">
+            Last Check: {{ host['last_check'] }} <br />
+            Next Check: <span id="host-next-check">{{ host['next_check'] }}</span> <br />
+            IP Address: {{ host['address'] }}
+          </p>
+          {% if('management_page' in host): %}
+          <a href="{{ host['management_page'] }}" class="card-link" target="_blank"> Launch Management <i class="mdi mdi-launch icon-sm icon-inline"></i></a>
+          {% endif %}
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-{% if('services' in host): %}
-<div class="mt-2 pt-1" align="right">
-  <button class="btn btn-primary" onclick="check_now('{{host['id']}}')">Check Now</button>
-</div>
-<table class="table table-striped mt-3">
-  <thead>
+<div class="container">
+  {% if('services' in host): %}
+  <div class="mt-2 pt-1" align="right">
+    <button class="btn btn-primary service_check_btn" onclick="check_now('{{host['id']}}')">Check Now</button>
+  </div>
+  <table class="table table-striped mt-3" id="service_status">
+    <thead>
+      <tr>
+        <th>Service</th>
+        <th class="hide-md">Output</th>
+        <th>Last Change</th>
+      </tr>
+    </thead>
+    {% for row in host['services']: %}
     <tr>
-      <th>Service</th>
-      <th>Output</th>
-      <th>Last Change</th>
+      <td class="{{ current_status[row['return_code']] }} row_1">
+        {{ row['name'] }}
+        {% if(row['state'] == 'UNCONFIRMED') %}
+        (check {{ row['check_attempt'] }}/{{ host['service_check_attempts'] }})
+        {% endif %}
+        {% if('service_url' in row) %}
+        <a href="{{ row['service_url'] }}" target="_blank" class="mdi mdi-launch icon-sm icon-inline"></a>
+        {% endif %}
+      </td>
+      <td class="{{ status_text[row['return_code']] }} row_2 hide-md">{{ row['text'].replace("\n", '<br />') | safe }}</td>
+      <td class="{{ status_text[row['return_code']] }}">{{ row['last_state_change'] }}</td>
     </tr>
-  </thead>
-  {% for row in host['services']: %}
-  <tr>
-    <td class="{{ current_status[row['return_code']] }}" width="20%">
-      {{ row['name'] }}
-      {% if(row['state'] == 'UNCONFIRMED') %}
-      (check {{ row['check_attempt'] }}/{{ host['service_check_attempts'] }})
-      {% endif %}
-      {% if('service_url' in row) %}
-      <a href="{{ row['service_url'] }}" target="_blank" class="mdi mdi-launch icon-sm icon-inline"></a>
-      {% endif %}
-    </td>
-    <td class="{{ status_text[row['return_code']] }}" width="60%">{{ row['text'].replace("\n", '<br />') | safe }}</td>
-    <td class="{{ status_text[row['return_code']] }}">{{ row['last_state_change'] }}</td>
-  </tr>
-  {% endfor %}
-</table>
-{% endif %}
-
+    {% endfor %}
+  </table>
+  {% endif %}
+</div>
 {% endblock %}
