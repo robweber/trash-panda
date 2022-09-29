@@ -37,7 +37,7 @@
 		display:none;
 	}
 
-  .navbar-brand {
+  .navbar-brand, .host-title {
     font-size: 1.50rem;
   }
 
