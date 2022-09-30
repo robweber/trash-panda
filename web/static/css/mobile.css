@@ -70,6 +70,10 @@ p {
   .create-file-btn {
     margin-top: 5px;
   }
+
+  .navbar-expand-lg .navbar-collapse {
+    text-align: right;
+  }
 }
 
 @media screen and (max-width:500px) {
