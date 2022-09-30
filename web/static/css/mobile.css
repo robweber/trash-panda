@@ -35,8 +35,6 @@ p {
 
 @media screen and (max-width: 991px) {
 
-
-
 	.hide-lg{
 		display:none;
 	}
@@ -78,4 +76,10 @@ p {
   p {
     font-size: .8em;
   }
+
+  .host_title span::before {
+    content: "\A";
+    white-space: pre;
+  }
+
 }

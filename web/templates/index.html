@@ -24,7 +24,7 @@ function load_status(){
       row = tr.clone();
 
       // link for the details
-      details = $('<a>').html('<i class="mdi mdi-' + h.icon + ' icon-inline mr-2"></i>' + h.name).addClass('ml-2');
+      details = $('<a>').html('<i class="mdi mdi-' + h.icon + ' icon-inline mr-2"></i><span>' + h.name + "</span>").addClass('host_title ml-2');
       details.attr('href', '/status/' + h.id);
 
       row.append(td.clone().append(details));
