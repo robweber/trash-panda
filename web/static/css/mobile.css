@@ -1,3 +1,7 @@
+p {
+  margin-top: 10px;
+}
+
 .navbar-brand {
   font-size: 1.75rem;
 }
@@ -29,7 +33,10 @@
 	}
 }
 
-@media screen and (max-width: 991px) and (min-width: 300px) {
+@media screen and (max-width: 991px) {
+
+
+
 	.hide-lg{
 		display:none;
 	}
@@ -38,7 +45,7 @@
 	}
 
   .navbar-brand, .host-title {
-    font-size: 1.50rem;
+    font-size: 1.25rem;
   }
 
   #service_status td.row_1 {
@@ -67,19 +74,8 @@
   }
 }
 
-@media screen and (max-width: 300px) {
-	.hide-lg{
-		display:none;
-	}
-	.hide-md{
-		display:none;
-	}
-	.hide-sm{
-		display:none;
+@media screen and (max-width:500px) {
+  p {
+    font-size: .8em;
   }
-
-  .host-status-card{
-    text-align: left;
-  }
-
 }
