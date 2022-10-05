@@ -2,10 +2,12 @@
 <html>
     <head>
         <title>Trash Panda</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="/static/css/bootstrap.min.css" />
         <link rel="stylesheet" href="/static/css/bootstrap-theme.min.css" />
         <link rel="stylesheet" href="/static/css/materialdesignicons.min.css" />
         <link rel="stylesheet" href="/static/css/icons.css" />
+        <link rel="stylesheet" href="/static/css/mobile.css" />
         <script src="/static/js/jquery.min.js"></script>
         <script src="/static/js/popper.min.js"></script>
         <script src="/static/js/bootstrap.min.js"></script>
@@ -13,14 +15,17 @@
     </head>
     <body>
         <div class="container">
-        <div class="header clearfix">
-          <a class="btn btn-secondary float-right ml-3" href="/editor" role="button" id="editMenu" aria-haspopup="false" aria-expanded="false">
-            Config
-          </a>
-          <a class="btn btn-secondary float-right" href="/" role="button" id="statusMenu" aria-haspopup="false" aria-expanded="false">
-            Status
-          </a>
-        <h3 class="text-muted"><span class="text-danger">Trash Panda</span> - {{ page_title }}</h3>
+        <div class="header">
+          <nav class="navbar navbar-expand-lg">
+            <h3 class="navbar-brand text-muted"><span class="text-danger">Trash Panda</span> - {{ page_title }}</h3>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="mdi mdi-menu icon-inline"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+              <a class="btn btn-secondary ml-2" href="/" aria-haspopup="false" aria-expanded="false">Status</a>
+              <a class="btn btn-secondary ml-2" href="/editor" aria-haspopup="false" aria-expanded="false">Config</a>
+            </div>
+          </nav>
         </div>
         {% for category,message in get_flashed_messages(with_categories=true) %}
         <div class="alert alert-{{ category }}" role="alert">

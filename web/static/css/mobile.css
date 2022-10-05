@@ -1,0 +1,89 @@
+p {
+  margin-top: 10px;
+}
+
+.navbar-brand {
+  font-size: 1.75rem;
+}
+
+/* moves menu to right */
+.navbar-expand-lg .navbar-collapse {
+  justify-content: end;
+}
+
+.nav-btn {
+  float: right;
+}
+
+.host-status-card{
+  text-align: right;
+}
+
+#service_status td.row_1 {
+  width: 20%;
+}
+
+#service_status td.row_2 {
+  width: 60%;
+}
+
+@media screen and (max-width: 1199px) and (min-width: 991px) {
+	.hide-lg{
+		display:none;
+	}
+}
+
+@media screen and (max-width: 991px) {
+
+	.hide-lg{
+		display:none;
+	}
+	.hide-md{
+		display:none;
+	}
+
+  .navbar-brand, .host-title {
+    font-size: 1.20rem;
+  }
+
+  #service_status td.row_1 {
+    width: 50%;
+  }
+
+  #service_status td.row_2 {
+    width: 0%;
+  }
+
+  .nav-btn {
+    margin-top: 5px;
+  }
+
+  .host-status-card{
+    text-align: left;
+  }
+
+  .service_check_btn, .create-file-btn, .nav-btn{
+    display: block;
+    width: 100%;
+  }
+
+  .create-file-btn {
+    margin-top: 5px;
+  }
+
+  .navbar-expand-lg .navbar-collapse {
+    text-align: right;
+  }
+}
+
+@media screen and (max-width:500px) {
+  p {
+    font-size: .8em;
+  }
+
+  .host_title span::before {
+    content: "\A";
+    white-space: pre;
+  }
+
+}
