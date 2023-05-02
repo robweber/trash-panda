@@ -152,7 +152,7 @@ def webapp_thread(port_number, config_file, debugMode=False, logHandlers=[]):
 
         return jsonify(result)
 
-    @app.route('/api/silence_host/<id>/<minutes>', methods=['GET'])
+    @app.route('/api/silence_host/<id>/<minutes>', methods=['POST'])
     def silence_host(id, minutes):
         until = datetime.datetime.now() + datetime.timedelta(minutes=int(minutes))
         result = monitor.silence_host(id, until)

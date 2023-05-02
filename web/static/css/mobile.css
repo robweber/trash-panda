@@ -19,6 +19,10 @@ p {
   text-align: right;
 }
 
+.div-inline{
+    display:inline-block;
+}
+
 #service_status td.row_1 {
   width: 20%;
 }
@@ -62,8 +66,13 @@ p {
     text-align: left;
   }
 
-  .service_check_btn, .create-file-btn, .nav-btn{
+  .service_check_btn, .create-file-btn, .silence_btn, .nav-btn{
+    margin-bottom:5px;
     display: block;
+    width: 100%;
+  }
+
+  .dropdown-mobile {
     width: 100%;
   }
 

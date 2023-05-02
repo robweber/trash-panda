@@ -16,6 +16,38 @@ function check_now(id){
     }
   });
 }
+
+function silence_host(id, minutes){
+  $.post('/api/silence_host/' + id + '/' + minutes, function(data, status, request){
+    if(data.success){
+      if(data.is_silenced)
+      {
+        $('#js-success-alert').html("Host silenced until " + data.until);
+
+        $('#silence-btn').html('Silenced');
+        $('#silence-btn').addClass('btn-danger');
+        $('#silence-btn').removeClass('btn-warning');
+        $('#cancel-btn').show();
+      }
+      else
+      {
+        $('#js-success-alert').html("Silent mode canceled");
+
+        $('#silence-btn').html('Silence');
+        $('#silence-btn').addClass('btn-warning');
+        $('#silence-btn').removeClass('btn-danger');
+        $('#cancel-btn').hide();
+      }
+
+      $('#js-success-alert').show().delay(3000).fadeOut();
+    }
+    else {
+      $('#js-error-alert').html("Error silencing host");
+      $('#js-error-alert').show().delay(3000).fadeOut();
+    }
+  });
+}
+
 </script>
 {% endblock %}
 {% block content %}
@@ -49,7 +81,20 @@ function check_now(id){
 <div class="container">
   {% if('services' in host): %}
   <div class="mt-2 pt-1" align="right">
-    <button class="btn btn-primary service_check_btn" onclick="check_now('{{host['id']}}')">Check Now</button>
+  <button class="btn btn-primary service_check_btn" onclick="check_now('{{host['id']}}')">Check Now</button>
+  <div class="dropdown div-inline silence_btn">
+    {% if host['silenced'] %}
+    <button id="silence-btn" class="btn btn-danger dropdown-toggle silence_btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Silenced</button>
+    {% else %}
+    <button id="silence-btn" class="btn btn-warning dropdown-toggle silence_btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Silence</button>
+    {% endif %}
+    <div class="dropdown-menu dropdown-mobile" aria-labelledby="dropdownMenuButton">
+      <button class="dropdown-item" type="button" id="cancel-btn" style="{{ 'display:none' if not host['silenced'] else '' }}" onClick="silence_host('{{host['id']}}', -1)">Cancel</button>
+      <button class="dropdown-item" type="button" onClick="silence_host('{{host['id']}}', 30)">30 Min</button>
+      <button class="dropdown-item" type="button" onClick="silence_host('{{host['id']}}', 60)">1 Hour</button>
+      <button class="dropdown-item" type="button" onClick="silence_host('{{host['id']}}', 120)">2 Hours</button>
+    </div>
+  </div>
   </div>
   <table class="table table-striped mt-3" id="service_status">
     <thead>
