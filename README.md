@@ -120,6 +120,7 @@ __/api/status__ - detailed listing of the status of each host
         "text": "11 days, 2:09:34\n"
       }
     ],
+    "silenced": false,
     "type": "switch"
   }
 ]
@@ -152,8 +153,18 @@ __/api/check_now/<host_id>__ - updates a given host's next check time to the cur
 
 ```
 {
-  "success": True
+  "success": true
   "next_check": "09-14-2022 09:44AM"
+}
+```
+
+__/api/silence_host/<host_id>/<minutes>__ - sets the given hosts silenced property to True for the given amount of minutes. This will silence any notifications for this time.
+
+```
+{
+  "is_silenced": true,
+  "success": true,
+  "until": "05-02-2023 01:31PM"
 }
 ```
 
