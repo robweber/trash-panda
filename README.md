@@ -69,7 +69,7 @@ optional arguments:
 
 Once running the dashboard page can be loaded. The landing page will display all currently configured hosts and their overall status. If the host is down, or any configured service unavailable, the overall status will change. This page is refreshed every __15 seconds__. Data will change depending on the update interval set when the program is loaded.
 
-Clicking on a host name will show you more information about that device. Individual services will be listed along with any output to indicate their current status. If configured, the management page for the host can also be launched from here.
+Clicking on a host name will show you more information about that device. Individual services will be listed along with any output to indicate their current status. From the host status page a check of all services can be forced, and notifications temporarily silenced. If configured, the management page for the host can also be launched from here.
 
 ### API
 
@@ -216,7 +216,7 @@ config:
 
 ### Notifications
 
-By default the system will not send any notifications, but there is support for some built-in notification methods. These can be defined in the `config` section of the YAML file by creating a `notifier` option. A notifier is loaded at startup and will send notifications on host status (up/down) changes or service status changes each time a check is run. Services must be in a CONFIRMED state before a notification is sent. Services are in an UNCONFIRMED state when either a warning or critical state has not reached the `service_check_attempts` threshold described above.
+By default the system will not send any notifications, but there is support for some built-in notification methods. These can be defined in the `config` section of the YAML file by creating a `notifier` option. A notifier is loaded at startup and will send notifications on host status (up/down) changes or service status changes each time a check is run. Services must be in a CONFIRMED state before a notification is sent. Services are in an UNCONFIRMED state when either a warning or critical state has not reached the `service_check_attempts` threshold described above. It is possible to temporarily silence notifications using the web interface or [API](#api).
 
 Additional notification methods can be defined by extending the `MonitorNotification` class. Built-in notification types are listed below.
 

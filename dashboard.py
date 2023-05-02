@@ -307,7 +307,10 @@ while 1:
     for host in status:
         # send notifications, if there are any
         if(notify is not None):
-            asyncio.run(check_notifications(notify, history.get_host(host['id']), host))
+            if(not host['silenced']):
+                asyncio.run(check_notifications(notify, history.get_host(host['id']), host))
+            else:
+                logging.info(f"{ host['name'] } is in silent mode, skipping notifications")
 
         # save the updated host
         history.save_host(host['id'], host)
