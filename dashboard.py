@@ -152,6 +152,19 @@ def webapp_thread(port_number, config_file, debugMode=False, logHandlers=[]):
 
         return jsonify(result)
 
+    @app.route('/api/silence_host/<id>/<minutes>', methods=['GET'])
+    def silence_host(id, minutes):
+        until = datetime.datetime.now() + datetime.timedelta(minutes=int(minutes))
+        result = monitor.silence_host(id, until)
+
+        if(result['success']):
+            # update the host in the history DB as well
+            aHost = history.get_host(id)
+            aHost['silenced'] = result['is_silenced']
+            history.save_host(id, aHost)
+
+        return jsonify(result)
+
     @app.route('/editor', methods=['GET'])
     def editor():
         return render_template("editor.html", config_file=config_file, page_title='Config Editor')

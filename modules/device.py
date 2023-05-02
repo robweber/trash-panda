@@ -1,3 +1,5 @@
+import modules.utils as utils
+from datetime import datetime
 from slugify import slugify
 from modules.exceptions import ConfigValueMissingError
 
@@ -17,6 +19,7 @@ class Device:
     interval = 5
     check_attempts = 3
     services = []
+    silenced = False
 
     def __init__(self, host_def):
         self.type = host_def['type']
@@ -32,6 +35,7 @@ class Device:
         self.services = host_def['services']
         self.last_check = 0
         self.next_check = 0
+        self.silenced = datetime.now().strftime(utils.TIME_FORMAT)
 
         # set the address as part of the config
         self.config['address'] = self.address
@@ -41,7 +45,7 @@ class Device:
         can be serialized for JSON output"""
         result = {'type': self.type, 'id': self.id, 'name': self.name, 'address': self.address,
                   'icon': self.icon, 'info': self.info, 'interval': self.interval, 'service_check_attempts': self.check_attempts,
-                  'last_check': self.last_check, 'config': self.config}
+                  'last_check': self.last_check, 'config': self.config, 'silenced': self.is_silenced()}
 
         if(self.management_page is not None):
             result['management_page'] = self.management_page
@@ -53,6 +57,15 @@ class Device:
         Returns and array of all services this device will check
         """
         return self.services
+
+    def is_silenced(self):
+        """
+        Returns true/false if the host should currently be in silent mode.
+        This is true if the silenced timestamp is greater than the current time
+        """
+        silence_off = datetime.strptime(self.silenced, utils.TIME_FORMAT)
+
+        return silence_off > datetime.now()
 
 
 class HostType:

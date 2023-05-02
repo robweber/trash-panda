@@ -274,6 +274,7 @@ class HostMonitor:
         return self.hosts[id] if id in self.hosts else None
 
     def check_now(self, id):
+        """sets the next check time on the host to now, forcing a check"""
         result = {"success": False}
 
         aHost = self.get_host(id)
@@ -285,6 +286,27 @@ class HostMonitor:
                 self.hosts[id] = aHost
 
                 result['next_check'] = aHost.next_check
+                result['success'] = True
+
+        return result
+
+    def silence_host(self, id, until):
+        """sets the silenced property on a host which will expire when the current time
+        exceeds the given datetime object
+        """
+        result = {"success": False}
+
+        aHost = self.get_host(id)
+
+        if(aHost is not None):
+            with self.lock:
+                # set the host as silenced until this datetime
+                aHost.silenced = until.strftime(utils.TIME_FORMAT)
+                self.hosts[id] = aHost
+
+                logging.debug(f"Silencing {id} until {aHost.silenced}")
+                result['is_silenced'] = aHost.is_silenced()
+                result['until'] = aHost.silenced
                 result['success'] = True
 
         return result
