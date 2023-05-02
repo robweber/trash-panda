@@ -53,7 +53,6 @@ function silence_host(id, minutes){
 {% block content %}
 {% set current_status = ['text-success', 'text-warning', 'text-danger', 'text-secondary'] %}
 {% set status_text = ['', '', '', 'text-secondary'] %}
-
 <div class="container">
   <div class="row">
     <div class="col-lg-8">
@@ -82,6 +81,7 @@ function silence_host(id, minutes){
   {% if('services' in host): %}
   <div class="mt-2 pt-1" align="right">
   <button class="btn btn-primary service_check_btn" onclick="check_now('{{host['id']}}')">Check Now</button>
+  {% if has_notifier %}
   <div class="dropdown div-inline silence_btn">
     {% if host['silenced'] %}
     <button id="silence-btn" class="btn btn-danger dropdown-toggle silence_btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Silenced</button>
@@ -95,6 +95,7 @@ function silence_host(id, minutes){
       <button class="dropdown-item" type="button" onClick="silence_host('{{host['id']}}', 120)">2 Hours</button>
     </div>
   </div>
+  {% endif %}
   </div>
   <table class="table table-striped mt-3" id="service_status">
     <thead>
