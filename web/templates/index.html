@@ -45,14 +45,21 @@ function load_status(){
       row.append(td.clone().text(h.last_check).addClass('hide-md'));
       row.append(td.clone().text(h.next_check).addClass('hide-md'));
 
+      silent_mode = '';
+      if(h.silenced)
+      {
+        silent_mode = $('<i>');
+        silent_mode.attr('class','mdi mdi-volume-off icon-sm icon-inline ml-1');
+      }
+
       if(h.overall_status == 0){
-        row.append(td.clone().text("OK").addClass('text-success'));
+        row.append(td.clone().text("OK").addClass('text-success').append(silent_mode));
       }
       else if(h.overall_status == 1){
-        row.append(td.clone().text("Warning").addClass('text-warning'));
+        row.append(td.clone().text("Warning").addClass('text-warning').append(silent_mode));
       }
       else {
-        row.append(td.clone().text("Critical").addClass('text-danger'));
+        row.append(td.clone().text("Critical").addClass('text-danger').append(silent_mode));
       }
 
       table.append(row);
