@@ -37,7 +37,7 @@ def signal_handler(signum, frame):
     sys.exit(0)
 
 
-def webapp_thread(port_number, config_file, debugMode=False, logHandlers=[]):
+def webapp_thread(port_number, config_file, notifier_configured, debugMode=False, logHandlers=[]):
     app = Flask(import_name="trash-panda", static_folder=os.path.join(utils.DIR_PATH, 'web', 'static'),
                 template_folder=os.path.join(utils.DIR_PATH, 'web', 'templates'))
 
@@ -78,7 +78,8 @@ def webapp_thread(port_number, config_file, debugMode=False, logHandlers=[]):
         result = _get_host(id)
 
         if(result is not None):
-            return render_template("host_status.html", host=result, page_title='Host Status')
+            # set if a notifier is configured to toggle silent mode controls
+            return render_template("host_status.html", host=result, page_title='Host Status', has_notifier=notifier_configured)
         else:
             flash('Host page not found', 'warning')
             return redirect('/')
@@ -148,6 +149,19 @@ def webapp_thread(port_number, config_file, debugMode=False, logHandlers=[]):
             # update the next check time in the DB as well
             aHost = history.get_host(id)
             aHost['next_check'] = result['next_check']
+            history.save_host(id, aHost)
+
+        return jsonify(result)
+
+    @app.route('/api/silence_host/<id>/<minutes>', methods=['POST'])
+    def silence_host(id, minutes):
+        until = datetime.datetime.now() + datetime.timedelta(minutes=int(minutes))
+        result = monitor.silence_host(id, until)
+
+        if(result['success']):
+            # update the host in the history DB as well
+            aHost = history.get_host(id)
+            aHost['silenced'] = result['is_silenced']
             history.save_host(id, aHost)
 
         return jsonify(result)
@@ -283,7 +297,7 @@ monitor = HostMonitor(yaml_file)
 
 # start the web app
 logging.info('Starting Trash Panda Web Service')
-webAppThread = threading.Thread(name='Web App', target=webapp_thread, args=(args.port, args.file, True, logHandlers))
+webAppThread = threading.Thread(name='Web App', target=webapp_thread, args=(args.port, args.file, notify is not None, True, logHandlers))
 webAppThread.setDaemon(True)
 webAppThread.start()
 
@@ -294,7 +308,10 @@ while 1:
     for host in status:
         # send notifications, if there are any
         if(notify is not None):
-            asyncio.run(check_notifications(notify, history.get_host(host['id']), host))
+            if(not host['silenced']):
+                asyncio.run(check_notifications(notify, history.get_host(host['id']), host))
+            else:
+                logging.info(f"{ host['name'] } is in silent mode, skipping notifications")
 
         # save the updated host
         history.save_host(host['id'], host)

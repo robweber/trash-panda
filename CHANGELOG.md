@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## Unreleased
+
+### Added
+
+- new http call `/api/silence_host/<id>/<minutes>` will put host in silent mode for the given number of minutes
+- added property `silence` to API status output. Set to true when host is still in silent mode
+- updated web interface so hosts can be put in silent mode and show silent mode status
+
+## 3.3
+
+### Added
+
+- added custom CSS for mobile devices
+
 ## 3.2
 
 ### Added
