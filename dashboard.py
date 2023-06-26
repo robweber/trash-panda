@@ -285,8 +285,8 @@ else:
 
 # create the notifier, if needed
 notify = None
-if('notifier' in yaml_file['config']):
-    notify = notifier.create_notifier(yaml_file['config']['notifier'])
+if('notifications' in yaml_file['config']):
+    notify = notifier.create_notifier(yaml_file['config']['notifications'])
 
 # check if the watchdog file was created
 if(os.path.exists(utils.WATCHDOG_FILE)):
