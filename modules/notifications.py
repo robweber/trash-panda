@@ -5,13 +5,19 @@ from pushover import Client
 
 class NotificationGroup:
     """Contains a group of notification objects that can be triggered all at once"""
-    notifiers = []
+    default = "all"
+    notifiers = {}
 
-    def __init__(self, notify_types):
+    def __init__(self, default_type, notify_types):
         """notify_types should be a list of notification types from the config"""
+
+        # the type to use if none is given
+        self.default = default_type
+        logging.info(f"Default notification type is: {self.default}")
+
         # go through the list and create each notifier
         for n in notify_types:
-            self.notifiers.append(self.__create_notifier(n))
+            self.notifiers[n['type']] = self.__create_notifier(n)
 
     def __create_notifier(self, notifier):
         """Create a notifier class using the given config"""
@@ -24,12 +30,32 @@ class NotificationGroup:
 
         return result
 
-    def notify_host(self, host, status):
-        for n in self.notifiers:
+    def __get_notify_group(self, type=None):
+        """Find the notification group based on the type given
+
+        returns: list of matching notifiers
+        """
+        if(type is None):
+            type = self.default
+
+        if(type == 'all'):
+            # special case for using all types
+            return self.notifiers.values()
+        elif(type == 'none'):
+            # special case, return blank list
+            return []
+        else:
+            # use only the type specified
+            return [self.notifiers[type]]
+
+    def notify_host(self, host, status, type=None):
+
+        # send to any notifier in this group
+        for n in self.__get_notify_group(type):
             n.notify_host(host, status)
 
-    def notify_service(self, host, service):
-        for n in self.notifiers:
+    def notify_service(self, host, service, type=None):
+        for n in self.__get_notify_group(type):
             n.notify_service(host, service)
 
 
