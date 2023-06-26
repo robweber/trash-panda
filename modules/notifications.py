@@ -3,16 +3,34 @@ import modules.utils as utils
 from pushover import Client
 
 
-def create_notifier(notifier):
-    """Create a notifier class using the given config"""
-    result = None
+class NotificationGroup:
+    """Contains a group of notification objects that can be triggered all at once"""
+    notifiers = []
 
-    if(notifier['type'] == 'log'):
-        result = LogNotification(notifier['args'])
-    elif(notifier['type'] == 'pushover'):
-        result = PushoverNotification(notifier['args'])
+    def __init__(self, notify_types):
+        """notify_types should be a list of notification types from the config"""
+        # go through the list and create each notifier
+        for n in notify_types:
+            self.notifiers.append(self.__create_notifier(n))
 
-    return result
+    def __create_notifier(self, notifier):
+        """Create a notifier class using the given config"""
+        result = None
+
+        if(notifier['type'] == 'log'):
+            result = LogNotification(notifier['args'])
+        elif(notifier['type'] == 'pushover'):
+            result = PushoverNotification(notifier['args'])
+
+        return result
+
+    def notify_host(self, host, status):
+        for n in self.notifiers:
+            n.notify_host(host, status)
+
+    def notify_service(self, host, service):
+        for n in self.notifiers:
+            n.notify_service(host, service)
 
 
 class MonitorNotification:

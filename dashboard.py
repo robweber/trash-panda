@@ -22,10 +22,10 @@ import time
 import os
 import os.path
 import modules.utils as utils
-import modules.notifications as notifier
 from natsort import natsorted
 from modules.monitor import HostMonitor
 from modules.history import HostHistory
+from modules.notifications import NotificationGroup
 from flask import Flask, flash, render_template, jsonify, redirect, request, Response
 
 history = HostHistory()
@@ -286,7 +286,7 @@ else:
 # create the notifier, if needed
 notify = None
 if('notifications' in yaml_file['config']):
-    notify = notifier.create_notifier(yaml_file['config']['notifications'])
+    notify = NotificationGroup(yaml_file['config']['notifications'])
 
 # check if the watchdog file was created
 if(os.path.exists(utils.WATCHDOG_FILE)):

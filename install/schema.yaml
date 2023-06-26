@@ -28,24 +28,26 @@ config:
         type: string
     notifications:
       required: False
-      type: dict
+      type: list
       schema:
-        type:
-          required: True
-          type: string
-          allowed:
-            - log
-            - pushover
-        args:
-          required: False
-          type: dict
-          valueschema:
-            type:
-              - string
-              - integer
-              - boolean
-          default:
-            args: none
+        type: dict
+        schema:
+          type:
+            required: True
+            type: string
+            allowed:
+              - log
+              - pushover
+          args:
+            required: False
+            type: dict
+            valueschema:
+              type:
+                - string
+                - integer
+                - boolean
+            default:
+              args: none
 services:
   required: True
   type: dict

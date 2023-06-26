@@ -216,28 +216,28 @@ config:
 
 ### Notifications
 
-By default the system will not send any notifications, but there is support for some built-in notification methods. These can be defined in the `config` section of the YAML file by creating a `notifications` option. A notifier is loaded at startup and will send notifications on host status (up/down) changes or service status changes each time a check is run. Services must be in a CONFIRMED state before a notification is sent. Services are in an UNCONFIRMED state when either a warning or critical state has not reached the `service_check_attempts` threshold described above. It is possible to temporarily silence notifications using the web interface or [API](#api).
+By default the system will not send any notifications, but there is support for some built-in notification methods. These can be defined in the `config` section of the YAML file by creating a `notifications` option. One, or more, notification types can be specified. Each notification type is loaded at startup and will send notifications on host status (up/down) changes or service status changes each time a check is run. Services must be in a CONFIRMED state before a notification is sent. Services are in an UNCONFIRMED state when either a warning or critical state has not reached the `service_check_attempts` threshold described above. It is possible to temporarily silence notifications using the web interface or [API](#api).
 
-Additional notification methods can be defined by extending the `MonitorNotification` class. Built-in notification types are listed below.
+Additional notification types can be defined by extending the `MonitorNotification` class. Built-in notification types are listed below.
 
 __Log Notifier__ - writes all notification messages directly to the log. Optionally the `path` argument can be used to specify a custom log path for notification messages.
 ```
 config:
   notifications:
-    type: log
-    args:
-      path: /path/to/custom.log
-      propagate: True  # controls if notifications also written to root logger
+    - type: log
+      args:
+        path: /path/to/custom.log
+        propagate: True  # controls if notifications also written to root logger
 ```
 
 __Pushover Notifier__ - sends messages through the [Pushover Notification Service](https://pushover.net/). A valid application key and user key are needed for your account and can be generated using [their instructions](https://pushover.net/api).
 ```
 config:
   notifications:
-    type: pushover
-    args:
-      api_key: pushover_api_key
-      user_key: pushover_user_key
+    - type: pushover
+      args:
+        api_key: pushover_api_key
+        user_key: pushover_user_key
 ```
 
 ## Services
