@@ -157,15 +157,15 @@ class HostMonitor:
             # the host is alive, continue checks
             service_results = self.__custom_checks(services, host)
 
-            service_results.append(self.__make_service_output(host, "Alive", 0, "Ping successfull!"))
+            service_results.append(self.__make_service_output(host, {'name': "Alive"}, 0, "Ping successfull!"))
         else:
             logging.debug(f"{host.name}: Is Not Alive")
 
             # the host is not alive, set "unknown" for all other services
             for service in services:
-                service_results.append(self.__make_service_output(host, service['name'], 3, "Not attempted", service['service_url']))
+                service_results.append(self.__make_service_output(host, service, 3, "Not attempted"))
 
-            service_results.append(self.__make_service_output(host, "Alive", 2, "Ping failed"))
+            service_results.append(self.__make_service_output(host, {'name': "Alive"}, 2, "Ping failed"))
 
         result['services'] = sorted(service_results, key=lambda s: s['name'])
 
@@ -184,17 +184,22 @@ class HostMonitor:
         # if over 50% responded return True
         return True if (len(total)/len(responses) > .5) else False
 
-    def __make_service_output(self, host, name, return_code, text, url=""):
+    def __make_service_output(self, host, service, return_code, text):
         """Helper method to take the name, return_code, and output and wrap
         it in a Dict.
         """
-        service_id = slugify(name)
+        service_id = slugify(service['name'])
         now = datetime.datetime.now()
-        result = {"name": name, "return_code": return_code, "text": text, "id": service_id,
+        result = {"name": service['name'], "return_code": return_code, "text": text, "id": service_id,
                   "check_attempt": 1, "state": utils.CONFIRMED_STATE, "last_state_change": now.strftime(utils.TIME_FORMAT)}
 
-        if(url.strip() != ""):
-            result['service_url'] = url
+        # set service url if it exists
+        if('service_url' in service):
+            result['service_url'] = service['service_url']
+
+        # add notifier if set at service level
+        if('notifier' in service):
+            result['notifier'] = service['notifier']
 
         # determine check attempts and service state (skip OK and Unknown states)
         old_service = self.history.get_service(host.id, service_id)
@@ -222,7 +227,7 @@ class HostMonitor:
 
         for s in services:
             output = self.__run_process(self.__create_service_call(s, host.config), [])
-            result.append(self.__make_service_output(host, s['name'], output.returncode, output.stdout, s['service_url']))
+            result.append(self.__make_service_output(host, s, output.returncode, output.stdout))
             time.sleep(1)
 
         return result

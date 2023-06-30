@@ -1,3 +1,13 @@
+# first define some lists to re-use later
+
+# full list of allowed notification types
+notification_types:
+  allowed: &notification_types
+    - all
+    - none
+    - pushover
+    - log
+
 # schema for the yaml layout, validated at startup
 config:
   required: False
@@ -33,11 +43,7 @@ config:
         primary:
           required: False
           type: string
-          allowed:
-            - all
-            - none
-            - pushover
-            - log
+          allowed: *notification_types
           default: all
         types:
           type: list
@@ -96,6 +102,10 @@ types:
       interval:
         required: False
         type: integer
+      notifier:
+        required: False
+        type: string
+        allowed: *notification_types
       service_check_attempts:
         required: False
         type: integer
@@ -126,6 +136,10 @@ types:
             name:
               required: True
               type: string
+            notifier:
+              required: False
+              type: string
+              allowed: *notification_types
             service_url:
               required: False
               type: string
@@ -156,6 +170,10 @@ hosts:
       interval:
         required: False
         type: integer
+      notifier:
+        required: False
+        type: string
+        allowed: *notification_types
       service_check_attempts:
         required: False
         type: integer
@@ -188,6 +206,10 @@ hosts:
             name:
               required: True
               type: string
+            notifier:
+              required: False
+              type: string
+              allowed: *notification_types
             service_url:
               required: False
               type: string

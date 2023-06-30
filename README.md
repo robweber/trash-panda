@@ -276,6 +276,7 @@ web_server:
   name: Web Server
   icon: server
   interval: 10
+  notifier: log
   service_check_attempts: 2
   config:
     virtual_host:
@@ -287,7 +288,11 @@ web_server:
 
 The above defines a device type of __web_server__ that can be implemented by a host. The host must have the variable __virtual_host__ present, as it's used in the http service config; and also will automatically have the service check __http__ assigned to it.
 
-Also notice the __interval__ value. This is optional. By default the global interval will be used, but individual device types, or individual hosts, can set their own.  
+Also of note are some optional variables.
+
+* __interval__: By default the global interval will be used, but individual device types, or individual hosts, can set their own.
+* __notifier__: Again, by default the global notification type will be used but hosts types can set their own. This will apply to the host and all services under it.
+* __service_check_attempts__: Override the global service check value with a custom value for this host
 
 ## Host Definitions
 
@@ -310,7 +315,7 @@ services:
       path: "/admin"
 ```
 
-The above host will inherit the services from the __web_server__ type above but it also adds an additional http check on port 5000 for a different site. Both of these will be checked at run time.
+The above host will inherit the services from the __web_server__ type above but it also adds an additional http check on port 5000 for a different site. Both of these will be checked at run time. Any variables available within the Host Type can be overridden by an individual host as well (icon, check interval, etc).
 
 ### Optional Attributes
 
