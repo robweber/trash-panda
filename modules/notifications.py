@@ -48,13 +48,20 @@ class NotificationGroup:
             # use only the type specified
             return [self.notifiers[type]]
 
-    def notify_host(self, host, status, type=None):
+    def notify_host(self, host, status):
+
+        # determine the type
+        type = host['notifier'] if 'notifier' in host else self.default
 
         # send to any notifier in this group
         for n in self.__get_notify_group(type):
             n.notify_host(host, status)
 
-    def notify_service(self, host, service, type=None):
+    def notify_service(self, host, service):
+
+        # determine the type
+        type = service['notifier'] if 'notifier' in service else (host['notifier'] if 'notifier' in host else self.default)
+
         for n in self.__get_notify_group(type):
             n.notify_service(host, service)
 

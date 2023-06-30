@@ -117,7 +117,8 @@ __/api/status__ - detailed listing of the status of each host
         "name": "Switch Uptime",
         "return_code": 1,
         "state": "UNCONFIRMED",
-        "text": "11 days, 2:09:34\n"
+        "text": "11 days, 2:09:34\n",
+        "notifier": "none"
       }
     ],
     "silenced": false,
@@ -216,7 +217,7 @@ config:
 
 ### Notifications
 
-By default the system will not send any notifications, but there is support for some built-in notification methods. These can be defined in the `config` section of the YAML file by creating a `notifications` option. One, or more, notification types can be specified. By default notifications will be sent to all configured type, however a `primary` type can be specified that will be used by default unless another is specified at the host or service level. A special `none` type can also be used to specify no notifications. This is useful at the host or service level.
+By default the system will not send any notifications, but there is support for some built-in notification methods. These can be defined in the `config` section of the YAML file by creating a `notifications` option. One, or more, notification types can be specified. By default notifications will be sent to `all` configured types, however a `primary` type can be specified that will be used by default unless another is specified at the host or service level. A special `none` type can also be used to specify no notifications. This is useful at the host or service level.
 
 Notifications are triggered on host status (up/down) changes or service status changes each time a check is run. Services must be in a CONFIRMED state before a notification is sent. Services are in an UNCONFIRMED state when either a warning or critical state has not reached the `service_check_attempts` threshold described above. It is possible to temporarily silence notifications using the web interface or [API](#api).
 
@@ -226,6 +227,7 @@ __Log Notifier__ - writes all notification messages directly to the log. Optiona
 ```
 config:
   notifications:
+    primary: all
     types:
       - type: log
         args:
