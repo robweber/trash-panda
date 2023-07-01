@@ -317,6 +317,7 @@ while 1:
         # save the updated host
         history.save_host(host['id'], host)
 
+    logging.debug("Host check complete")
     # record the last time this loop ran
     history.save_last_check()
     time.sleep(60-datetime.datetime.now().second)  # sleep until the top of the next minute
