@@ -62,7 +62,7 @@ function silence_host(id, minutes){
     <div class="col-lg-4 host-status-card">
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title">Type: <span class="text-primary">{{ host['type'] | replace('_',' ') | title }}</span></h5>
+          <h5 class="card-title">Type: <span class="text-info">{{ host['type'] | replace('_',' ') | title }}</span></h5>
           <p class="card-text">
             Last Check: {{ host['last_check'] }} <br />
             Next Check: <span id="host-next-check">{{ host['next_check'] }}</span> <br />
