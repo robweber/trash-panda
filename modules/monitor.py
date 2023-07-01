@@ -194,7 +194,7 @@ class HostMonitor:
                   "check_attempt": 1, "state": utils.CONFIRMED_STATE, "last_state_change": now.strftime(utils.TIME_FORMAT)}
 
         # set service url if it exists
-        if('service_url' in service):
+        if('service_url' in service and service['service_url'].strip() != ""):
             result['service_url'] = service['service_url']
 
         # add notifier if set at service level
