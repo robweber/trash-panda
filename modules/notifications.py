@@ -1,6 +1,10 @@
 import logging
+import smtplib
+import ssl
 import modules.utils as utils
 from pushover import Client
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 
 class NotificationGroup:
@@ -27,6 +31,8 @@ class NotificationGroup:
             result = LogNotification(notifier['args'])
         elif(notifier['type'] == 'pushover'):
             result = PushoverNotification(notifier['args'])
+        elif(notifier['type'] == 'email'):
+            result = EmailNotification(notifier['args'])
 
         return result
 
@@ -137,7 +143,9 @@ class PushoverNotification(MonitorNotification):
     https://pushover.net/
     https://pypi.org/project/python-pushover/
 
-    Both application and user identification keys are needed
+    Custom config:
+    * application key
+    * user identifiction key
     """
     client = None
 
@@ -148,3 +156,47 @@ class PushoverNotification(MonitorNotification):
 
     def _send_message(self, message):
         self.client.send_message(message, title="Monitoring Notification")
+
+
+class EmailNotification(MonitorNotification):
+    """Sends notifications using built-in Python SMTP classes
+
+    Custom Config:
+    * server
+    * port (default 25)
+    * secure
+    * username (if secure)
+    * password (if secure)
+    * sender
+    * recipient
+    """
+
+    smtp_args = {}
+
+    def __init__(self, args):
+        super().__init__('email')
+        self.smtp_args = args
+
+        if('port' not in self.smtp_args):
+            self.smtp_args['port'] = 25
+
+    def _send_message(self, message):
+        # generate both a text and html message
+        email = MIMEMultipart("alternative")
+        email["Subject"] = "Monitoring Notification"
+
+        html = f"<html><body><p>{ message }</p></body></html>"
+
+        email.attach(MIMEText(message, "plain"))
+        email.attach(MIMEText(html, "html"))
+
+        if(self.smtp_args['secure']):
+            # Create a secure SSL context
+            context = ssl.create_default_context()
+
+            with smtplib.SMTP_SSL(self.smtp_args['server'], self.smtp_args['port'], context=context) as server:
+                server.login(self.smtp_args['username'], self.smtp_args['password'])
+                server.sendmail(self.smtp_args['sender'], self.smtp_args['recipient'], email.as_string())
+        else:
+            with smtplib.SMTP() as server:
+                server.sendmail(self.smtp_args['sender'], self.smtp_args['recipient'], email.as_string())

@@ -7,6 +7,7 @@ notification_types:
     - none
     - pushover
     - log
+    - email
 
 # service definition, used for host types and hosts
 service_definition: &service_definition
@@ -87,6 +88,7 @@ config:
                 allowed:
                   - log
                   - pushover
+                  - email
               args:
                 required: False
                 type: dict

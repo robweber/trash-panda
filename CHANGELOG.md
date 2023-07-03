@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - updated web interface so hosts can be put in silent mode and show silent mode status
 - multiple notification channels can be added instead of just one. Can also set primary type (`all`) by default.
 - `notifier` tag can be set at the host or service level to override the default notification method. Special options `all` and `none` are also available
+- new `email` notification type to route messages through to an email account
 
 ### Changed
 

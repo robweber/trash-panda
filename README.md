@@ -223,7 +223,24 @@ Notifications are triggered on host status (up/down) changes or service status c
 
 Additional notification types can be defined by extending the `MonitorNotification` class. Built-in notification types are listed below.
 
-__Log Notifier__ - writes all notification messages directly to the log. Optionally the `path` argument can be used to specify a custom log path for notification messages.
+__Email Notifier__ - sends notifications to an email address. Requires a valid SMTP server to route the mail through. Can be something like Gmail if valid permissions are given to send mail through the account.
+```
+config:
+  notifications:
+    primary: email
+    types:
+      - type: email
+        args:
+          server: email.server.com
+          port: 25  # could be different, check your outgoing mail server settings
+          secure: True  # if False, make sure your server allows non-authenticated connections
+          username: user  # if secure=True
+          password: password  # if secure=True
+          sender: sender@email.server.com
+          recipient: recipient@address.com
+```
+
+__Log Notifier__ - writes notification messages directly to the log. Optionally the `path` argument can be used to specify a custom log path for notification messages.
 ```
 config:
   notifications:
