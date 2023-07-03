@@ -151,6 +151,7 @@ types:
                 type:
                   - string
                   - integer
+                  - float
 hosts:
   required: True
   type: list
@@ -221,3 +222,4 @@ hosts:
                 type:
                   - string
                   - integer
+                  - float

@@ -18,6 +18,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 - global notifications are now set with the `notification` option instead of `notifier`
 
+### Fixed
+
+- can use floating point numbers as arguments for a service, previously was limited to integers
+
 ## 3.3
 
 ### Added
