@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Changed
 
 - global notifications are now set with the `notification` option instead of `notifier`
+- condensed `schema.yaml` file layout
 
 ### Fixed
 

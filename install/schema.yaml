@@ -8,6 +8,37 @@ notification_types:
     - pushover
     - log
 
+# service definition, used for host types and hosts
+service_definition: &service_definition
+  required: False
+  type: list
+  minlength: 1
+  schema:
+    type: dict
+    schema:
+      type:
+        required: True
+        type: string
+      name:
+        required: True
+        type: string
+      notifier:
+        required: False
+        type: string
+        allowed: *notification_types
+      service_url:
+        required: False
+        type: string
+        default: ""
+      args:
+        required: False
+        type: dict
+        valueschema:
+          type:
+            - string
+            - integer
+            - float
+
 # schema for the yaml layout, validated at startup
 config:
   required: False
@@ -123,35 +154,7 @@ types:
               type:
                 - string
                 - integer
-      services:
-        required: False
-        type: list
-        minlength: 1
-        schema:
-          type: dict
-          schema:
-            type:
-              required: True
-              type: string
-            name:
-              required: True
-              type: string
-            notifier:
-              required: False
-              type: string
-              allowed: *notification_types
-            service_url:
-              required: False
-              type: string
-              default: ""
-            args:
-              required: False
-              type: dict
-              valueschema:
-                type:
-                  - string
-                  - integer
-                  - float
+      services: *service_definition
 hosts:
   required: True
   type: list
@@ -194,32 +197,4 @@ hosts:
           type:
             - string
             - integer
-      services:
-        required: False
-        type: list
-        minlength: 1
-        schema:
-          type: dict
-          schema:
-            type:
-              required: True
-              type: string
-            name:
-              required: True
-              type: string
-            notifier:
-              required: False
-              type: string
-              allowed: *notification_types
-            service_url:
-              required: False
-              type: string
-              default: ""
-            args:
-              required: False
-              type: dict
-              valueschema:
-                type:
-                  - string
-                  - integer
-                  - float
+      services: *service_definition
