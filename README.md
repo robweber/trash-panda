@@ -117,7 +117,8 @@ __/api/status__ - detailed listing of the status of each host
         "name": "Switch Uptime",
         "return_code": 1,
         "state": "UNCONFIRMED",
-        "text": "11 days, 2:09:34\n"
+        "text": "11 days, 2:09:34\n",
+        "notifier": "none"
       }
     ],
     "silenced": false,
@@ -216,28 +217,51 @@ config:
 
 ### Notifications
 
-By default the system will not send any notifications, but there is support for some built-in notification methods. These can be defined in the `config` section of the YAML file by creating a `notifier` option. A notifier is loaded at startup and will send notifications on host status (up/down) changes or service status changes each time a check is run. Services must be in a CONFIRMED state before a notification is sent. Services are in an UNCONFIRMED state when either a warning or critical state has not reached the `service_check_attempts` threshold described above. It is possible to temporarily silence notifications using the web interface or [API](#api).
+By default the system will not send any notifications, but there is support for some built-in notification methods. These can be defined in the `config` section of the YAML file by creating a `notifications` option. One, or more, notification types can be specified. By default notifications will be sent to `all` configured types, however a `primary` type can be specified that will be used by default unless another is specified at the host or service level. A special `none` type can also be used to specify no notifications. This is useful at the host or service level.
 
-Additional notification methods can be defined by extending the `MonitorNotification` class. Built-in notification types are listed below.
+Notifications are triggered on host status (up/down) changes or service status changes each time a check is run. Services must be in a CONFIRMED state before a notification is sent. Services are in an UNCONFIRMED state when either a warning or critical state has not reached the `service_check_attempts` threshold described above. It is possible to temporarily silence notifications using the web interface or [API](#api).
 
-__Log Notifier__ - writes all notification messages directly to the log. Optionally the `path` argument can be used to specify a custom log path for notification messages.
+Additional notification types can be defined by extending the `MonitorNotification` class. Built-in notification types are listed below.
+
+__Email Notifier__ - sends notifications to an email address. Requires a valid SMTP server to route the mail through. Can be something like Gmail if valid permissions are given to send mail through the account.
 ```
 config:
-  notifier:
-    type: log
-    args:
-      path: /path/to/custom.log
-      propagate: True  # controls if notifications also written to root logger
+  notifications:
+    primary: email
+    types:
+      - type: email
+        args:
+          server: email.server.com
+          port: 25  # could be different, check your outgoing mail server settings
+          secure: True  # if False, make sure your server allows non-authenticated connections
+          username: user  # if secure=True
+          password: password  # if secure=True
+          sender: sender@email.server.com
+          recipient: recipient@address.com
+```
+
+__Log Notifier__ - writes notification messages directly to the log. Optionally the `path` argument can be used to specify a custom log path for notification messages.
+```
+config:
+  notifications:
+    primary: all
+    types:
+      - type: log
+        args:
+          path: /path/to/custom.log
+          propagate: True  # controls if notifications also written to root logger
 ```
 
 __Pushover Notifier__ - sends messages through the [Pushover Notification Service](https://pushover.net/). A valid application key and user key are needed for your account and can be generated using [their instructions](https://pushover.net/api).
 ```
 config:
-  notifier:
-    type: pushover
-    args:
-      api_key: pushover_api_key
-      user_key: pushover_user_key
+  notifications:
+    primary: none
+    types:
+      - type: pushover
+        args:
+          api_key: pushover_api_key
+          user_key: pushover_user_key
 ```
 
 ## Services
@@ -271,6 +295,7 @@ web_server:
   name: Web Server
   icon: server
   interval: 10
+  notifier: log
   service_check_attempts: 2
   config:
     virtual_host:
@@ -282,7 +307,11 @@ web_server:
 
 The above defines a device type of __web_server__ that can be implemented by a host. The host must have the variable __virtual_host__ present, as it's used in the http service config; and also will automatically have the service check __http__ assigned to it.
 
-Also notice the __interval__ value. This is optional. By default the global interval will be used, but individual device types, or individual hosts, can set their own.  
+Also of note are some optional variables.
+
+* __interval__: By default the global interval will be used, but individual device types, or individual hosts, can set their own.
+* __notifier__: Again, by default the global notification type will be used but hosts types can set their own. This will apply to the host and all services under it.
+* __service_check_attempts__: Override the global service check value with a custom value for this host
 
 ## Host Definitions
 
@@ -305,7 +334,7 @@ services:
       path: "/admin"
 ```
 
-The above host will inherit the services from the __web_server__ type above but it also adds an additional http check on port 5000 for a different site. Both of these will be checked at run time.
+The above host will inherit the services from the __web_server__ type above but it also adds an additional http check on port 5000 for a different site. Both of these will be checked at run time. Any variables available within the Host Type can be overridden by an individual host as well (icon, check interval, etc).
 
 ### Optional Attributes
 

@@ -11,6 +11,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - new http call `/api/silence_host/<id>/<minutes>` will put host in silent mode for the given number of minutes
 - added property `silence` to API status output. Set to true when host is still in silent mode
 - updated web interface so hosts can be put in silent mode and show silent mode status
+- multiple notification channels can be added instead of just one. Can also set primary type (`all`) by default.
+- `notifier` tag can be set at the host or service level to override the default notification method. Special options `all` and `none` are also available
+- new `email` notification type to route messages through to an email account
+
+### Changed
+
+- global notifications are now set with the `notification` option instead of `notifier`
+- condensed `schema.yaml` file layout
+
+### Fixed
+
+- can use floating point numbers as arguments for a service, previously was limited to integers
 
 ## 3.3
 

@@ -30,6 +30,7 @@ class Device:
         self.info = host_def['info']
         self.icon = host_def['icon']
         self.interval = host_def['interval']
+        self.notifier = host_def['notifier']
         self.check_attempts = host_def['service_check_attempts']
         self.config = host_def['config']
         self.services = host_def['services']
@@ -47,8 +48,12 @@ class Device:
                   'icon': self.icon, 'info': self.info, 'interval': self.interval, 'service_check_attempts': self.check_attempts,
                   'last_check': self.last_check, 'config': self.config, 'silenced': self.is_silenced()}
 
+        # set these values if they exist
         if(self.management_page is not None):
             result['management_page'] = self.management_page
+
+        if(self.notifier is not None):
+            result['notifier'] = self.notifier
 
         return result
 
@@ -78,6 +83,7 @@ class HostType:
     info = ""
     icon = 'devices'
     interval = 5
+    notifier = None
     check_attempts = 3
     config = {}
     services = []
@@ -86,6 +92,7 @@ class HostType:
         self.type = type_name
         self.name = type_def['name']
         self.interval = default_interval if 'interval' not in type_def else type_def['interval']
+        self.notifier = None if 'notifier' not in type_def else type_def['notifier']
         self.check_attempts = default_attempts if 'service_check_attempts' not in type_def else type_def['service_check_attempts']
 
         if('info' in type_def):
@@ -124,6 +131,9 @@ class HostType:
 
         if('interval' not in device_def):
             device_def['interval'] = self.interval
+
+        if('notifier' not in device_def):
+            device_def['notifier'] = self.notifier
 
         if('service_check_attempts' not in device_def):
             device_def['service_check_attempts'] = self.check_attempts

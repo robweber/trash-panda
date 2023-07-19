@@ -1,3 +1,45 @@
+# first define some lists to re-use later
+
+# full list of allowed notification types
+notification_types:
+  allowed: &notification_types
+    - all
+    - none
+    - pushover
+    - log
+    - email
+
+# service definition, used for host types and hosts
+service_definition: &service_definition
+  required: False
+  type: list
+  minlength: 1
+  schema:
+    type: dict
+    schema:
+      type:
+        required: True
+        type: string
+      name:
+        required: True
+        type: string
+      notifier:
+        required: False
+        type: string
+        allowed: *notification_types
+      service_url:
+        required: False
+        type: string
+        default: ""
+      args:
+        required: False
+        type: dict
+        valueschema:
+          type:
+            - string
+            - integer
+            - float
+
 # schema for the yaml layout, validated at startup
 config:
   required: False
@@ -26,26 +68,37 @@ config:
       valueschema:
         required: True
         type: string
-    notifier:
+    notifications:
       required: False
       type: dict
       schema:
-        type:
-          required: True
-          type: string
-          allowed:
-            - log
-            - pushover
-        args:
+        primary:
           required: False
-          type: dict
-          valueschema:
-            type:
-              - string
-              - integer
-              - boolean
-          default:
-            args: none
+          type: string
+          allowed: *notification_types
+          default: all
+        types:
+          type: list
+          schema:
+            type: dict
+            schema:
+              type:
+                required: True
+                type: string
+                allowed:
+                  - log
+                  - pushover
+                  - email
+              args:
+                required: False
+                type: dict
+                valueschema:
+                  type:
+                    - string
+                    - integer
+                    - boolean
+                default:
+                  args: none
 services:
   required: True
   type: dict
@@ -82,6 +135,10 @@ types:
       interval:
         required: False
         type: integer
+      notifier:
+        required: False
+        type: string
+        allowed: *notification_types
       service_check_attempts:
         required: False
         type: integer
@@ -99,30 +156,7 @@ types:
               type:
                 - string
                 - integer
-      services:
-        required: False
-        type: list
-        minlength: 1
-        schema:
-          type: dict
-          schema:
-            type:
-              required: True
-              type: string
-            name:
-              required: True
-              type: string
-            service_url:
-              required: False
-              type: string
-              default: ""
-            args:
-              required: False
-              type: dict
-              valueschema:
-                type:
-                  - string
-                  - integer
+      services: *service_definition
 hosts:
   required: True
   type: list
@@ -142,6 +176,10 @@ hosts:
       interval:
         required: False
         type: integer
+      notifier:
+        required: False
+        type: string
+        allowed: *notification_types
       service_check_attempts:
         required: False
         type: integer
@@ -161,27 +199,4 @@ hosts:
           type:
             - string
             - integer
-      services:
-        required: False
-        type: list
-        minlength: 1
-        schema:
-          type: dict
-          schema:
-            type:
-              required: True
-              type: string
-            name:
-              required: True
-              type: string
-            service_url:
-              required: False
-              type: string
-              default: ""
-            args:
-              required: False
-              type: dict
-              valueschema:
-                type:
-                  - string
-                  - integer
+      services: *service_definition
