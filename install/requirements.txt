@@ -2,6 +2,7 @@ asyncio
 cerberus
 configargparse
 Flask
+Flask-Markdown
 natsort
 python-pushover
 pythonping

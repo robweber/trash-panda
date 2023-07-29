@@ -27,6 +27,7 @@ from modules.monitor import HostMonitor
 from modules.history import HostHistory
 from modules.notifications import NotificationGroup
 from flask import Flask, flash, render_template, jsonify, redirect, request, Response
+from flaskext.markdown import Markdown
 
 history = HostHistory()
 
@@ -40,6 +41,7 @@ def signal_handler(signum, frame):
 def webapp_thread(port_number, config_file, notifier_configured, debugMode=False, logHandlers=[]):
     app = Flask(import_name="trash-panda", static_folder=os.path.join(utils.DIR_PATH, 'web', 'static'),
                 template_folder=os.path.join(utils.DIR_PATH, 'web', 'templates'))
+    Markdown(app)
 
     # generate random number for session secret key
     app.secret_key = os.urandom(24)
@@ -79,7 +81,7 @@ def webapp_thread(port_number, config_file, notifier_configured, debugMode=False
 
         if(result is not None):
             # set if a notifier is configured to toggle silent mode controls
-            return render_template("host_status.html", host=result, page_title='Host Status', has_notifier=notifier_configured)
+            return render_template("host_status.html", host=result, page_title='Host Status', has_notifier=notifier_configured, docs="")
         else:
             flash('Host page not found', 'warning')
             return redirect('/')
