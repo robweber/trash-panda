@@ -25,7 +25,7 @@ CONFIRMED_STATE = "CONFIRMED"
 UNCONFIRMED_STATE = "UNCONFIRMED"
 
 # allowed file types for web editor
-ALLOWED_EDITOR_TYPES = ('.yaml', '.py')
+ALLOWED_EDITOR_TYPES = ('.yaml', '.py', '.md')
 
 # time format when converting datetime objects
 TIME_FORMAT = "%m-%d-%Y %I:%M%p"
