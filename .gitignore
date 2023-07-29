@@ -1,6 +1,7 @@
 # project specific
 conf/*
 .service_down
+docs/*.md
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
