@@ -80,49 +80,63 @@ function silence_host(id, minutes){
 </div>
 
 <div class="container">
-  {% if('services' in host): %}
   <div class="mt-2 pt-1" align="right">
-  <button class="btn btn-primary service_check_btn" onclick="check_now('{{host['id']}}')">Check Now</button>
+  {% if('services' in host): %}
+    <button class="btn btn-primary service_check_btn" onclick="check_now('{{host['id']}}')">Check Now</button>
   {% if has_notifier %}
-  <div class="dropdown div-inline silence_btn">
-    {% if host['silenced'] %}
-    <button id="silence-btn" class="btn btn-danger dropdown-toggle silence_btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Silenced</button>
-    {% else %}
-    <button id="silence-btn" class="btn btn-warning dropdown-toggle silence_btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Silence</button>
-    {% endif %}
-    <div class="dropdown-menu dropdown-mobile" aria-labelledby="dropdownMenuButton">
-      <button class="dropdown-item" type="button" id="cancel-btn" style="{{ 'display:none' if not host['silenced'] else '' }}" onClick="silence_host('{{host['id']}}', -1)">Cancel</button>
-      <button class="dropdown-item" type="button" onClick="silence_host('{{host['id']}}', 30)">30 Min</button>
-      <button class="dropdown-item" type="button" onClick="silence_host('{{host['id']}}', 60)">1 Hour</button>
-      <button class="dropdown-item" type="button" onClick="silence_host('{{host['id']}}', 120)">2 Hours</button>
+    <div class="dropdown div-inline silence_btn">
+      {% if host['silenced'] %}
+      <button id="silence-btn" class="btn btn-danger dropdown-toggle silence_btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Silenced</button>
+      {% else %}
+      <button id="silence-btn" class="btn btn-warning dropdown-toggle silence_btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Silence</button>
+      {% endif %}
+      <div class="dropdown-menu dropdown-mobile" aria-labelledby="dropdownMenuButton">
+        <button class="dropdown-item" type="button" id="cancel-btn" style="{{ 'display:none' if not host['silenced'] else '' }}" onClick="silence_host('{{host['id']}}', -1)">Cancel</button>
+        <button class="dropdown-item" type="button" onClick="silence_host('{{host['id']}}', 30)">30 Min</button>
+        <button class="dropdown-item" type="button" onClick="silence_host('{{host['id']}}', 60)">1 Hour</button>
+        <button class="dropdown-item" type="button" onClick="silence_host('{{host['id']}}', 120)">2 Hours</button>
+      </div>
+    </div>
+  {% endif %}
+  </div>
+  <ul class="nav nav-tabs" id="host-content-nav" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" id="services-tab" data-toggle="tab" href="#services" role="tab">Services</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="services-tab" data-toggle="tab" href="#documentation" role="tab">Documentation</a>
+    </li>
+  </ul>
+  <div class="tab-content" id="host-content">
+    <div class="tab-pane show active" id="services">
+      <table class="table table-striped mt-3" id="service_status">
+        <thead class="thead-dark">
+          <tr>
+            <th>Service</th>
+            <th class="hide-md">Output</th>
+            <th>Last Change</th>
+          </tr>
+        </thead>
+        {% for row in host['services']: %}
+        <tr>
+          <td class="{{ current_status[row['return_code']] }} row_1">
+            {{ row['name'] }}
+            {% if(row['state'] == 'UNCONFIRMED') %}
+            (check {{ row['check_attempt'] }}/{{ host['service_check_attempts'] }})
+            {% endif %}
+            {% if('service_url' in row) %}
+            <a href="{{ row['service_url'] }}" target="_blank" class="mdi mdi-launch icon-sm icon-inline"></a>
+            {% endif %}
+          </td>
+          <td class="{{ status_text[row['return_code']] }} row_2 hide-md">{{ row['text'].replace("\n", '<br />') | safe }}</td>
+          <td class="{{ status_text[row['return_code']] }}">{{ row['last_state_change'] }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+      {% endif %}
+    </div>
+    <div class="tab-pane" id="documentation">
     </div>
   </div>
-  {% endif %}
-  </div>
-  <table class="table table-striped mt-3" id="service_status">
-    <thead>
-      <tr>
-        <th>Service</th>
-        <th class="hide-md">Output</th>
-        <th>Last Change</th>
-      </tr>
-    </thead>
-    {% for row in host['services']: %}
-    <tr>
-      <td class="{{ current_status[row['return_code']] }} row_1">
-        {{ row['name'] }}
-        {% if(row['state'] == 'UNCONFIRMED') %}
-        (check {{ row['check_attempt'] }}/{{ host['service_check_attempts'] }})
-        {% endif %}
-        {% if('service_url' in row) %}
-        <a href="{{ row['service_url'] }}" target="_blank" class="mdi mdi-launch icon-sm icon-inline"></a>
-        {% endif %}
-      </td>
-      <td class="{{ status_text[row['return_code']] }} row_2 hide-md">{{ row['text'].replace("\n", '<br />') | safe }}</td>
-      <td class="{{ status_text[row['return_code']] }}">{{ row['last_state_change'] }}</td>
-    </tr>
-    {% endfor %}
-  </table>
-  {% endif %}
 </div>
 {% endblock %}
