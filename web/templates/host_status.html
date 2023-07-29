@@ -52,6 +52,7 @@ function silence_host(id, minutes){
 {% endblock %}
 {% block content %}
 {% set current_status = ['text-success', 'text-warning', 'text-danger', 'text-secondary'] %}
+{% set overall_status = ['OK', 'Warning', 'Critical', 'Unknown'] %}
 {% set status_text = ['', '', '', 'text-secondary'] %}
 <div class="container">
   <div class="row">
@@ -64,6 +65,7 @@ function silence_host(id, minutes){
         <div class="card-body">
           <h5 class="card-title">Type: <span class="text-info">{{ host['type'] | replace('_',' ') | title }}</span></h5>
           <p class="card-text">
+            Overall Status: <span class="{{ current_status[host['overall_status']] }}">{{ overall_status[host['overall_status']] }}</span> <br />
             Last Check: {{ host['last_check'] }} <br />
             Next Check: <span id="host-next-check">{{ host['next_check'] }}</span> <br />
             IP Address: {{ host['address'] }}
