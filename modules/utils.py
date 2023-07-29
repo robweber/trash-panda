@@ -7,6 +7,7 @@ Utility functions and variables for global use
 import json
 import logging
 import os
+import os.path
 import yaml
 from cerberus import Validator
 
@@ -14,6 +15,7 @@ from cerberus import Validator
 DIR_PATH = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 NAGIOS_PATH = "/usr/lib/nagios/plugins/"
 WATCHDOG_FILE = os.path.join(DIR_PATH, '.service_down')
+DOCS_PATH = os.path.join(DIR_PATH, "docs")
 
 # valid status descriptions
 SERVICE_STATUSES = ["OK", "Warning", "Critical", "Unknown"]
@@ -60,6 +62,16 @@ def load_config_file(file):
 
     return result
 
+
+# load the markdown documenation, if it exists
+def load_documentation(host):
+    result = ""
+
+    file_path = os.path.join(DOCS_PATH, f"{host}.md")
+    if(os.path.exists(file_path)):
+        result = read_file(file_path)
+
+    return result
 
 # read JSON formatted file
 def read_json(file):
