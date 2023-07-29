@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## Unreleased
+
+### Added
+
+- host status page can show documentation specific to that host. Created using markdown files in the `docs` directory
+
 ## Version 4.0
 
 ### Added
