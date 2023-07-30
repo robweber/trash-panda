@@ -139,7 +139,7 @@ function silence_host(id, minutes){
       {% if docs | length %}
       {{ docs | markdown }}
       {% else %}
-      <p align="center">No documentation. Create the file <b>docs/{{ host['id'] }}.md</b> to create some.</p>
+      <p align="center">No documentation. Create the file <b>{{ host['id'] }}.md</b> to create some.</p>
       {% endif %}
     </div>
   </div>

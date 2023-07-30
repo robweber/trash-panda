@@ -15,7 +15,6 @@ from cerberus import Validator
 DIR_PATH = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 NAGIOS_PATH = "/usr/lib/nagios/plugins/"
 WATCHDOG_FILE = os.path.join(DIR_PATH, '.service_down')
-DOCS_PATH = os.path.join(DIR_PATH, "docs")
 
 # valid status descriptions
 SERVICE_STATUSES = ["OK", "Warning", "Critical", "Unknown"]
@@ -64,12 +63,11 @@ def load_config_file(file):
 
 
 # load the markdown documenation, if it exists
-def load_documentation(host):
+def load_documentation(host_file):
     result = ""
 
-    file_path = os.path.join(DOCS_PATH, f"{host}.md")
-    if(os.path.exists(file_path)):
-        result = read_file(file_path)
+    if(os.path.exists(host_file)):
+        result = read_file(host_file)
 
     return result
 
