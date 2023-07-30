@@ -18,6 +18,7 @@ This is a _very_ basic monitoring solution meant for simple home use. It will mo
 - [Host Types](#host-types)
 - [Host Definitions](#host-definitions)
   - [Optional Attributes](#optional-attributes)
+- [Host Documentation](#host-documentation)
 - [Templating](#templating)
   - [Host](#host)
   - [Service](#service)
@@ -203,6 +204,7 @@ config:
   default_interval: 3
   service_check_attempts: 3
   check_on_startup: True
+  docs_dir: docs
   jinja_constants:
     CUSTOM_PATH: /path/
   notify:
@@ -212,6 +214,7 @@ config:
 * default_interval - the default host check interval, in minutes. This will default to 3 unless changed. [Individual hosts](#host-types) can set their own interval if needed. At runtime this value is randomly adjusted +/- 60 seconds to help spread load.
 * service_check_attempts: how many times a service should be checked before confirming a warning or critical state. [Individual hosts](#host-types). Default is 3, set this to 1 to automatically confirm state changes.
 * check_on_startup - if hosts should all be checked immediately after startup. Defaults to True. If this is set to False, host checks will start on their normal interval from the program start time.
+* docs_dir - directory containing host documentation files, defaults to `docs`.
 * jinja_constants - a list of key:value pairs that will be passed to the [Jinja templating engine](#templating). These can be things like commonly used system paths or referenced names used in defining host or service values.
 * notifier - defines a notification channel, see more below
 
@@ -344,6 +347,12 @@ The following attributes are useful, but not necessary, for any host definition:
 * management_page - the full URL to web management for this device, if it exists
 * interval - the check interval, if different than the global value
 * service_check_attempts - how many service checks to confirm warning/critical states. Only needed if different than the global value.
+
+## Host Documentation
+
+On every host status page there is a tab for the configured services, and host documentation. The documentation tab is an optional feature that can pull host information from a Markdown file for that host. By default the location of these files is in the `docs` directory, but this can be changed in the config file.
+
+To work properly the documentation file should have the same name as as the host and end in `.md`. For a host named __My Web Server__ the file would be the slugified version of the host __my-web-server.md__. This is the same as the host id returned by the [API](#api) or found in the browser path when viewing the host status. 
 
 ## Templating
 
