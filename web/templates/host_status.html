@@ -137,7 +137,7 @@ function silence_host(id, minutes){
     </div>
     <div class="tab-pane mt-3" id="documentation">
       {% if docs | length %}
-      {{ docs | markdown }}
+      {{ docs | safe }}
       {% else %}
       <p align="center">No documentation. Create the file <b>{{ host['id'] }}.md</b> to create some.</p>
       {% endif %}

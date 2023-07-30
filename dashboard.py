@@ -27,7 +27,6 @@ from modules.monitor import HostMonitor
 from modules.history import HostHistory
 from modules.notifications import NotificationGroup
 from flask import Flask, flash, render_template, jsonify, redirect, request, Response
-from flaskext.markdown import Markdown
 
 history = HostHistory()
 
@@ -41,7 +40,6 @@ def signal_handler(signum, frame):
 def webapp_thread(port_number, config_file, notifier_configured, debugMode=False, docs_dir="", logHandlers=[]):
     app = Flask(import_name="trash-panda", static_folder=os.path.join(utils.DIR_PATH, 'web', 'static'),
                 template_folder=os.path.join(utils.DIR_PATH, 'web', 'templates'))
-    Markdown(app)
 
     # generate random number for session secret key
     app.secret_key = os.urandom(24)

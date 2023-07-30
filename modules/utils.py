@@ -6,6 +6,8 @@ Utility functions and variables for global use
 """
 import json
 import logging
+import markdown
+import markdown.extensions.fenced_code
 import os
 import os.path
 import yaml
@@ -69,7 +71,7 @@ def load_documentation(host_file):
     if(os.path.exists(host_file)):
         result = read_file(host_file)
 
-    return result
+    return markdown.markdown(result, extensions=['fenced_code'])
 
 # read JSON formatted file
 def read_json(file):
