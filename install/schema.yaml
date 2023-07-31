@@ -171,6 +171,9 @@ hosts:
       type:
         required: True
         type: string
+      id:
+        required: False
+        type: string
       name:
         required: True
         type: string

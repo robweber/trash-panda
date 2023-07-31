@@ -13,6 +13,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - added `docs_dir` configuration key to specify custom documentation directory
 - overall host status displayed on status page
 
+### Changed
+
+- can set host ID using the `id` value if needed. Will default to a slugified version of the name if not set
+
 ## Version 4.0
 
 ### Added
