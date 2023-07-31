@@ -5,7 +5,7 @@
 }
 
 #documentation h2 {
-  font-weight: bold;
+  border-bottom: .05rem solid #e5e5e5;
   margin-bottom: .8em;
 }
 
