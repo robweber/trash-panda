@@ -70,7 +70,7 @@ optional arguments:
 
 Once running the dashboard page can be loaded. The landing page will display all currently configured hosts and their overall status. If the host is down, or any configured service unavailable, the overall status will change. This page is refreshed every __15 seconds__. Data will change depending on the update interval set when the program is loaded.
 
-Clicking on a host name will show you more information about that device. Individual services will be listed along with any output to indicate their current status. From the host status page a check of all services can be forced, and notifications temporarily silenced. If configured, the management page for the host can also be launched from here.
+Clicking on a host name will show you more information about that device. Individual services will be listed along with any output to indicate their current status. From the host status page a check of all services can be forced, and notifications temporarily silenced. If configured, a management page for the host can also be launched from here. For additional flexibility more host information can be displayed in the [documentation](#host-documentation) tab via custom Markdown files. 
 
 ### API
 
@@ -352,7 +352,7 @@ The following attributes are useful, but not necessary, for any host definition:
 
 On every host status page there is a tab for the configured services, and host documentation. The documentation tab is an optional feature that can pull host information from a Markdown file for that host. By default the location of these files is in the `docs` directory, but this can be changed in the config file.
 
-To work properly the documentation file should have the same name as as the host and end in `.md`. For a host named __My Web Server__ the file would be the slugified version of the host __my-web-server.md__. This is the same as the host id returned by the [API](#api) or found in the browser path when viewing the host status. 
+To work properly the documentation file should have the same name as as the host and end in `.md`. For a host named __My Web Server__ the file would be the slugified version of the host __my-web-server.md__. This is the same as the host id returned by the [API](#api) or found in the browser path when viewing the host status.
 
 ## Templating
 
