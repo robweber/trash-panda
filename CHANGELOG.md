@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Added
 
 - host status page can show documentation specific to that host. Created using markdown files in the `docs` directory, or a custom directory
+- Markdown (.md) is a valid file type to edit in the Configuration editor
 - added `docs_dir` configuration key to specify custom documentation directory
 - overall host status displayed on status page
 

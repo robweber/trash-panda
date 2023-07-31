@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% block header %}
 <link rel="stylesheet" href="/static/css/documentation.css" />
+<link rel="stylesheet" href="/static/css/highlightjs.min.css" />
+<script src="/static/js/highlight.min.js"></script>
 <script type="text/javascript">
 function check_now(id){
   //set the host next check time to now to force an update
@@ -145,4 +147,7 @@ function silence_host(id, minutes){
     </div>
   </div>
 </div>
+{% endblock %}
+{% block onload_scripts %}
+hljs.highlightAll();
 {% endblock %}
