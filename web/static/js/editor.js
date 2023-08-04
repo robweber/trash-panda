@@ -96,6 +96,10 @@ function loadEditor(){
     {
       editor.session.setMode("ace/mode/python");
     }
+    else if(fileInfo['ext'] == '.md')
+    {
+      editor.session.setMode('ace/mode/markdown');
+    }
     else
     {
       editor.session.setMode("ace/mode/plaintext");

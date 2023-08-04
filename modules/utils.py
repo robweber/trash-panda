@@ -6,7 +6,10 @@ Utility functions and variables for global use
 """
 import json
 import logging
+import markdown
+import markdown.extensions.fenced_code
 import os
+import os.path
 import yaml
 from cerberus import Validator
 
@@ -23,7 +26,7 @@ CONFIRMED_STATE = "CONFIRMED"
 UNCONFIRMED_STATE = "UNCONFIRMED"
 
 # allowed file types for web editor
-ALLOWED_EDITOR_TYPES = ('.yaml', '.py')
+ALLOWED_EDITOR_TYPES = ('.yaml', '.py', '.md')
 
 # time format when converting datetime objects
 TIME_FORMAT = "%m-%d-%Y %I:%M%p"
@@ -60,6 +63,15 @@ def load_config_file(file):
 
     return result
 
+
+# load the markdown documenation, if it exists
+def load_documentation(host_file):
+    result = ""
+
+    if(os.path.exists(host_file)):
+        result = read_file(host_file)
+
+    return markdown.markdown(result, extensions=['fenced_code'])
 
 # read JSON formatted file
 def read_json(file):

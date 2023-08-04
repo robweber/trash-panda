@@ -62,6 +62,10 @@ config:
       required: False
       type: integer
       default: 3
+    docs_dir:
+      required: False
+      type: string
+      default: docs
     jinja_constants:
       required: False
       type: dict
@@ -166,6 +170,9 @@ hosts:
     schema:
       type:
         required: True
+        type: string
+      id:
+        required: False
         type: string
       name:
         required: True

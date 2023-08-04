@@ -37,7 +37,7 @@ def signal_handler(signum, frame):
     sys.exit(0)
 
 
-def webapp_thread(port_number, config_file, notifier_configured, debugMode=False, logHandlers=[]):
+def webapp_thread(port_number, config_file, notifier_configured, debugMode=False, docs_dir="", logHandlers=[]):
     app = Flask(import_name="trash-panda", static_folder=os.path.join(utils.DIR_PATH, 'web', 'static'),
                 template_folder=os.path.join(utils.DIR_PATH, 'web', 'templates'))
 
@@ -79,7 +79,8 @@ def webapp_thread(port_number, config_file, notifier_configured, debugMode=False
 
         if(result is not None):
             # set if a notifier is configured to toggle silent mode controls
-            return render_template("host_status.html", host=result, page_title='Host Status', has_notifier=notifier_configured)
+            return render_template("host_status.html", host=result, page_title='Host Status',
+                                    has_notifier=notifier_configured, docs=utils.load_documentation(os.path.join(docs_dir, f"{id}.md")))
         else:
             flash('Host page not found', 'warning')
             return redirect('/')
@@ -298,7 +299,7 @@ monitor = HostMonitor(yaml_file)
 
 # start the web app
 logging.info('Starting Trash Panda Web Service')
-webAppThread = threading.Thread(name='Web App', target=webapp_thread, args=(args.port, args.file, notify is not None, True, logHandlers))
+webAppThread = threading.Thread(name='Web App', target=webapp_thread, args=(args.port, args.file, notify is not None, True, yaml_file['config']['docs_dir'], logHandlers))
 webAppThread.setDaemon(True)
 webAppThread.start()
 

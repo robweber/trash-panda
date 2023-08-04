@@ -23,7 +23,7 @@ class Device:
 
     def __init__(self, host_def):
         self.type = host_def['type']
-        self.id = slugify(host_def['name'])
+        self.id = slugify(host_def['name']) if 'id' not in host_def else host_def['id']
         self.name = host_def['name']
         self.address = host_def['address']
         self.management_page = None if 'management_page' not in host_def else host_def['management_page']

@@ -1,0 +1,24 @@
+#documentation h1 {
+  text-decoration: underline;
+  margin-bottom: 1em;
+  text-align: center;
+}
+
+#documentation h2 {
+  border-bottom: .06rem solid #e5e5e5;
+  margin-top: .8em;
+  margin-bottom: .8em;
+}
+
+#documentation h3 {
+  font-size: 1.5em;
+}
+
+#documentation pre {
+  padding-left: 1em;
+  padding-right: 1em;
+}
+
+#documentation pre code {
+  color: #e83e8c;
+}
