@@ -73,6 +73,7 @@ def load_documentation(host_file):
 
     return markdown.markdown(result, extensions=['fenced_code'])
 
+
 # read JSON formatted file
 def read_json(file):
     result = {}
