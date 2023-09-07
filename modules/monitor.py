@@ -255,6 +255,10 @@ class HostMonitor:
                     host_alive = list(filter(lambda x: x['id'] == 'alive', host_check['services']))
                     host_check['alive'] = host_alive[0]['return_code']
 
+                    if(host_alive[0]['return_code'] > 0):
+                        # if the host isn't alive that is the overall status
+                        host_check['overall_status'] = host_alive[0]['return_code']
+
                     # create a slug to act as the id for lookups
                     host_check['id'] = aHost.id
 

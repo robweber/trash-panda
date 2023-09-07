@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## Unreleased
+
+## Fixed
+
+- if host status is "not alive" do not use overall status output from the services for overall host status, this will always be "unknown" since services are set to unknown when host is down. Instead use host status return value
+
 ## Version 4.1
 
 ### Added
