@@ -22,14 +22,7 @@ import os.path
 import requests
 import sys
 import modules.utils as utils
-import modules.notifications as notifier
-
-
-def send_notification(notify_type):
-    notify = notifier.create_notifier(notify_type)
-
-    # send as critical notification
-    notify.notify_host("Trash Panda Service", 2)
+from modules.notifications import NotificationGroup
 
 
 # parse the CLI args
@@ -69,7 +62,7 @@ try:
 
 except Exception as e:
     # any error set return code to Critical
-    logging.error(e.message)
+    logging.error(e)
     return_code = 2
 
 if(return_code == 0):
@@ -90,8 +83,12 @@ if(args.config and return_code > 0 and not os.path.exists(utils.WATCHDOG_FILE)):
         sys.exit(return_code)
 
     # create the notifier, if defined
-    if('notifier' in yaml_file['config']):
-        send_notification(yaml_file['config']['notifier'])
+
+    if('notifications' in yaml_file['config']):
+        notify = NotificationGroup(yaml_file['config']['notifications']['primary'],
+                                   yaml_file['config']['notifications']['types'])
+
+        notify.notify_host("Trash Panda", return_code)
         utils.write_file(utils.WATCHDOG_FILE, datetime.datetime.now())
 
 # exit
