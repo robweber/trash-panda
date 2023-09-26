@@ -83,12 +83,12 @@ if(args.config and return_code > 0 and not os.path.exists(utils.WATCHDOG_FILE)):
         sys.exit(return_code)
 
     # create the notifier, if defined
-
     if('notifications' in yaml_file['config']):
         notify = NotificationGroup(yaml_file['config']['notifications']['primary'],
                                    yaml_file['config']['notifications']['types'])
 
-        notify.notify_host("Trash Panda", return_code)
+        # notify the host, expects a host dict
+        notify.notify_host({"name": "Trash Panda"}, return_code)
         utils.write_file(utils.WATCHDOG_FILE, datetime.datetime.now())
 
 # exit

@@ -9,6 +9,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ## Fixed
 
 - if host status is "not alive" do not use overall status output from the services for overall host status, this will always be "unknown" since services are set to unknown when host is down. Instead use host status return value
+- fixed `watchdog.py`, this was never amended to the new notifications methods added in 4.0
+- fixed checking for `notifier` key with a host definition before sending notifications. Was not working properly as the host was passed as a string
 
 ## Version 4.1
 

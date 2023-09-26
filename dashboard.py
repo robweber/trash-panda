@@ -235,7 +235,7 @@ async def check_notifications(notify, old_host, new_host):
     if(len(old_host) > 0):
         # check if the host is up at all
         if(new_host['alive'] != old_host['alive']):
-            notify.notify_host(new_host['name'], new_host['alive'])
+            notify.notify_host(new_host, new_host['alive'])
         else:
             # if service list isn't the same just skip checking for now
             if(len(new_host['services']) == len(old_host['services'])):
@@ -246,7 +246,7 @@ async def check_notifications(notify, old_host, new_host):
                        (old_host['services'][i]['state'] == utils.UNCONFIRMED_STATE and
                        new_host['services'][i]['state'] == utils.CONFIRMED_STATE)):
                         # something has changed in this service's status
-                        notify.notify_service(new_host['name'], new_host['services'][i])
+                        notify.notify_service(new_host, new_host['services'][i])
 
 # parse the CLI args
 parser = configargparse.ArgumentParser(description='Trash Panda')
