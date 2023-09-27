@@ -1,5 +1,6 @@
 import datetime
 import jinja2
+import json
 import logging
 import os.path
 import subprocess
@@ -190,8 +191,17 @@ class HostMonitor:
         """
         service_id = slugify(service['name'])
         now = datetime.datetime.now()
-        result = {"name": service['name'], "return_code": return_code, "text": text, "id": service_id,
+        result = {"name": service['name'], "return_code": return_code, "text": text, "raw_text": text, "id": service_id,
                   "check_attempt": 1, "state": utils.CONFIRMED_STATE, "last_state_change": now.strftime(utils.TIME_FORMAT)}
+
+        if('output_filter' in service):
+            jinja_vars = {"value": text, "return_code": return_code}
+
+            # convert to dict if response is JSON
+            if(utils.is_json(text)):
+                jinja_vars['value'] = json.loads(text)
+
+            result['text'] = self.__render_template(service['output_filter'], jinja_vars)
 
         # set service url if it exists
         if('service_url' in service and service['service_url'].strip() != ""):
