@@ -12,6 +12,7 @@ import os
 import os.path
 import yaml
 from cerberus import Validator
+from json.decoder import JSONDecodeError
 
 # full path to the running directory of the program
 DIR_PATH = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
@@ -72,6 +73,20 @@ def load_documentation(host_file):
         result = read_file(host_file)
 
     return markdown.markdown(result, extensions=['fenced_code'])
+
+
+# Checks if a string can be decoded into a JSON object
+def is_json(str):
+    result = False
+
+    try:
+        json.loads(str)
+        result = True
+    except JSONDecodeError:
+        # do nothing
+        pass
+
+    return result
 
 
 # read JSON formatted file
