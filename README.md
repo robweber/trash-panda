@@ -109,7 +109,8 @@ __/api/status__ - detailed listing of the status of each host
         "name": "Alive",
         "return_code": 0,
         "state": "CONFIRMED",
-        "text": "Ping successfull!"
+        "text": "Ping successfull!",
+        "raw_text": "Ping successfull!"
       },
       {
 	      "check_attempt": 1,
@@ -119,6 +120,7 @@ __/api/status__ - detailed listing of the status of each host
         "return_code": 1,
         "state": "UNCONFIRMED",
         "text": "11 days, 2:09:34\n",
+        "raw_text": "11 days, 2:09:34\n",
         "notifier": "none"
       }
     ],
@@ -332,6 +334,7 @@ config:
 services:
   - type: http
     name: "Admin Page"
+    output_filter: "{{ value.trim() }}"
     args:
       port: 5000
       path: "/admin"
@@ -339,7 +342,7 @@ services:
 
 The above host will inherit the services from the __web_server__ type above but it also adds an additional http check on port 5000 for a different site. Both of these will be checked at run time. Any variables available within the Host Type can be overridden by an individual host as well (icon, check interval, etc).
 
-### Optional Attributes
+### Optional Host Attributes
 
 The following attributes are useful, but not necessary, for any host definition:
 * id - defaults to a slugified version of the name (`my-web-server` in example), but can be set specifically using the id value
@@ -349,6 +352,17 @@ The following attributes are useful, but not necessary, for any host definition:
 * interval - the check interval, if different than the global value
 * service_check_attempts - how many service checks to confirm warning/critical states. Only needed if different than the global value.
 
+### Modifying Service Output
+
+By default service output text is filtered based on [Nagios performance data syntax](https://nagios-plugins.org/doc/guidelines.html#AEN200) so that performance data is not shown in the web interface. When using the [API](#api) the original output is stored in the `raw_text` attribute.
+
+It is possible to define a custom `output_filter` for a service that parses the output text in a different way. This is useful if service check output has odd characters, or returns JSON responses. It is worth noting that modifying the output text does not affect the return code status in any way, it's just a way to produce more readable output. Templates can be used but only the following variables are available:
+
+* `value` - The original service output. If Trash Panda detects that a string is JSON it will be automatically parsed prior to rendering the template.
+* `return_code` - The service `return_code` as an integer 0-3.  
+* Global variables set via `jinja_constants` in the [global config](#global-configuration).
+
+
 ## Host Documentation
 
 On every host status page there is a tab for the configured services, and host documentation. The documentation tab is an optional feature that can pull host information from a Markdown file for that host. By default the location of these files is in the `docs` directory, but this can be changed in the config file.
@@ -357,7 +371,7 @@ To work properly the documentation file should have the same ID as as the host a
 
 ## Templating
 
-When expanding templates for service variables there are a few global variables and custom functions available. Global variables can be added to by setting values in the `jinja_constants` section of the [global config](#global-configuration). Check the [example config file](https://github.com/robweber/trash-panda/blob/main/install/monitor_example.yaml) to see how these can be used within host and service configurations.
+When expanding templates for service check variables there are a few global variables and custom functions available. Global variables can be added to by setting values in the `jinja_constants` section of the [global config](#global-configuration). Check the [example config file](https://github.com/robweber/trash-panda/blob/main/install/monitor_example.yaml) to see how these can be used within host and service configurations.
 
 ### Host
 

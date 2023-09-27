@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ## Unreleased
 
+### Added
+
+- in the `/api/status` endpoint services now contain a `text` and `raw_text` attribute. Raw text is the output directly from the service check while the text attribute may be filtered for better readability.
+- host service definitions can include an `output_filter` template to modify the output of a service check for better readability
+
+### Changed
+
+- service check output is filtered based on the [Nagios performance data output format](https://nagios-plugins.org/doc/guidelines.html#AEN200). Output in the form `"output|performance data"` is split on the pipe (|) character and only the output portion rendered in the UI.
+
 ## Fixed
 
 - if host status is "not alive" do not use overall status output from the services for overall host status, this will always be "unknown" since services are set to unknown when host is down. Instead use host status return value
