@@ -196,7 +196,8 @@ class HostMonitor:
 
         if('output_filter' in service):
             jinja_vars = {"value": text, "return_code": return_code}
-
+            jinja_vars.update(self.custom_jinja_constants)  # add any custom constants
+            
             # convert to dict if response is JSON
             if(utils.is_json(text)):
                 jinja_vars['value'] = json.loads(text)
