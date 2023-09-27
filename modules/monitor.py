@@ -194,15 +194,16 @@ class HostMonitor:
         result = {"name": service['name'], "return_code": return_code, "text": text, "raw_text": text, "id": service_id,
                   "check_attempt": 1, "state": utils.CONFIRMED_STATE, "last_state_change": now.strftime(utils.TIME_FORMAT)}
 
-        if('output_filter' in service):
-            jinja_vars = {"value": text, "return_code": return_code}
-            jinja_vars.update(self.custom_jinja_constants)  # add any custom constants
-            
-            # convert to dict if response is JSON
-            if(utils.is_json(text)):
-                jinja_vars['value'] = json.loads(text)
+        # filter the service output text
+        jinja_vars = {"value": text, "return_code": return_code}
+        jinja_vars.update(self.custom_jinja_constants)  # add any custom constants
 
-            result['text'] = self.__render_template(service['output_filter'], jinja_vars)
+        # convert to dict if response is JSON
+        if(utils.is_json(text)):
+            jinja_vars['value'] = json.loads(text)
+
+        jinja_template = service['output_filter'] if 'output_filter' in service else "{{ (value | string).split('|') | first }}"
+        result['text'] = self.__render_template(jinja_template, jinja_vars)
 
         # set service url if it exists
         if('service_url' in service and service['service_url'].strip() != ""):
