@@ -106,6 +106,22 @@ config:
                     - boolean
                 default:
                   args: none
+    web:
+      required: False
+      type: dict
+      schema:
+        top_nav:
+          required: False
+          type: list
+          schema:
+            type: dict
+            schema:
+              name:
+                required: True
+                type: string
+              url:
+                required: True
+                type: string
 services:
   required: True
   type: dict
