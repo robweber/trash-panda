@@ -23,6 +23,9 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
               <a class="btn btn-secondary ml-2" href="/" aria-haspopup="false" aria-expanded="false">Status</a>
+              {% for button in create_nav() %}
+              <a class="btn btn-secondary ml-2" href="{{ button.url }}">{{ button.name }}</a>
+              {% endfor %}
               <a class="btn btn-secondary ml-2" href="/editor" aria-haspopup="false" aria-expanded="false">Config</a>
             </div>
           </nav>

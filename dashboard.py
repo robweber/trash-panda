@@ -37,7 +37,7 @@ def signal_handler(signum, frame):
     sys.exit(0)
 
 
-def webapp_thread(port_number, config_file, notifier_configured, debugMode=False, docs_dir="", logHandlers=[]):
+def webapp_thread(port_number, config_file, config_yaml, notifier_configured, debugMode=False, logHandlers=[]):
     app = Flask(import_name="trash-panda", static_folder=os.path.join(utils.DIR_PATH, 'web', 'static'),
                 template_folder=os.path.join(utils.DIR_PATH, 'web', 'templates'))
 
@@ -80,11 +80,16 @@ def webapp_thread(port_number, config_file, notifier_configured, debugMode=False
         if(result is not None):
             # set if a notifier is configured to toggle silent mode controls
             return render_template("host_status.html", host=result, page_title='Host Status',
-                                   has_notifier=notifier_configured, docs=utils.load_documentation(os.path.join(docs_dir, f"{id}.md")))
+                                   has_notifier=notifier_configured, docs=utils.load_documentation(os.path.join(config_yaml['config']['docs_dir'], f"{id}.md")))
         else:
             flash('Host page not found', 'warning')
             return redirect('/')
 
+    @app.route('/editor', methods=['GET'])
+    def editor():
+        return render_template("editor.html", config_file=config_file, page_title='Config Editor')
+
+    """ Start of API """
     @app.route('/api/health', methods=['GET'])
     def health():
         """calculate the monitoring system health by making sure the main program
@@ -167,10 +172,6 @@ def webapp_thread(port_number, config_file, notifier_configured, debugMode=False
 
         return jsonify(result)
 
-    @app.route('/editor', methods=['GET'])
-    def editor():
-        return render_template("editor.html", config_file=config_file, page_title='Config Editor')
-
     @app.route('/api/browse_files/', methods=['GET'], defaults={'browse_path': utils.DIR_PATH})
     @app.route('/api/browse_files/<path:browse_path>', methods=['GET'])
     def list_directory(browse_path):
@@ -222,6 +223,17 @@ def webapp_thread(port_number, config_file, notifier_configured, debugMode=False
             result['errors'] = yaml_check['errors']
 
         return jsonify(result)
+
+    """ Start of custom processors """
+    @app.context_processor
+    def custom_nav():
+        def create_nav():
+            # return any custom nav components
+            if 'web' in config_yaml and 'top_nav' in config_yaml['web']:
+                return config_yaml['config']['web']['top_nav']
+            else:
+                return []
+        return dict(create_nav=create_nav)
 
     # run the web app
     app.run(debug=debugMode, host='0.0.0.0', port=port_number, use_reloader=False)
@@ -300,7 +312,7 @@ monitor = HostMonitor(yaml_file)
 # start the web app
 logging.info('Starting Trash Panda Web Service')
 webAppThread = threading.Thread(name='Web App', target=webapp_thread,
-                                args=(args.port, args.file, notify is not None, True, yaml_file['config']['docs_dir'], logHandlers))
+                                args=(args.port, args.file, yaml_file, notify is not None, True, logHandlers))
 webAppThread.setDaemon(True)
 webAppThread.start()
 
