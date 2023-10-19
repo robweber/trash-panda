@@ -211,6 +211,12 @@ config:
     CUSTOM_PATH: /path/
   notify:
     type: log
+  web:
+    top_nav:
+      links:
+        - name: Test Link
+          url: http://url
+          new_tab: False
 ```
 
 * default_interval - the default host check interval, in minutes. This will default to 3 unless changed. [Individual hosts](#host-types) can set their own interval if needed. At runtime this value is randomly adjusted +/- 60 seconds to help spread load.
@@ -267,6 +273,23 @@ config:
         args:
           api_key: pushover_api_key
           user_key: pushover_user_key
+```
+
+### Website Options
+
+Using the optional `web` key you can control some aspects of the web interface.
+
+__Top Nav Links__
+
+You can add additional links to the top navigation menu by using `links` key. Each link must include a name and url. By default links will open in a new browser tab but this can be changed by setting `new_tab: False`.
+
+```
+web:
+  top_nav:
+    links:
+      - name: Test Link
+        url: http://url
+        new_tab: False  # this is an optional attribute
 ```
 
 ## Services

@@ -112,20 +112,24 @@ config:
       schema:
         top_nav:
           required: False
-          type: list
+          type: dict
           schema:
-            type: dict
-            schema:
-              name:
-                required: True
-                type: string
-              url:
-                required: True
-                type: string
-              new_tab:
-                required: False
-                type: boolean
-                default: True
+            links:
+              required: False
+              type: list
+              schema:
+                type: dict
+                schema:
+                  name:
+                    required: True
+                    type: string
+                  url:
+                    required: True
+                    type: string
+                  new_tab:
+                    required: False
+                    type: boolean
+                    default: True
 services:
   required: True
   type: dict
