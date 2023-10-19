@@ -122,6 +122,10 @@ config:
               url:
                 required: True
                 type: string
+              new_tab:
+                required: False
+                type: boolean
+                default: True
 services:
   required: True
   type: dict

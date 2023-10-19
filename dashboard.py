@@ -229,7 +229,7 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
     def custom_nav():
         def create_nav():
             # return any custom nav components
-            if 'web' in config_yaml and 'top_nav' in config_yaml['web']:
+            if 'web' in config_yaml['config'] and 'top_nav' in config_yaml['config']['web']:
                 return config_yaml['config']['web']['top_nav']
             else:
                 return []
