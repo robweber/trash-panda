@@ -14,6 +14,7 @@ This is a _very_ basic monitoring solution meant for simple home use. It will mo
 - [Config File](#config-file)
   - [Global Configuration](#global-configuration)
   - [Notifications](#notifications)
+  - [Website Options](#website-options)
 - [Services](#services)
 - [Host Types](#host-types)
 - [Host Definitions](#host-definitions)
@@ -304,7 +305,7 @@ web:
   top_nav:
     style:
       type: button
-      color: gray
+      color: gray  # only works with button type
 ```
 
 __Top Nav Links__
