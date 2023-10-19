@@ -1,5 +1,16 @@
 # first define some lists to re-use later
 
+# list of colors
+allowed_colors:
+  allowed: &allowed_colors
+    - black
+    - blue
+    - gray
+    - green
+    - light_blue
+    - red
+    - yellow
+
 # full list of allowed notification types
 notification_types:
   allowed: &notification_types
@@ -109,14 +120,34 @@ config:
     web:
       required: False
       type: dict
+      default: {}
       schema:
         top_nav:
           required: False
           type: dict
+          default: {}
           schema:
+            style:
+              required: False
+              type: dict
+              default: {}
+              schema:
+                type:
+                  required: False
+                  type: string
+                  default: button
+                  allowed:
+                    - button
+                    - link
+                color:
+                  required: False
+                  type: string
+                  default: gray
+                  allowed: *allowed_colors
             links:
               required: False
               type: list
+              default: []
               schema:
                 type: dict
                 schema:

@@ -226,17 +226,26 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
 
     """ Start of custom processors """
     @app.context_processor
-    def custom_nav():
-        def create_nav():
+    def nav_links():
+        def create_links():
             # return any custom nav components
-            result = []
-            try:
-                result = config_yaml['config']['web']['top_nav']['links']
-            except KeyError:
-                # will return empty list if key doesn't exist
-                pass
-            return result
-        return dict(create_nav=create_nav)
+            return config_yaml['config']['web']['top_nav']['links']
+        return dict(create_nav_links=create_links)
+
+    @app.context_processor
+    def nav_style():
+        def get_style():
+            style = config_yaml['config']['web']['top_nav']['style']['type']
+            # map bootstrap names to color names
+            colors = {"black": "dark", "blue": "primary", "gray": "secondary", "green": "success",
+                      "light_blue": "info", "red": "danger", "yellow": "warning"}
+
+            if(style == 'button'):
+                return colors[config_yaml['config']['web']['top_nav']['style']['color']]
+            else:
+                return 'link'
+
+        return dict(get_nav_style=get_style)
 
     # run the web app
     app.run(debug=debugMode, host='0.0.0.0', port=port_number, use_reloader=False)
