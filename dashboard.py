@@ -94,6 +94,12 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
         return render_template('docs.html', page_title=file.replace('-', ' ').title(), file=file,
                                docs=utils.load_documentation(os.path.join(config_yaml['config']['docs_dir'], f"{file}.md")))
 
+    @app.route('/guide', methods=['GET'])
+    def guide():
+        # load the README as an internal documentation guide
+        return render_template('docs.html', page_title='Guide', file='README',
+                               docs=utils.load_documentation(os.path.join(utils.DIR_PATH, "README.md")))
+
     """ Start of API """
     @app.route('/api/health', methods=['GET'])
     def health():

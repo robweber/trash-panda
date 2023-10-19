@@ -8,6 +8,8 @@ import json
 import logging
 import markdown
 import markdown.extensions.fenced_code
+import markdown.extensions.toc
+import markdown.extensions.tables
 import os
 import os.path
 import yaml
@@ -72,7 +74,7 @@ def load_documentation(host_file):
     if(os.path.exists(host_file)):
         result = read_file(host_file)
 
-    return markdown.markdown(result, extensions=['fenced_code'])
+    return markdown.markdown(result, extensions=['fenced_code', 'tables', 'toc'])
 
 
 # Checks if a string can be decoded into a JSON object
