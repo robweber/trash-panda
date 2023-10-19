@@ -10,12 +10,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 - added ability to add links to top nav via the config file, part of #25
 - can set color and style of top nav links, either `button` or `link` (plain hyperlink) styles are supported
-- any Markdown file from the __docs_dir__ can be loaded directly using the endpoint `/docs/<filename>`. This allows for custom pages to be created and linked within the site
-- Added link in footer to current README as an html page `/guide`. User can reference YAML syntax locally. 
+- any Markdown file from the __docs_dir__ can be loaded directly using the endpoint `/docs/<filename>`. This allows for custom pages to be created and linked within the site. Part of #25
+- Added link in footer to current README as an html page `/guide`. User can reference YAML syntax locally.
+- Enabled [Markdown extensions](https://python-markdown.github.io/extensions/) for Table of Contents and Tables
 
 ### Changed
 
 - _Status_ link changed to _Dashboard_ on top nav
+- example config now includes example for top nav link and custom page
 
 ## Version 4.2
 
