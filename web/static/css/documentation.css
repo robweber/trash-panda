@@ -22,3 +22,14 @@
 #documentation pre code {
   color: #e83e8c;
 }
+
+#documentation table {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+#documentation table, #documentation th, #documentation td {
+  border: 2px solid;
+  padding: 0.75rem;
+  vertical-align: top;
+}
