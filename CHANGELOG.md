@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## Unreleased
+
+### Added
+
+- added ability to add links to top nav via the config file, part of #25
+
+### Changed
+
+- _Status_ link changed to _Dashboard_ on top nav
+
 ## Version 4.2
 
 ### Added
