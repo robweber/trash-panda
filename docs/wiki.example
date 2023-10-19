@@ -1,0 +1,58 @@
+# Wiki
+
+This is an example for a custom Wiki page that can be created and linked in the top nav. Feel free to delete.
+
+## How to Create A Custom Page
+
+### Creating A Custom Page
+
+As described in the [guide](/guide#host-documentation) you can create markdown files in the `/docs` directory. All Markdown files should end with the `.md` extension.
+
+### Accessing A Custom Page
+
+Once created, any custom page can be loaded through the documents url. For this page the url is [/docs/wiki](/docs/wiki).
+
+### Modifying Top Nav
+
+Custom pages can include links to each other, or external links. You can also add one to the top navigation through the [website options](/guide#website-options) configuration. For the wiki page in this example the config file contains the entry:
+
+```
+web:
+  top_nav:
+    links:
+      - name: Wiki
+        url: /docs/wiki
+        new_tab: False
+```
+
+This creates a Wiki link pointing to the `/docs/wiki` Markdown file. Removing this from the config will delete the link.
+
+## Markdown Options
+
+You can use [classic Markdown syntax](https://www.markdownguide.org/basic-syntax/) on a custom page. Code examples will by highlighted automatically. There is also support for Table of Contents and Tables.
+
+### Table of Contents
+
+To create a table of contents add the following in your Markdown file where you want the table of contents:
+
+```
+[TOC]
+```
+
+[TOC]
+
+### Tables
+
+There is also support for tables. Create a table like this:
+
+```
+First Header  | Second Header
+------------- | -------------
+Content Cell  | Content Cell
+Content Cell  | Content Cell
+```
+
+First Header  | Second Header
+------------- | -------------
+Content Cell  | Content Cell
+Content Cell  | Content Cell

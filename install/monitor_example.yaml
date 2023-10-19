@@ -3,6 +3,11 @@
 config:
   # this is optional and will default to 3 if missing
   default_interval: 3
+  web:
+    top_nav:
+      links:
+        - name: Wiki
+          url: /docs/wiki
 services:
   http:
     command: "{{ path(NAGIOS_PATH, 'check_http') }}"
