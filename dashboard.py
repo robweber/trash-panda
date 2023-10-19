@@ -74,7 +74,6 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
 
     @app.route('/status/<id>')
     def host_status(id):
-
         result = _get_host(id)
 
         if(result is not None):
@@ -88,6 +87,12 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
     @app.route('/editor', methods=['GET'])
     def editor():
         return render_template("editor.html", config_file=config_file, page_title='Config Editor')
+
+    @app.route('/docs/<file>', methods=['GET'])
+    def load_doc(file):
+        # return doc information, if any exists
+        return render_template('docs.html', page_title=file.replace('-', ' ').title(), file=file,
+                               docs=utils.load_documentation(os.path.join(config_yaml['config']['docs_dir'], f"{file}.md")))
 
     """ Start of API """
     @app.route('/api/health', methods=['GET'])

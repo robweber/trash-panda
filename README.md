@@ -20,6 +20,7 @@ This is a _very_ basic monitoring solution meant for simple home use. It will mo
 - [Host Definitions](#host-definitions)
   - [Optional Attributes](#optional-attributes)
 - [Host Documentation](#host-documentation)
+  - [Direct Documentation Links](#direct-documentation-links)
 - [Templating](#templating)
   - [Host](#host)
   - [Service](#service)
@@ -219,7 +220,7 @@ config:
         color: gray
       links:
         - name: Test Link
-          url: http://url
+          url: /docs/test-link
           new_tab: False
 ```
 
@@ -310,14 +311,14 @@ web:
 
 __Top Nav Links__
 
-You can add additional links to the top navigation menu by using `links` key. Each link must include a name and url. By default links will open in a new browser tab but this can be changed by setting `new_tab: False`.
+You can add additional links to the top navigation menu by using `links` key. Each link must include a name and URL. By default links will open in a new browser tab but this can be changed by setting `new_tab: False`. A common use case is linking directly to a custom page created with the [markdown documentation](#direct-documentation-links) feature.
 
 ```
 web:
   top_nav:
     links:
       - name: Test Link
-        url: http://url
+        url: /docs/test-link
         new_tab: False  # this is an optional attribute
 ```
 
@@ -417,9 +418,13 @@ It is possible to define a custom `output_filter` for a service that parses the 
 
 ## Host Documentation
 
-On every host status page there is a tab for the configured services, and host documentation. The documentation tab is an optional feature that can pull host information from a Markdown file for that host. By default the location of these files is in the `docs` directory, but this can be changed in the config file.
+On every host status page there is a tab for the configured services, and host documentation. The documentation tab is an optional feature that can pull host information from a Markdown file for that host. By default the location of these files is in the `docs` directory, but this can be changed in the [config file](#global-configuration).
 
-To work properly the documentation file should have the same ID as as the host and end in `.md`. For a host named __My Web Server__ the file would be the slugified version of the host __my-web-server.md__. This is the same as the host id returned by the [API](#api) or found in the browser path when viewing the host status.
+To work properly the documentation file should have the same ID as the host and end in `.md`. For a host named __My Web Server__ the file would be the slugified version of the host __my-web-server.md__. This is the same as the host id returned by the [API](#api) or found in the browser path when viewing the host status.
+
+### Direct Documentation Links
+
+An endpoint `/docs/<filename>` exists to load and render any Markdown file from the docs directory. These can be linked together to create a rudimentary wiki page or other type of custom documentation for display via Markdown parsing. Coupled with [custom nav links](#website-options) this can be linked on any page. The link for a file `information.md` within the docs directory would be `/docs/information`. As with host documentation filenames are assumed to be in a slugified format.
 
 ## Templating
 

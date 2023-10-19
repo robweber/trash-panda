@@ -1,5 +1,5 @@
 # this is a simple configuration file where all service, type, and host definitions are in one file.
-# These can be separated out as show in the documentation
+# These can be separated out as show in the documentation https://github.com/robweber/trash-panda/blob/main/README.md
 config:
   # this is optional and will default to 3 if missing
   default_interval: 3
