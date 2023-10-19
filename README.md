@@ -213,6 +213,9 @@ config:
     type: log
   web:
     top_nav:
+      style:
+        type: button
+        color: gray
       links:
         - name: Test Link
           url: http://url
@@ -278,6 +281,31 @@ config:
 ### Website Options
 
 Using the optional `web` key you can control some aspects of the web interface.
+
+__Top Nav Style__
+
+The top navigation style can be modified using the `style` key. Two style types are supported:
+
+* __button__ - the default style, a rounded button.
+* __link__ - just a plain text link
+
+Additionally the __button__ style can also include a __color__ option. Accepted options are based on default Bootstrap colors:
+
+* black
+* blue
+* gray
+* green
+* light_blue
+* red
+* yellow
+
+```
+web:
+  top_nav:
+    style:
+      type: button
+      color: gray
+```
 
 __Top Nav Links__
 

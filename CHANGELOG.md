@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Added
 
 - added ability to add links to top nav via the config file, part of #25
+- can set color and style of top nav links, either `button` or `link` (plain hyperlink) styles are supported
 
 ### Changed
 
