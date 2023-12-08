@@ -472,6 +472,7 @@ The following projects are used within this project and contributed most of the 
 * [Bootstrap](https://getbootstrap.com/) - web frontend toolkit
 * [JQuery](https://jquery.com/) - Javascript library
 * [Material Design Icons](https://materialdesignicons.com/) - open source web icons
+* [Twemoji](https://github.com/twitter/twemoji) - Twitter Open Source Emojis (Trash Panda Logo)
 
 ## License
 
