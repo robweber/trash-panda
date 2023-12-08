@@ -13,11 +13,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - any Markdown file from the __docs_dir__ can be loaded directly using the endpoint `/docs/<filename>`. This allows for custom pages to be created and linked within the site. Part of #25
 - Added link in footer to current README as an html page `/guide`. User can reference YAML syntax locally.
 - Enabled [Markdown extensions](https://python-markdown.github.io/extensions/) for Table of Contents and Tables
+- Favicon and logo from [Twemoji](https://github.com/twitter/twemoji)
 
 ### Changed
 
 - _Status_ link changed to _Dashboard_ on top nav
 - example config now includes example for top nav link and custom page
+- only show title on desktop view, otherwise show only icon image
 
 ## Version 4.2
 
