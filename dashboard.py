@@ -37,7 +37,7 @@ def signal_handler(signum, frame):
     sys.exit(0)
 
 
-def webapp_thread(port_number, config_file, notifier_configured, debugMode=False, docs_dir="", logHandlers=[]):
+def webapp_thread(port_number, config_file, config_yaml, notifier_configured, debugMode=False, logHandlers=[]):
     app = Flask(import_name="trash-panda", static_folder=os.path.join(utils.DIR_PATH, 'web', 'static'),
                 template_folder=os.path.join(utils.DIR_PATH, 'web', 'templates'))
 
@@ -74,17 +74,33 @@ def webapp_thread(port_number, config_file, notifier_configured, debugMode=False
 
     @app.route('/status/<id>')
     def host_status(id):
-
         result = _get_host(id)
 
         if(result is not None):
             # set if a notifier is configured to toggle silent mode controls
-            return render_template("host_status.html", host=result, page_title='Host Status',
-                                   has_notifier=notifier_configured, docs=utils.load_documentation(os.path.join(docs_dir, f"{id}.md")))
+            return render_template("host_status.html", host=result, page_title='Host Status', has_notifier=notifier_configured,
+                                   docs=utils.load_documentation(os.path.join(config_yaml['config']['docs_dir'], f"{id}.md")))
         else:
             flash('Host page not found', 'warning')
             return redirect('/')
 
+    @app.route('/editor', methods=['GET'])
+    def editor():
+        return render_template("editor.html", config_file=config_file, page_title='Config Editor')
+
+    @app.route('/docs/<file>', methods=['GET'])
+    def load_doc(file):
+        # return doc information, if any exists
+        return render_template('docs.html', page_title=file.replace('-', ' ').title(), file=file,
+                               docs=utils.load_documentation(os.path.join(config_yaml['config']['docs_dir'], f"{file}.md")))
+
+    @app.route('/guide', methods=['GET'])
+    def guide():
+        # load the README as an internal documentation guide
+        return render_template('docs.html', page_title='Guide', file='README',
+                               docs=utils.load_documentation(os.path.join(utils.DIR_PATH, "README.md")))
+
+    """ Start of API """
     @app.route('/api/health', methods=['GET'])
     def health():
         """calculate the monitoring system health by making sure the main program
@@ -167,10 +183,6 @@ def webapp_thread(port_number, config_file, notifier_configured, debugMode=False
 
         return jsonify(result)
 
-    @app.route('/editor', methods=['GET'])
-    def editor():
-        return render_template("editor.html", config_file=config_file, page_title='Config Editor')
-
     @app.route('/api/browse_files/', methods=['GET'], defaults={'browse_path': utils.DIR_PATH})
     @app.route('/api/browse_files/<path:browse_path>', methods=['GET'])
     def list_directory(browse_path):
@@ -222,6 +234,29 @@ def webapp_thread(port_number, config_file, notifier_configured, debugMode=False
             result['errors'] = yaml_check['errors']
 
         return jsonify(result)
+
+    """ Start of custom processors """
+    @app.context_processor
+    def nav_links():
+        def create_links():
+            # return any custom nav components
+            return config_yaml['config']['web']['top_nav']['links']
+        return dict(create_nav_links=create_links)
+
+    @app.context_processor
+    def nav_style():
+        def get_style():
+            style = config_yaml['config']['web']['top_nav']['style']['type']
+            # map bootstrap names to color names
+            colors = {"black": "dark", "blue": "primary", "gray": "secondary", "green": "success",
+                      "light_blue": "info", "red": "danger", "yellow": "warning"}
+
+            if(style == 'button'):
+                return colors[config_yaml['config']['web']['top_nav']['style']['color']]
+            else:
+                return 'link'
+
+        return dict(get_nav_style=get_style)
 
     # run the web app
     app.run(debug=debugMode, host='0.0.0.0', port=port_number, use_reloader=False)
@@ -300,7 +335,7 @@ monitor = HostMonitor(yaml_file)
 # start the web app
 logging.info('Starting Trash Panda Web Service')
 webAppThread = threading.Thread(name='Web App', target=webapp_thread,
-                                args=(args.port, args.file, notify is not None, True, yaml_file['config']['docs_dir'], logHandlers))
+                                args=(args.port, args.file, yaml_file, notify is not None, True, logHandlers))
 webAppThread.setDaemon(True)
 webAppThread.start()
 

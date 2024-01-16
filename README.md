@@ -14,11 +14,13 @@ This is a _very_ basic monitoring solution meant for simple home use. It will mo
 - [Config File](#config-file)
   - [Global Configuration](#global-configuration)
   - [Notifications](#notifications)
+  - [Website Options](#website-options)
 - [Services](#services)
 - [Host Types](#host-types)
 - [Host Definitions](#host-definitions)
   - [Optional Attributes](#optional-attributes)
 - [Host Documentation](#host-documentation)
+  - [Direct Documentation Links](#direct-documentation-links)
 - [Templating](#templating)
   - [Host](#host)
   - [Service](#service)
@@ -211,6 +213,15 @@ config:
     CUSTOM_PATH: /path/
   notify:
     type: log
+  web:
+    top_nav:
+      style:
+        type: button
+        color: gray
+      links:
+        - name: Test Link
+          url: /docs/test-link
+          new_tab: False
 ```
 
 * default_interval - the default host check interval, in minutes. This will default to 3 unless changed. [Individual hosts](#host-types) can set their own interval if needed. At runtime this value is randomly adjusted +/- 60 seconds to help spread load.
@@ -267,6 +278,48 @@ config:
         args:
           api_key: pushover_api_key
           user_key: pushover_user_key
+```
+
+### Website Options
+
+Using the optional `web` key you can control some aspects of the web interface.
+
+__Top Nav Style__
+
+The top navigation style can be modified using the `style` key. Two style types are supported:
+
+* __button__ - the default style, a rounded button.
+* __link__ - just a plain text link
+
+Additionally the __button__ style can also include a __color__ option. Accepted options are based on default Bootstrap colors:
+
+* black
+* blue
+* gray
+* green
+* light_blue
+* red
+* yellow
+
+```
+web:
+  top_nav:
+    style:
+      type: button
+      color: gray  # only works with button type
+```
+
+__Top Nav Links__
+
+You can add additional links to the top navigation menu by using `links` key. Each link must include a name and URL. By default links will open in a new browser tab but this can be changed by setting `new_tab: False`. A common use case is linking directly to a custom page created with the [markdown documentation](#direct-documentation-links) feature.
+
+```
+web:
+  top_nav:
+    links:
+      - name: Test Link
+        url: /docs/test-link
+        new_tab: False  # this is an optional attribute
 ```
 
 ## Services
@@ -365,9 +418,13 @@ It is possible to define a custom `output_filter` for a service that parses the 
 
 ## Host Documentation
 
-On every host status page there is a tab for the configured services, and host documentation. The documentation tab is an optional feature that can pull host information from a Markdown file for that host. By default the location of these files is in the `docs` directory, but this can be changed in the config file.
+On every host status page there is a tab for the configured services, and host documentation. The documentation tab is an optional feature that can pull host information from a Markdown file for that host. By default the location of these files is in the `docs` directory, but this can be changed in the [config file](#global-configuration).
 
-To work properly the documentation file should have the same ID as as the host and end in `.md`. For a host named __My Web Server__ the file would be the slugified version of the host __my-web-server.md__. This is the same as the host id returned by the [API](#api) or found in the browser path when viewing the host status.
+To work properly the documentation file should have the same ID as the host and end in `.md`. For a host named __My Web Server__ the file would be the slugified version of the host __my-web-server.md__. This is the same as the host id returned by the [API](#api) or found in the browser path when viewing the host status.
+
+### Direct Documentation Links
+
+An endpoint `/docs/<filename>` exists to load and render any Markdown file from the docs directory. These can be linked together to create a rudimentary wiki page or other type of custom documentation for display via Markdown parsing. Coupled with [custom nav links](#website-options) this can be linked on any page. The link for a file `information.md` within the docs directory would be `/docs/information`. As with host documentation filenames are assumed to be in a slugified format.
 
 ## Templating
 
@@ -415,6 +472,7 @@ The following projects are used within this project and contributed most of the 
 * [Bootstrap](https://getbootstrap.com/) - web frontend toolkit
 * [JQuery](https://jquery.com/) - Javascript library
 * [Material Design Icons](https://materialdesignicons.com/) - open source web icons
+* [Twemoji](https://github.com/twitter/twemoji) - Twitter Open Source Emojis (Trash Panda Logo)
 
 ## License
 

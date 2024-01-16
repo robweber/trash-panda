@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block header %}
+<link rel="stylesheet" href="/static/css/documentation.css" />
+<link rel="stylesheet" href="/static/css/highlightjs.min.css" />
+<script src="/static/js/highlight.min.js"></script>
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="mt-3" id="documentation">
+      {% if docs | length %}
+      {{ docs | safe }}
+      {% else %}
+      <p align="center">No documentation. Create the file <b>{{ file }}.md</b> to create some.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block onload_scripts %}
+hljs.highlightAll();
+{% endblock %}

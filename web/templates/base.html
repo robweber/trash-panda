@@ -3,6 +3,9 @@
     <head>
         <title>Trash Panda</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png">
         <link rel="stylesheet" href="/static/css/bootstrap.min.css" />
         <link rel="stylesheet" href="/static/css/bootstrap-theme.min.css" />
         <link rel="stylesheet" href="/static/css/materialdesignicons.min.css" />
@@ -17,13 +20,16 @@
         <div class="container">
         <div class="header">
           <nav class="navbar navbar-expand-lg">
-            <h3 class="navbar-brand text-muted"><span class="text-danger">Trash Panda</span> - {{ page_title }}</h3>
+            <h3 class="navbar-brand text-muted"><img src="/static/favicon-50x50.png" class="mr-3"/><span class="tp-title"><span class="text-danger">Trash Panda</span> -</span> {{ page_title }}</h3>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
               <span class="mdi mdi-menu icon-inline"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
-              <a class="btn btn-secondary ml-2" href="/" aria-haspopup="false" aria-expanded="false">Status</a>
-              <a class="btn btn-secondary ml-2" href="/editor" aria-haspopup="false" aria-expanded="false">Config</a>
+              <a class="btn btn-{{ get_nav_style() }} ml-2" href="/" aria-haspopup="false" aria-expanded="false">Dashboard</a>
+              <a class="btn btn-{{ get_nav_style() }} ml-2" href="/editor" aria-haspopup="false" aria-expanded="false">Config</a>
+              {% for button in create_nav_links() %}
+              <a class="btn btn-{{ get_nav_style() }} ml-2" href="{{ button.url }}" target="{{ '_blank' if button.new_tab else '_self'}}">{{ button.name }}</a>
+              {% endfor %}
             </div>
           </nav>
         </div>
@@ -41,8 +47,12 @@
             {% block onload_scripts %}{% endblock %}
           });
         </script>
-        <footer class="footer mt-5">
-             <p align="center"><a href="https://github.com/robweber/trash-panda"><i class="mdi mdi-github icon-2x"></i></a></p>
+        <footer class="footer mt-5" align="center">
+           <p>
+             <a href="/guide" class="mr-3"><i class="mdi mdi-book-open-page-variant-outline icon-2x"></i></a>
+             <a href="https://github.com/robweber/trash-panda"><i class="mdi mdi-github icon-2x"></i></a>
+           </p>
+           <p>Version 4.2</p>
         </footer>
     </body>
 </html>

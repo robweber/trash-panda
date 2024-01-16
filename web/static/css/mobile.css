@@ -39,6 +39,10 @@ p {
 
 @media screen and (max-width: 991px) {
 
+  .tp-title {
+    display:none;
+  }
+
 	.hide-lg{
 		display:none;
 	}
