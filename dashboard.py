@@ -70,7 +70,7 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
 
     @app.route('/', methods=["GET"])
     def index():
-        return render_template("index.html")
+        return render_template("index.html", message=config_yaml['config']['web']['landing_page_text'])
 
     @app.route('/status/<id>')
     def host_status(id):

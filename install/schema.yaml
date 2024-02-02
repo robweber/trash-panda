@@ -122,6 +122,10 @@ config:
       type: dict
       default: {}
       schema:
+        landing_page_text:
+          type: string
+          required: False
+          default: none
         top_nav:
           required: False
           type: dict

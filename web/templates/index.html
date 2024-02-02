@@ -76,7 +76,11 @@ function load_status(){
 {% endblock %}
 {% block content %}
 <div class="container">
+  {% if (message == 'none'): %}
   <p>The overall status of each host is listed below. Click the name to see additional details. If a management page is configured it can be launched with the <i class="mdi mdi-launch icon-sm icon-inline"></i> icon.</p>
+  {% else: %}
+  <p>{{ message }}</p>
+  {% endif %}
   <table class="table table-striped" id="host_info">
     <thead class="thead-dark">
       <tr>
