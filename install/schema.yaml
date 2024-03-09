@@ -122,6 +122,15 @@ config:
       type: dict
       default: {}
       schema:
+        editor:
+          required: False
+          type: dict
+          default: {}
+          schema:
+            read_only:
+              required: False
+              type: boolean
+              default: False
         landing_page_text:
           type: string
           required: False

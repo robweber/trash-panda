@@ -86,7 +86,8 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
 
     @app.route('/editor', methods=['GET'])
     def editor():
-        return render_template("editor.html", config_file=config_file, page_title='Config Editor')
+        return render_template("editor.html", config_file=config_file, editor_config=config_yaml['config']['web']['editor'],
+                               page_title='Config Editor')
 
     @app.route('/docs/<file>', methods=['GET'])
     def load_doc(file):

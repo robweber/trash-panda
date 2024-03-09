@@ -214,6 +214,8 @@ config:
   notify:
     type: log
   web:
+    editor:
+      read_only: False
     landing_page_text: "Custom text to display on the landing page"
     top_nav:
       style:
