@@ -214,6 +214,9 @@ config:
   notify:
     type: log
   web:
+    editor:
+      read_only: False
+    landing_page_text: "Custom text to display on the landing page"
     top_nav:
       style:
         type: button
@@ -230,6 +233,7 @@ config:
 * docs_dir - directory containing host documentation files, defaults to `docs`.
 * jinja_constants - a list of key:value pairs that will be passed to the [Jinja templating engine](#templating). These can be things like commonly used system paths or referenced names used in defining host or service values.
 * notifier - defines a notification channel, see more below
+* web - customizations for the web interface, all of these are optional
 
 ### Notifications
 

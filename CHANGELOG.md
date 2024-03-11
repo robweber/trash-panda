@@ -14,6 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Added link in footer to current README as an html page `/guide`. User can reference YAML syntax locally.
 - Enabled [Markdown extensions](https://python-markdown.github.io/extensions/) for Table of Contents and Tables
 - Favicon and logo from [Twemoji](https://github.com/twitter/twemoji)
+- ability to edit the landing page text
+- can set editor to __read only__ mode. Allows files to be viewed but not saved
 
 ### Changed
 

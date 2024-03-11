@@ -5,14 +5,18 @@
 {% endblock %}
 {% block content %}
 <div class="container">
-  <p>Modify individual YAML config files for the monitoring system. Keep in mind that a restart of the service will be needed to make-live any changes. For help with syntax refer to <a href="/guide">the guide</a>.</p>
+  <p>Modify individual YAML config files or Markdown files for the monitoring system. Keep in mind that a restart of the service will be needed to make-live any changes. For help with syntax refer to <a href="/guide">the guide</a>.</p>
   <div align="right">
+    {% if not editor_config['read_only']: %}
     <button class="btn btn-success mr-1" onClick="saveFile()">Save</button>
     <button class="btn btn-primary" onClick="checkConfig()">Check Config</button>
+    {% else: %}
+    <h5 class="text-danger">Read Only Mode</h5>
+    {% endif %}
   </div>
   <div class="row my-1">
     <div class="col-md-8">
-      <h3><a href="#" onClick="return toggleFileBrowser()" id="config_path">{{ config_file }}</a></h3>
+      <h3>File: <a href="#" onClick="return toggleFileBrowser()" id="config_path">{{ config_file }}</a></h3>
     </div>
   </div>
   <div class="row my-1" id="file_browser" style="display:none">
@@ -48,6 +52,7 @@
   editor.setTheme("ace/theme/chrome");
   editor.setOption("maxLines", 40);
   editor.setOption("minLines", 40);
+  editor.setReadOnly({{ (editor_config['read_only']) | string | lower }});  // set based on read only config
   editor.session.setMode("ace/mode/yaml");
 
   //add the save key binding
