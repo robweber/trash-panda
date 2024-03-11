@@ -144,7 +144,7 @@ class HostMonitor:
 
     def __check_host(self, host):
         """
-        Called to run the checks on a specific host. If the ping check fails all subsequent checks are skipped
+        Called to run the checks on a specific host. If the ping command fails all subsequent checks are skipped
         and a result listing them as Not Attempted (return code of 3) is used.
         """
         result = host.serialize()
@@ -152,7 +152,16 @@ class HostMonitor:
         services = host.get_services()
         service_results = []
 
-        if(self._ping(host.address)):
+        # run the default ping command or a custom one to determine if host is alive
+        is_alive = False
+
+        if(host.ping_command is None):
+            is_alive = self._ping(host.address)
+        else:
+            output = self.__run_process(self.__create_service_call(host.ping_command, host.config), [])
+            is_alive = True if output.returncode == 0 else False
+
+        if(is_alive):
             logging.debug(f"{host.name}: Is Alive")
 
             # the host is alive, continue checks

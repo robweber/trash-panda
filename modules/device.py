@@ -37,6 +37,7 @@ class Device:
         self.last_check = 0
         self.next_check = 0
         self.silenced = datetime.now().strftime(utils.TIME_FORMAT)
+        self.ping_command = None if 'ping_command' not in host_def else host_def['ping_command']
 
         # set the address as part of the config
         self.config['address'] = self.address
@@ -87,6 +88,7 @@ class HostType:
     check_attempts = 3
     config = {}
     services = []
+    ping_command = None
 
     def __init__(self, type_name, type_def, default_interval, default_attempts):
         self.type = type_name
@@ -106,6 +108,9 @@ class HostType:
 
         if('services' in type_def):
             self.services = type_def['services']
+
+        if('ping_command' in type_def):
+            self.ping_command = type_def['ping_command']
 
     def __check_defaults(self, device_name, device_config):
 
@@ -137,6 +142,9 @@ class HostType:
 
         if('service_check_attempts' not in device_def):
             device_def['service_check_attempts'] = self.check_attempts
+
+        if('ping_command' not in device_def):
+            device_def['ping_command'] = self.ping_command
 
         if('config' not in device_def):
             device_def['config'] = {}

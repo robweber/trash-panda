@@ -54,6 +54,23 @@ service_definition: &service_definition
             - integer
             - float
 
+# ping command definition
+ping_definition: &ping_definition
+  required: False
+  type: dict
+  schema:
+    type:
+      required: True
+      type: string
+    args:
+      required: False
+      type: dict
+      valueschema:
+        type:
+          - string
+          - integer
+          - float
+
 # schema for the yaml layout, validated at startup
 config:
   required: False
@@ -217,6 +234,7 @@ types:
       service_check_attempts:
         required: False
         type: integer
+      ping_command: *ping_definition
       config:
         required: False
         type: dict
@@ -270,6 +288,7 @@ hosts:
       management_page:
         required: False
         type: string
+      ping_command: *ping_definition
       config:
         required: False
         type: dict
