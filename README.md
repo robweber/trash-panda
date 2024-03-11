@@ -376,6 +376,8 @@ web_server:
   interval: 10
   notifier: log
   service_check_attempts: 2
+  ping_command:
+    type: custom_ping
   config:
     virtual_host:
       required: True
@@ -391,6 +393,7 @@ Also of note are some optional variables.
 * __interval__: By default the global interval will be used, but individual device types, or individual hosts, can set their own.
 * __notifier__: Again, by default the global notification type will be used but hosts types can set their own. This will apply to the host and all services under it.
 * __service_check_attempts__: Override the global service check value with a custom value for this host
+* __ping_command__: Override the built in ICMP Ping check with a custom check defined in the [services](#services) list.
 
 ## Host Definitions
 
@@ -425,6 +428,7 @@ The following attributes are useful, but not necessary, for any host definition:
 * management_page - the full URL to web management for this device, if it exists
 * interval - the check interval, if different than the global value
 * service_check_attempts - how many service checks to confirm warning/critical states. Only needed if different than the global value.
+* ping_command - by default an ICMP ping command is sent to all hosts to verify they are online. This can be changed via a custom ping_command service to detect if the host is alive utilizing a different method. 
 
 ### Modifying Service Output
 
