@@ -4,12 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
-## Unreleased
+## Version 5.1
 
 ### Added
 
 - can set editor to __read only__ mode. Allows files to be viewed but not saved
-- optional `ping_command` value can be set per device or per device type. Allows for alive checks other than built in ICMP. 
+- optional `ping_command` value can be set per device or per device type. Allows for alive checks other than built in ICMP.
+
+### Changed
+
+- example config file utilizes fake service and ping checks to give a more realistic demo environment
 
 ## Version 5.0
 
