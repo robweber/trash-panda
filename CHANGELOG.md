@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Added
 
 - can set editor to __read only__ mode. Allows files to be viewed but not saved
+- optional `ping_command` value can be set per device or per device type. Allows for alive checks other than built in ICMP. 
 
 ## Version 5.0
 

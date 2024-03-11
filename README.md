@@ -233,7 +233,7 @@ config:
 * docs_dir - directory containing host documentation files, defaults to `docs`.
 * jinja_constants - a list of key:value pairs that will be passed to the [Jinja templating engine](#templating). These can be things like commonly used system paths or referenced names used in defining host or service values.
 * notifier - defines a notification channel, see more below
-* web - customizations for the web interface, all of these are optional
+* web - customizations for the [web interface](#website-options), all of these are optional
 
 ### Notifications
 
@@ -287,6 +287,23 @@ config:
 ### Website Options
 
 Using the optional `web` key you can control some aspects of the web interface.
+
+__Editor Options__
+
+Using the `editor` key you can control if the editor page allows for config files to be editable or simply read only.
+
+```
+editor:
+  read_only: False  # files are editable by default
+```
+
+__Landing Page Text__
+
+The default text on the landing page can also be modified to give different information or instructions relevant to the system.
+
+```
+landing_page_text: "Custom text to display on the landing page"
+```
 
 __Top Nav Style__
 
