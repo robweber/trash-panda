@@ -1,14 +1,23 @@
 # this is a simple configuration file where all service, type, and host definitions are in one file.
-# These can be separated out as show in the documentation https://github.com/robweber/trash-panda/blob/main/README.md
+# These can be separated out as shown in the documentation https://github.com/robweber/trash-panda/blob/main/README.md
 config:
   # this is optional and will default to 3 if missing
   default_interval: 3
   web:
+    landing_page_text: "This is an example configuration using fake hosts and fake service checks to demonstrate various components of the Trash Panda environment."
     top_nav:
       links:
         - name: Wiki
           url: /docs/wiki
+# dummy checks are used in this config but the real checks can be swapped out as the command type
 services:
+  dummy_check:
+    command: "python3 {{ path(SCRIPTS_PATH, 'dummy_check.py') }}"
+    args:
+      - "-m"
+      - "{{ service.message }}"
+      - "-r"
+      - "{{ default(service.return_code, 0) }}"
   http:
     command: "{{ path(NAGIOS_PATH, 'check_http') }}"
     args:
@@ -28,15 +37,6 @@ services:
       - "-u"
       - "{{ default(service.path, '/') }}"
       - "-S"
-  mythtv_tuners:
-    command: "python3 {{ path(SCRIPTS_PATH, 'check_mythtv.py') }}"
-    args:
-      - "-H"
-      - "{{ service.hostname }}"
-      - "-p"
-      - "{{ default(service.port, 6544) }}"
-      - "-t"
-      - "tuner"
   esxi_datastores:
     command: "python3 {{ path(SCRIPTS_PATH, 'check_esxi.py')}}"
     args:
@@ -90,50 +90,75 @@ services:
       - "-o"
       - "1.3.6.1.2.1.1.3.0"
 types:
-  esxi:
-    name: ESXi
-    icon: desktop-tower
-    config:
-      username:
-        required: True
-      password:
-        required: True
-      port:
-        required: False
-        default: 443
-    services:
-      - type: esxi_datastores
-        name: "Datastores"
-        critical: 90
-        warning: 85
-      - type: esxi_host_status
-        name: "Host Status"
-      - type: esxi_vm_status
-        name: "VM Status"
+  firewall:
+    name: Firewall
+    icon: server-security
+    # remove this to use ICMP checks
+    ping_command:
+      type: dummy_check
+      args:
+        message: "Alive"
+        return_code: 0
   server:
     name: Server
     icon: server
+    # these will be inherited by individual hosts
+    services:
+      - type: dummy_check
+        name: "SSH"
+        args:
+          message: SSH Port Not Open
+          return_code: 2
+      - type: dummy_check
+        name: "Linux Updates"
+        # utilize the output filter to parse the returned json
+        output_filter: "There are {{ value.security }} security and {{ value.non_security }} non-security updates pending"
+        args:
+          message: >-
+            {"security": 0, "non_security": 33 }
+          return_code: 1
   switch:
     name: Switch
     icon: router-network
-    info: "This device type will work with generic managed switches. SNMP information must be correct and setup on the switch for services to properly be queried."
+    info: "This config is currently using fake check values, to use properly convert the service checks to proper SNMP checks."
+    # remove this to use ICMP checks
+    ping_command:
+      type: dummy_check
+      args:
+        message: "Alive"
+        return_code: 0
     config:
       community:
         required: True
         default: "public"
     services:
-      - type: switch_uptime
+      - type: dummy_check
         name: "Switch Uptime"
+        args:
+          message: "50 days, 7:13:05"
+          return_code: 0
 hosts:
+  - type: firewall
+    name: "Firewall 1"
+    address: 192.168.0.1
   - type: switch
     name: "Switch 1"
-    ip: 192.168.0.1
+    address: 192.168.0.2
     config:
       community: "public"
-  - type: esxi
-    name: "ESXi 1"
-    ip: 192.168.0.2
-    management_page: "https://192.168.0.2/ui/"
-    config:
-      username: "root"
-      password: "pass"
+  - type: server
+    name: "Web Server"
+    address: 192.168.0.10
+    management_page: "http://192.168.0.10/"
+    ping_command:
+      type: dummy_check
+      args:
+        message: "Alive"
+        return_code: 0
+    # will inherit services plus add these
+    services:
+      - type: dummy_check
+        name: HTTP
+        args:
+          message: "HTTP OK: HTTP/1.1 200 OK - 732014 bytes in 0.156 second response time"
+          return_code: 0
