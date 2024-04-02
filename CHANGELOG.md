@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## Version 5.2
+
+### Added
+
+- `/editor` now accepts query param to load a document `/editor?path=/path/to/file`
+- Edit button now jumps direction to documentation file editor
+
 ## Version 5.1
 
 ### Added

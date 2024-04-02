@@ -78,8 +78,9 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
 
         if(result is not None):
             # set if a notifier is configured to toggle silent mode controls
+            doc_file = os.path.join(config_yaml['config']['docs_dir'], f"{id}.md")
             return render_template("host_status.html", host=result, page_title='Host Status', has_notifier=notifier_configured,
-                                   docs=utils.load_documentation(os.path.join(config_yaml['config']['docs_dir'], f"{id}.md")))
+                                   docs=utils.load_documentation(doc_file), doc_file=doc_file)
         else:
             flash('Host page not found', 'warning')
             return redirect('/')
