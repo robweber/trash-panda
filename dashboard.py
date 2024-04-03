@@ -333,10 +333,6 @@ if('notifications' in yaml_file['config']):
     notify = NotificationGroup(yaml_file['config']['notifications']['primary'],
                                yaml_file['config']['notifications']['types'])
 
-# check if the watchdog file was created
-if(os.path.exists(utils.WATCHDOG_FILE)):
-    os.remove(utils.WATCHDOG_FILE)
-
 logging.info('Starting monitoring check daemon')
 monitor = HostMonitor(yaml_file)
 

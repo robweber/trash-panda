@@ -11,6 +11,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - `/editor` now accepts query param to load a document `/editor?path=/path/to/file`
 - Edit button now jumps direction to documentation file editor
 
+### Changed
+
+- changed behavior of the watchdog service. It now sends both __up__ and __down__ status messages. The main dashboard program does not modify the .service_down file any longer, this is done in the watchdog only. 
+
 ## Version 5.1
 
 ### Added

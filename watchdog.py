@@ -65,13 +65,25 @@ except Exception as e:
     logging.error(e)
     return_code = 2
 
+send_notification = False
 if(return_code == 0):
     logging.info("Trash Panda is running normally")
+
+    if(os.path.exists(utils.WATCHDOG_FILE)):
+        # send notification and remove watchdog file
+        send_notification = True
+        os.remove(utils.WATCHDOG_FILE)
+
 else:
     logging.info("Trash Panda is down")
 
+    if(not os.path.exists(utils.WATCHDOG_FILE)):
+        # send notification and create watchdog file
+        send_notification = True
+        utils.write_file(utils.WATCHDOG_FILE, datetime.datetime.now())
+
 # attempt to send notifications if configured
-if(args.config and return_code > 0 and not os.path.exists(utils.WATCHDOG_FILE)):
+if(args.config and send_notification):
     # load the config file
     yaml_check = utils.load_config_file(args.config)
 
@@ -89,7 +101,6 @@ if(args.config and return_code > 0 and not os.path.exists(utils.WATCHDOG_FILE)):
 
         # notify the host, expects a host dict
         notify.notify_host({"name": "Trash Panda"}, return_code)
-        utils.write_file(utils.WATCHDOG_FILE, datetime.datetime.now())
 
 # exit
 sys.exit(return_code)
