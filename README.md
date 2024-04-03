@@ -428,7 +428,7 @@ The following attributes are useful, but not necessary, for any host definition:
 * management_page - the full URL to web management for this device, if it exists
 * interval - the check interval, if different than the global value
 * service_check_attempts - how many service checks to confirm warning/critical states. Only needed if different than the global value.
-* ping_command - by default an ICMP ping command is sent to all hosts to verify they are online. This can be changed via a custom ping_command service to detect if the host is alive utilizing a different method. 
+* ping_command - by default an ICMP ping command is sent to all hosts to verify they are online. This can be changed via a custom ping_command service to detect if the host is alive utilizing a different method.
 
 ### Modifying Service Output
 
@@ -479,13 +479,13 @@ The following custom functions are available in addition to any standard [Jinja 
 
 ## Watchdog
 
-Trash Panda will check if defined hosts and services are running, but what keeps track of Trash Panda? The `watchdog.py` script can be used to externally check the Trash Panda web service via the [health api](#api) endpoint. This script should be setup to run via a cron job and can read in the same YAML config file to trigger monitoring notifications. If the health service is either not running, or it reports that the monitoring system checker is not running, a notification will be sent using the configured notifier from the YAML file.
+Trash Panda will check if defined hosts and services are running, but what keeps track of Trash Panda? The `watchdog.py` script can be used to externally check the Trash Panda web service via the [health api](#api) endpoint. This script should be setup to run via a cron job and can read in the same YAML config file to trigger monitoring notifications. If the health service is either not running, or it reports that the monitoring system checker is not running, a notification will be sent using the configured notifier from the YAML file. When the service returns to normal operation a recovery notification is also sent.
 
 ```
 python3 watchdog.py -c conf/monitor.yaml
 ```
 
-Once a notification is sent a flag file is created in the Trash Panda repo directory named `.service_down`. This file prevents further notifications and will be deleted when the Trash Panda service is restarted.
+Once a notification is sent a flag file is created in the Trash Panda repo directory named `.service_down`. This file prevents further notifications and will be deleted when the Trash Panda service recovers. 
 
 ## Credits
 
