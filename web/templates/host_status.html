@@ -130,6 +130,12 @@ function silence_host(id, minutes){
             {% if('service_url' in row) %}
             <a href="{{ row['service_url'] }}" target="_blank" class="mdi mdi-launch icon-sm icon-inline"></a>
             {% endif %}
+            <br />
+            <div class="text-right mt-1">
+              {% for t in row['tags'] %}
+              <a href="/tags/{{ t }}" class="text-light"><span class="badge rounded-pill bg-dark">{{ t }}</span></a>
+              {% endfor %}
+            </div>
           </td>
           <td class="{{ status_text[row['return_code']] }} row_2 hide-md">{{ row['text'].replace("\n", '<br />') | safe }}</td>
           <td class="{{ status_text[row['return_code']] }}">{{ row['last_state_change'] }}</td>
