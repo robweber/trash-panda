@@ -30,6 +30,9 @@ class HostHistory:
     def list_hosts(self):
         return self.__read_db(DBKeys.VALID_HOSTS.value)
 
+    def list_tags(self):
+        return self.__read_db(DBKeys.VALID_TAGS.value)
+
     def get_host(self, host_id):
         """ get host information from the database based on the ID
 
@@ -38,6 +41,9 @@ class HostHistory:
         :returns: a dict with the host information, empty if not found
         """
         return self.__read_db(f"{DBKeys.HOST_STATUS.value}.{host_id}")
+
+    def get_tag(self, tag_name):
+        return self.__read_db(f"{DBKeys.TAGS.value}.{tag_name}")
 
     def get_service(self, host_id, service_id):
         """ get information on a specific service from a specific host
@@ -65,6 +71,9 @@ class HostHistory:
         """ saves a list of valid host names """
         self.__write_db(DBKeys.VALID_HOSTS.value, names)
 
+    def set_tags(self, names):
+        self.__write_db(DBKeys.VALID_TAGS.value, names)
+
     def save_host(self, host_id, host_status):
         """ saves the host status to the database with the given ID
 
@@ -72,7 +81,20 @@ class HostHistory:
         :param host_status: the host's status as a dict
         """
 
+        self.__update_tags(host_status)
         self.__write_db(f"{DBKeys.HOST_STATUS.value}.{host_id}", host_status)
+
+    def __update_tags(self, host_status):
+        current_tags = self.list_tags()
+
+        for s in host_status['services']:
+            s['host'] = {"name": host_status['name'], "id": host_status['id']}  # save some host info
+
+            for t in s['tags']:
+                # update the service call for this tag
+                tag = self.get_tag(t)
+                tag[s['id']] = s
+                self.__write_db(f"{DBKeys.TAGS.value}.{t}", tag)
 
     def __read_db(self, db_key):
         """ read a value from the Redis DB based on the given key
@@ -95,3 +117,5 @@ class DBKeys(Enum):
     VALID_HOSTS = "host_names"
     HOST_STATUS = "host_status"
     LAST_CHECK = "last_check_timestamp"
+    VALID_TAGS = "tag_names"
+    TAGS = "tags"
