@@ -53,6 +53,7 @@ class HostMonitor:
 
         # get host description by type
         now = datetime.datetime.now()
+        tag_names = []
         for i in range(0, len(yaml_file['hosts'])):
             device = self.__create_device(yaml_file['hosts'][i])
 
@@ -65,11 +66,13 @@ class HostMonitor:
                 next_check_now = now + datetime.timedelta(minutes=-1)
                 device.next_check = next_check_now.strftime(utils.TIME_FORMAT)
 
+            tag_names = tag_names + device.get_service_tags()
             self.hosts[device.id] = device
             logging.info(f"Loading device {device.name} with check interval every {device.interval} min")
 
-        # save a list of all valid host names
+        # save a list of all valid host and tag names
         self.history.set_hosts(self.get_hosts())
+        self.history.set_tags(list(set(tag_names)))
 
     def __create_types(self, types_def, default_interval, default_attempts):
         """Create devices type definitions based on defined YAML"""
@@ -200,8 +203,9 @@ class HostMonitor:
         """
         service_id = slugify(service['name'])
         now = datetime.datetime.now()
-        result = {"name": service['name'], "return_code": return_code, "text": text, "raw_text": text, "id": service_id,
-                  "check_attempt": 1, "state": utils.CONFIRMED_STATE, "last_state_change": now.strftime(utils.TIME_FORMAT)}
+        result = {"name": service['name'], "return_code": return_code, "text": text, "raw_text": text, "id": f"{host.id}-{service_id}",
+                  "check_attempt": 1, "state": utils.CONFIRMED_STATE, "last_state_change": now.strftime(utils.TIME_FORMAT),
+                  "tags": service['tags'] if 'tags' in service else []}
 
         # filter the service output text
         jinja_vars = {"value": text, "return_code": return_code}
@@ -273,7 +277,7 @@ class HostMonitor:
                     host_check['overall_status'] = overall_status['return_code']
 
                     # figure out if the host is alive at all
-                    host_alive = list(filter(lambda x: x['id'] == 'alive', host_check['services']))
+                    host_alive = list(filter(lambda x: x['id'] == f"{aHost.id}-alive", host_check['services']))
                     host_check['alive'] = host_alive[0]['return_code']
 
                     if(host_alive[0]['return_code'] > 0):

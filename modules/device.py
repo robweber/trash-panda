@@ -64,6 +64,13 @@ class Device:
         """
         return self.services
 
+    def get_service_tags(self):
+        result = []
+        for s in self.services:
+            result = result + s['tags']
+        # use set to remove dups, not fastest but list should be small
+        return list(set(result))
+
     def is_silenced(self):
         """
         Returns true/false if the host should currently be in silent mode.
