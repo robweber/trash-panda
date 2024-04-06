@@ -45,6 +45,12 @@ service_definition: &service_definition
       output_filter:
         required: False
         type: string
+      tags:
+        required: False
+        type: list
+        default: []
+        schema:
+          type: string
       args:
         required: False
         type: dict
