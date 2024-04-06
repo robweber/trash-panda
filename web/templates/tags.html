@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+{% set current_status = ['text-success', 'text-warning', 'text-danger', 'text-secondary'] %}
+{% set overall_status = ['OK', 'Warning', 'Critical', 'Unknown'] %}
+{% set status_text = ['', '', '', 'text-secondary'] %}
+<div class="container">
+  <table class="table table-striped" id="host_info">
+    <thead class="thead-dark">
+      <tr>
+        <th>Service</th>
+        <th>Host</th>
+        <th class="hide-md">Output</th>
+        <th>Last Change</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in services: %}
+      <tr>
+        <td class="{{ current_status[row['return_code']] }} row_1">
+          {{ row['name'] }}
+          {% if(row['state'] == 'UNCONFIRMED') %}
+          (check {{ row['check_attempt'] }}/{{ host['service_check_attempts'] }})
+          {% endif %}
+          {% if('service_url' in row) %}
+          <a href="{{ row['service_url'] }}" target="_blank" class="mdi mdi-launch icon-sm icon-inline"></a>
+          {% endif %}
+        </td>
+        <td><a href="/status/{{ row['host']['id'] }}">{{ row['host']['name'] }}</a></td>
+        <td class="{{ status_text[row['return_code']] }} row_2 hide-md">{{ row['text'].replace("\n", '<br />') | safe }}</td>
+        <td class="{{ status_text[row['return_code']] }}">{{ row['last_state_change'] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

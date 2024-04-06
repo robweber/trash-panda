@@ -85,6 +85,12 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
             flash('Host page not found', 'warning')
             return redirect('/')
 
+    @app.route('/tags/<tag_name>')
+    def tags(tag_name):
+        tag = history.get_tag(tag_name)
+
+        return render_template("tags.html", services=list(tag.values()), tag_name=tag_name, page_title=f"{tag_name}")
+
     @app.route('/editor', methods=['GET'])
     def editor():
 
@@ -135,6 +141,16 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
         status = [history.get_host(h) for h in hosts]
 
         return jsonify(status)
+
+    @app.route('/api/tags', methods=['GET'])
+    def get_tags():
+        result = {}
+        tags = history.list_tags()
+
+        # get a dict {tag_name: values }
+        result = {tag_name: list(history.get_tag(tag_name).values()) for tag_name in tags}
+
+        return jsonify(result)
 
     @app.route('/api/overall_status', methods=['GET'])
     def overall_status():
