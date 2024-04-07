@@ -68,6 +68,7 @@ class Device:
         result = []
         for s in self.services:
             result = result + s['tags']
+
         # use set to remove dups, not fastest but list should be small
         return list(set(result))
 

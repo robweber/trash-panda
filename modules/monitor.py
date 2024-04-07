@@ -70,9 +70,12 @@ class HostMonitor:
             self.hosts[device.id] = device
             logging.info(f"Loading device {device.name} with check interval every {device.interval} min")
 
-        # save a list of all valid host and tag names
+        # save a list of all valid hosts
         self.history.set_hosts(self.get_hosts())
-        self.history.set_tags(list(set(tag_names)))
+
+        # save a list of tag names in the format {slug: name}
+        tags = {slugify(t): t  for t in list(set(tag_names))}
+        self.history.set_tags(tags)
 
     def __create_types(self, types_def, default_interval, default_attempts):
         """Create devices type definitions based on defined YAML"""

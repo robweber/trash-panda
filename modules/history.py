@@ -2,6 +2,7 @@ import datetime
 import json
 import redis
 from enum import Enum
+from slugify import slugify
 
 
 class HostHistory:
@@ -72,6 +73,7 @@ class HostHistory:
         self.__write_db(DBKeys.VALID_HOSTS.value, names)
 
     def set_tags(self, names):
+        print(names)
         self.__write_db(DBKeys.VALID_TAGS.value, names)
 
     def save_host(self, host_id, host_status):
@@ -85,16 +87,20 @@ class HostHistory:
         self.__write_db(f"{DBKeys.HOST_STATUS.value}.{host_id}", host_status)
 
     def __update_tags(self, host_status):
-        current_tags = self.list_tags()
 
         for s in host_status['services']:
             s['host'] = {"name": host_status['name'], "id": host_status['id']}  # save some host info
 
             for t in s['tags']:
                 # update the service call for this tag
-                tag = self.get_tag(t)
-                tag[s['id']] = s
-                self.__write_db(f"{DBKeys.TAGS.value}.{t}", tag)
+                tag = self.get_tag(slugify(t))
+
+                # if tag empty set some values
+                if(not tag):
+                    tag = {"name": t, "services":{}}
+
+                tag['services'][s['id']] = s
+                self.__write_db(f"{DBKeys.TAGS.value}.{slugify(t)}", tag)
 
     def __read_db(self, db_key):
         """ read a value from the Redis DB based on the given key
