@@ -65,6 +65,10 @@ class Device:
         return self.services
 
     def get_service_tags(self):
+        """
+        Returns an array of all service tags that exist within
+        services on this host
+        """
         result = []
         for s in self.services:
             result = result + s['tags']

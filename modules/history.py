@@ -73,7 +73,7 @@ class HostHistory:
         self.__write_db(DBKeys.VALID_HOSTS.value, names)
 
     def set_tags(self, names):
-        print(names)
+        """ saves a list of tags in the format {id: tag_name}"""
         self.__write_db(DBKeys.VALID_TAGS.value, names)
 
     def save_host(self, host_id, host_status):
@@ -87,7 +87,7 @@ class HostHistory:
         self.__write_db(f"{DBKeys.HOST_STATUS.value}.{host_id}", host_status)
 
     def __update_tags(self, host_status):
-
+        """ updates service info for all tags on this host """
         for s in host_status['services']:
             s['host'] = {"name": host_status['name'], "id": host_status['id']}  # save some host info
 
