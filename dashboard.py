@@ -89,8 +89,8 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
             return redirect('/')
 
     @app.route('/tags/<tag_name>')
-    def tags(tag_name):
-        tag = history.get_tag(tag_name)
+    def tags(tag_id):
+        tag = history.get_tag(tag_id)
 
         return render_template("tags.html", services=list(tag['services'].values()), page_title=f"{tag['name']}")
 
@@ -154,6 +154,16 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
         result = {tags[id]: list(history.get_tag(id)['services'].values()) for id in tags.keys()}
 
         return jsonify(result)
+
+    @app.route('/api/tag/<tag_id>', methods=['GET'])
+    def get_tag(tag_id):
+        tag = history.get_tag(tag_id)
+        tag['id'] = tag_id
+
+        # convert services to an array
+        tag['services'] = list(tag['services'].values())
+
+        return jsonify(tag)
 
     @app.route('/api/overall_status', methods=['GET'])
     def overall_status():
