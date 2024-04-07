@@ -74,7 +74,7 @@ class HostMonitor:
         self.history.set_hosts(self.get_hosts())
 
         # save a list of tag names in the format {slug: name}
-        tags = {slugify(t): t  for t in list(set(tag_names))}
+        tags = {slugify(t): t for t in list(set(tag_names))}
         self.history.set_tags(tags)
 
     def __create_types(self, types_def, default_interval, default_attempts):

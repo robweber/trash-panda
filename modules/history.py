@@ -97,7 +97,7 @@ class HostHistory:
 
                 # if tag empty set some values
                 if(not tag):
-                    tag = {"name": t, "services":{}}
+                    tag = {"name": t, "services": {}}
 
                 tag['services'][s['id']] = s
                 self.__write_db(f"{DBKeys.TAGS.value}.{slugify(t)}", tag)
