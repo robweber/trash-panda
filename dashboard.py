@@ -88,7 +88,7 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
             flash('Host page not found', 'warning')
             return redirect('/')
 
-    @app.route('/tags/<tag_name>')
+    @app.route('/tag/<tag_id>')
     def tags(tag_id):
         tag = history.get_tag(tag_id)
 
