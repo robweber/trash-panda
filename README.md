@@ -10,7 +10,6 @@ This is a _very_ basic monitoring solution meant for simple home use. It will mo
 - [Install](#install)
 - [Usage](#usage)
 - [Dashboard](#dashboard)
-  - [API](#api)
 - [Config File](#config-file)
   - [Global Configuration](#global-configuration)
   - [Notifications](#notifications)
@@ -26,6 +25,7 @@ This is a _very_ basic monitoring solution meant for simple home use. It will mo
   - [Service](#service)
   - [Script Paths](#script-paths)
   - [Custom Functions](#custom-functions)
+- [API](#api)
 - [Watchdog](#watchdog)
 - [Credits](#credits)
 - [License](#license)
@@ -73,106 +73,6 @@ optional arguments:
 Once running the dashboard page can be loaded. The landing page will display all currently configured hosts and their overall status. If the host is down, or any configured service unavailable, the overall status will change. This page is refreshed every __15 seconds__. Data will change depending on the update interval set when the program is loaded.
 
 Clicking on a host name will show you more information about that device. Individual services will be listed along with any output to indicate their current status. From the host status page a check of all services can be forced, and notifications temporarily silenced. If configured, a management page for the host can also be launched from here. For additional flexibility more host information can be displayed in the [documentation](#host-documentation) tab via custom Markdown files.
-
-### API
-
-For integration with other systems the API can be used. To decode the status return codes use the following:
-
-* 0 - OK, everything normal
-* 1 - Warning, potential problem
-* 2 - Critical, definitely a problem
-
-The status codes are determined by the settings for the device and the output of the various check utilities. See the `check_scripts/` folder for individual scripts that are run.
-
-__/api/status__ - detailed listing of the status of each host
-
-```
-[
-  {
-    "alive": 0,
-    "config": {
-      "community": "public"
-    },
-    "icon": "router-network",
-    "id": "switch-1",
-    "info": "This device type will work with generic managed switches. SNMP information must be correct and setup on the switch for services to properly be queried.",
-    "ip": "192.168.0.1",
-    "name": "Switch 1",
-    "overall_status": 1,
-    "interval": 3,
-    "service_check_attempts": 2,
-    "last_check": "07-21-2022 11:01AM",
-    "next_check": "07-21-2022 11:04AM",
-    "services": [
-      {
-        "check_attempt": 1,
-        "id": "alive",
-        "last_state_change": "07-02-2022 11:40AM",
-        "name": "Alive",
-        "return_code": 0,
-        "state": "CONFIRMED",
-        "text": "Ping successfull!",
-        "raw_text": "Ping successfull!"
-      },
-      {
-	      "check_attempt": 1,
-        "id": "switch-uptime",
-        "last_state_change": "07-02-2022 11:40AM",
-        "name": "Switch Uptime",
-        "return_code": 1,
-        "state": "UNCONFIRMED",
-        "text": "11 days, 2:09:34\n",
-        "raw_text": "11 days, 2:09:34\n",
-        "notifier": "none"
-      }
-    ],
-    "silenced": false,
-    "type": "switch"
-  }
-]
-```
-
-__/api/overall_status__ - a status summary of the overall status of all hosts. The `services` array is a list of all services currently in an error state.
-
-```
-{
-  "hosts_with_errors": 0,
-  "overall_status": 0,
-  "overall_status_description": "OK",
-  "total_hosts": 3,
-  "services_with_errors": 0,
-  "services": []
-}
-```
-
-__/api/health__ - basic program health. Status is set to _Offline_ if the main system checking loop hasn't run in over 2 minutes. This should look for services to check every 60 seconds when running properly.
-
-```
-{
-  "last_check_time": "07-05-2022 12:00PM",
-  "text": "Online",
-  "return_code": 0
-}
-```
-
-__/api/check_now/<host_id>__ - updates a given host's next check time to the current time. This forces a service check instead of waiting for the normal update interval. The host id can be found via the `/api/status` endpoint for each host.
-
-```
-{
-  "success": true
-  "next_check": "09-14-2022 09:44AM"
-}
-```
-
-__/api/silence_host/<host_id>/<minutes>__ - sets the given hosts silenced property to True for the given amount of minutes. This will silence any notifications for this time.
-
-```
-{
-  "is_silenced": true,
-  "success": true,
-  "until": "05-02-2023 01:31PM"
-}
-```
 
 ## Config File
 
@@ -477,6 +377,106 @@ The following custom functions are available in addition to any standard [Jinja 
 * `path()` - this is a shortcut for the Python os.path.join() method to easily join paths together.
 * `default()` - allows for setting a default in cases where the user may or may not set a variable. If the user variable doesn't exist the default is used.
 
+## API
+
+For integration with other systems the API can be used. To decode the status return codes use the following:
+
+* 0 - OK, everything normal
+* 1 - Warning, potential problem
+* 2 - Critical, definitely a problem
+
+The status codes are determined by the settings for the device and the output of the various check utilities. See the `check_scripts/` folder for individual scripts that are run.
+
+__/api/status__ - detailed listing of the status of each host
+
+```
+[
+  {
+    "alive": 0,
+    "config": {
+      "community": "public"
+    },
+    "icon": "router-network",
+    "id": "switch-1",
+    "info": "This device type will work with generic managed switches. SNMP information must be correct and setup on the switch for services to properly be queried.",
+    "ip": "192.168.0.1",
+    "name": "Switch 1",
+    "overall_status": 1,
+    "interval": 3,
+    "service_check_attempts": 2,
+    "last_check": "07-21-2022 11:01AM",
+    "next_check": "07-21-2022 11:04AM",
+    "services": [
+      {
+        "check_attempt": 1,
+        "id": "alive",
+        "last_state_change": "07-02-2022 11:40AM",
+        "name": "Alive",
+        "return_code": 0,
+        "state": "CONFIRMED",
+        "text": "Ping successfull!",
+        "raw_text": "Ping successfull!"
+      },
+      {
+	      "check_attempt": 1,
+        "id": "switch-uptime",
+        "last_state_change": "07-02-2022 11:40AM",
+        "name": "Switch Uptime",
+        "return_code": 1,
+        "state": "UNCONFIRMED",
+        "text": "11 days, 2:09:34\n",
+        "raw_text": "11 days, 2:09:34\n",
+        "notifier": "none"
+      }
+    ],
+    "silenced": false,
+    "type": "switch"
+  }
+]
+```
+
+__/api/overall_status__ - a status summary of the overall status of all hosts. The `services` array is a list of all services currently in an error state.
+
+```
+{
+  "hosts_with_errors": 0,
+  "overall_status": 0,
+  "overall_status_description": "OK",
+  "total_hosts": 3,
+  "services_with_errors": 0,
+  "services": []
+}
+```
+
+__/api/health__ - basic program health. Status is set to _Offline_ if the main system checking loop hasn't run in over 2 minutes. This should look for services to check every 60 seconds when running properly.
+
+```
+{
+  "last_check_time": "07-05-2022 12:00PM",
+  "text": "Online",
+  "return_code": 0
+}
+```
+
+__/api/check_now/<host_id>__ - updates a given host's next check time to the current time. This forces a service check instead of waiting for the normal update interval. The host id can be found via the `/api/status` endpoint for each host.
+
+```
+{
+  "success": true
+  "next_check": "09-14-2022 09:44AM"
+}
+```
+
+__/api/silence_host/<host_id>/<minutes>__ - sets the given hosts silenced property to True for the given amount of minutes. This will silence any notifications for this time.
+
+```
+{
+  "is_silenced": true,
+  "success": true,
+  "until": "05-02-2023 01:31PM"
+}
+```
+
 ## Watchdog
 
 Trash Panda will check if defined hosts and services are running, but what keeps track of Trash Panda? The `watchdog.py` script can be used to externally check the Trash Panda web service via the [health api](#api) endpoint. This script should be setup to run via a cron job and can read in the same YAML config file to trigger monitoring notifications. If the health service is either not running, or it reports that the monitoring system checker is not running, a notification will be sent using the configured notifier from the YAML file. When the service returns to normal operation a recovery notification is also sent.
@@ -485,7 +485,7 @@ Trash Panda will check if defined hosts and services are running, but what keeps
 python3 watchdog.py -c conf/monitor.yaml
 ```
 
-Once a notification is sent a flag file is created in the Trash Panda repo directory named `.service_down`. This file prevents further notifications and will be deleted when the Trash Panda service recovers. 
+Once a notification is sent a flag file is created in the Trash Panda repo directory named `.service_down`. This file prevents further notifications and will be deleted when the Trash Panda service recovers.
 
 ## Credits
 
