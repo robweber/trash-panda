@@ -92,7 +92,8 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
     def tags(tag_id):
         tag = history.get_tag(tag_id)
 
-        return render_template("tags.html", services=list(tag['services'].values()), page_title=f"{tag['name']}")
+        services = sorted(list(tag['services'].values()), key=lambda o: o['host']['name'])
+        return render_template("tags.html", services=services, tag_id=tag_id, page_title=f"{tag['name']}")
 
     @app.route('/editor', methods=['GET'])
     def editor():
@@ -161,7 +162,7 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
         tag['id'] = tag_id
 
         # convert services to an array
-        tag['services'] = list(tag['services'].values())
+        tag['services'] = sorted(list(tag['services'].values()), key=lambda o: o['host']['name'])
 
         return jsonify(tag)
 

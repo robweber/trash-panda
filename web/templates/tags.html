@@ -1,10 +1,58 @@
 {% extends "base.html" %}
+{% block header %}
+<script type="text/javascript">
+
+function load_status(){
+  $.ajax({type: 'GET', url: '/api/tag/{{ tag_id }}', success: function(data, status, request){
+    table = $('#tag_info > tbody');
+
+    // setup row objects
+    var tr = $('<tr>');
+    var td = $('<td>');
+
+    //clear existing data
+    table.empty();
+
+    data.services.forEach(function(s){
+      row = tr.clone();
+
+      if(s.return_code == 0){
+        row.append(td.clone().text(s.name).addClass('text-success'));
+      }
+      else if(s.return_code == 1){
+        row.append(td.clone().text(s.name).addClass('text-warning'));
+      }
+      else {
+        row.append(td.clone().text(s.name).addClass('text-danger'));
+      }
+
+      // link for the details
+      host = $('<a>').html(s.host.name);
+      host.attr('href', '/status/' + s.host.id);
+
+      row.append(td.clone().append(host));
+
+      row.append(td.clone().text(s.text.replace("\\n", "<br />")))
+      row.append(td.clone().text(s.last_state_change))
+
+      table.append(row);
+
+    });
+
+    // refresh in 15 seconds
+    setTimeout(load_status, 15000);
+  }});
+
+}
+
+</script>
+{% endblock %}
 {% block content %}
 {% set current_status = ['text-success', 'text-warning', 'text-danger', 'text-secondary'] %}
 {% set overall_status = ['OK', 'Warning', 'Critical', 'Unknown'] %}
 {% set status_text = ['', '', '', 'text-secondary'] %}
 <div class="container">
-  <table class="table table-striped" id="host_info">
+  <table class="table table-striped" id="tag_info">
     <thead class="thead-dark">
       <tr>
         <th>Service</th>
@@ -14,24 +62,12 @@
       </tr>
     </thead>
     <tbody>
-      {% for row in services: %}
-      <tr>
-        <td class="{{ current_status[row['return_code']] }} row_1">
-          {{ row['name'] }}
-          {% if(row['state'] == 'UNCONFIRMED') %}
-          (check {{ row['check_attempt'] }}/{{ host['service_check_attempts'] }})
-          {% endif %}
-          {% if('service_url' in row) %}
-          <a href="{{ row['service_url'] }}" target="_blank" class="mdi mdi-launch icon-sm icon-inline"></a>
-          {% endif %}
-        </td>
-        <td><a href="/status/{{ row['host']['id'] }}">{{ row['host']['name'] }}</a></td>
-        <td class="{{ status_text[row['return_code']] }} row_2 hide-md">{{ row['text'].replace("\n", '<br />') | safe }}</td>
-        <td class="{{ status_text[row['return_code']] }}">{{ row['last_state_change'] }}</td>
-      </tr>
-      {% endfor %}
+
     </tbody>
   </table>
 </div>
 
+{% endblock %}
+{% block onload_scripts %}
+load_status();
 {% endblock %}
