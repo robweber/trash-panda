@@ -60,24 +60,13 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
         werkzeug = logging.getLogger('werkzeug')
         werkzeug.disabled = True
 
-    def _get_host(id):
-        result = None
-
-        # get the host status from the db
-        host = history.get_host(id)
-
-        if(len(host) > 0):
-            result = host
-
-        return result
-
     @app.route('/', methods=["GET"])
     def index():
         return render_template("index.html", message=config_yaml['config']['web']['landing_page_text'])
 
     @app.route('/status/host/<id>')
     def host_status(id):
-        result = _get_host(id)
+        result = history.get_host(id)
 
         if(result is not None):
             # set if a notifier is configured to toggle silent mode controls
@@ -179,6 +168,12 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
         return jsonify({"total_hosts": len(hosts), "hosts_with_errors": error_count, "services_with_errors": len(services),
                         "overall_status": overall_status, "overall_status_description": utils.SERVICE_STATUSES[overall_status],
                         "services": services})
+
+    @app.route('/api/status/host/<host_id>', methods=['GET'])
+    def get_host(host_id):
+        host = history.get_host(host_id)
+
+        return jsonify(host)
 
     @app.route('/api/status/tag/<tag_id>', methods=['GET'])
     def get_tag(tag_id):

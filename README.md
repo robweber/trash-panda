@@ -530,8 +530,8 @@ __/api/status/tag/<tag_id>__ - information on the status of each service with th
       ],
       "text": "/home/rob/Scripts/backup/brother-eye.complete is OK! Last Modified: Mon Apr  8 12:12:33 2024"
     }
-  }
 }
+
 ```
 
 ## Commands
