@@ -18,6 +18,7 @@ This is a _very_ basic monitoring solution meant for simple home use. It will mo
 - [Host Types](#host-types)
 - [Host Definitions](#host-definitions)
   - [Optional Attributes](#optional-attributes)
+- [Tags](#tags)
 - [Host Documentation](#host-documentation)
   - [Direct Documentation Links](#direct-documentation-links)
 - [Templating](#templating)
@@ -294,6 +295,7 @@ Also of note are some optional variables.
 * __notifier__: Again, by default the global notification type will be used but hosts types can set their own. This will apply to the host and all services under it.
 * __service_check_attempts__: Override the global service check value with a custom value for this host
 * __ping_command__: Override the built in ICMP Ping check with a custom check defined in the [services](#services) list.
+* __tags__: a list of tags that apply to this service. See the (tags documentation)[#tags]
 
 ## Host Definitions
 
@@ -340,6 +342,31 @@ It is possible to define a custom `output_filter` for a service that parses the 
 * `return_code` - The service `return_code` as an integer 0-3.  
 * Global variables set via `jinja_constants` in the [global config](#global-configuration).
 
+## Tags
+
+Tags are a grouping feature that can be applied to services. This allows you to easily create separate dashboards for all services that match the tag. A common use case for this is a Disk Space service that may be applied to multiple hosts. By applying a tag to this service you can see that status of all the Disk Space services for each host in one place instead of looking at them individually. Another use could be tagging services that all interact with each other in some way across hosts (like a web server and database server).
+
+Adding a tag to a service can be done when creating either the [Host Type](#host-types) or [Host definition](#host-definitions).
+
+```
+type: web_server
+name: "My Web Server"
+address: 192.168.0.2
+management_page: "http://myserver:5000/admin"
+config:
+  virtual_host: "myserver"
+services:
+  - type: http
+    name: "Admin Page"
+    output_filter: "{{ value.trim() }}"
+    tags:
+      - Website
+    args:
+      port: 5000
+      path: "/admin"
+```
+
+The tag will automatically show on the services it's applied to. Clicking the tag name will bring up the status page for that tag, listing all the services. This page is similar to the dashboard in that it will refresh every 15 seconds. For quick access to a tag you can set it up as a [link on the dashboard](#website-options).
 
 ## Host Documentation
 
@@ -457,6 +484,8 @@ __/api/health__ - basic program health. Status is set to _Offline_ if the main s
   "return_code": 0
 }
 ```
+
+__/api/tag/<tag_id>__
 
 __/api/check_now/<host_id>__ - updates a given host's next check time to the current time. This forces a service check instead of waiting for the normal update interval. The host id can be found via the `/api/status` endpoint for each host.
 
