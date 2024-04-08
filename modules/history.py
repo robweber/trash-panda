@@ -11,7 +11,7 @@ class HostHistory:
     db = None
 
     def __init__(self):
-        self.db = redis.Redis('localhost', decode_responses=True)
+        self.db = redis.Redis('127.0.0.1', decode_responses=True)
 
     def save_last_check(self):
         """sets the last check time using the current time as a unix timestamp"""
@@ -29,10 +29,18 @@ class HostHistory:
         return last_update
 
     def list_hosts(self):
-        return self.__read_db(DBKeys.VALID_HOSTS.value)
+        return self.__read_db_json(DBQueries.GET_HOST_IDS.value)
 
     def list_tags(self):
-        return self.__read_db(DBKeys.VALID_TAGS.value)
+        all_tags = self.__read_db_json(DBQueries.GET_TAG_IDS.value)
+
+        # flatten down to unique names
+        reduced = [y for x in all_tags for y in x]
+
+        # convert to dict in form {id: name}
+        tags = {slugify(x):x for x in list(set(reduced))}
+
+        return tags
 
     def get_host(self, host_id):
         """ get host information from the database based on the ID
@@ -41,10 +49,28 @@ class HostHistory:
 
         :returns: a dict with the host information, empty if not found
         """
-        return self.__read_db(f"{DBKeys.HOST_STATUS.value}.{host_id}")
+        host = self.__read_db_json(DBQueries.GET_HOST.value.format(host_id=host_id))
 
-    def get_tag(self, tag_name):
-        return self.__read_db(f"{DBKeys.TAGS.value}.{tag_name}")
+        if(not host):
+            host = [{}]
+
+        return host[0]
+
+    def get_tag(self, tag_id):
+        """ finds services matching the given tag id
+
+        :param tag_id: the id of the tag to lookup
+
+        :returns: list of services that include this tag
+        """
+        # get a list of all tags
+        all_tags = self.list_tags()
+
+        # get list of services matching this tag id
+        result = {"id": tag_id, "name": all_tags[tag_id]}
+        result['services'] = self.__read_db_json(DBQueries.GET_TAG.value.format(tag_id=all_tags[tag_id]))
+
+        return result
 
     def get_service(self, host_id, service_id):
         """ get information on a specific service from a specific host
@@ -54,27 +80,32 @@ class HostHistory:
 
         :returns: a dict with the service information, empty if not found
         """
-        result = {}
+        service = self.__read_db_json(DBQueries.GET_SERVICE.value.format(host_id=host_id, service_id=service_id))
 
-        host = self.get_host(host_id)
+        if(not service):
+            service = [{}]
 
-        # find the service in the list
-        if('services' in host):
-            service_list = list(filter(lambda x: x['id'] == service_id, host['services']))
+        return service[0]
 
-            # should only have one result
-            if(len(service_list) > 0):
-                result = service_list[0]
+    def set_hosts(self, host_ids):
+        """ takes a list of host names and compares against the DB,
+        ids that do not exist are deleted - should be run at on startup
 
-        return result
+        :param host_ids: list of host ids from the config
+        """
+        # get a list of all hosts in DB
+        all_hosts = self.list_hosts()
 
-    def set_hosts(self, names):
-        """ saves a list of valid host names """
-        self.__write_db(DBKeys.VALID_HOSTS.value, names)
+        if(all_hosts is None):
+            # probably the first run
+            self.__write_db_json("$", [])
+        else:
+            # get items that are not in current list
+            old_hosts = list(set(all_hosts)-set(host_ids))
 
-    def set_tags(self, names):
-        """ saves a list of tags in the format {id: tag_name}"""
-        self.__write_db(DBKeys.VALID_TAGS.value, names)
+            # delete the old hosts
+            for host_id in old_hosts:
+                self.db.json().delete(DBQueries.GET_HOST.value)
 
     def save_host(self, host_id, host_status):
         """ saves the host status to the database with the given ID
@@ -83,8 +114,11 @@ class HostHistory:
         :param host_status: the host's status as a dict
         """
 
-        self.__update_tags(host_status)
-        self.__write_db(f"{DBKeys.HOST_STATUS.value}.{host_id}", host_status)
+        # delete the old value
+        self.db.json().delete(DBKeys.HOST_KEY.value, DBQueries.GET_HOST.value.format(host_id=host_id))
+
+        # add the new value https://redis.io/docs/latest/commands/json.arrappend/
+        self.db.json().arrappend(DBKeys.HOST_KEY.value, "$", host_status)
 
     def __update_tags(self, host_status):
         """ updates service info for all tags on this host """
@@ -100,7 +134,20 @@ class HostHistory:
                     tag = {"name": t, "services": {}}
 
                 tag['services'][s['id']] = s
-                self.__write_db(f"{DBKeys.TAGS.value}.{slugify(t)}", tag)
+                self.__write_db_json(f"{DBKeys.TAGS.value}.{slugify(t)}", tag)
+
+    def __read_db_json(self, query):
+        """ read a value from the DB using the JSON Module - https://redis.io/docs/latest/commands/json.get/
+        queries can be done as supported with JSON Paths - https://redis.io/docs/latest/develop/data-types/json/path/
+        """
+
+        result = self.db.json().get(DBKeys.HOST_KEY.value, query)
+
+        return result
+
+    def __write_db_json(self, db_filter, db_value):
+        """ write an object to the DB using the JSON module"""
+        self.db.json().set(DBKeys.HOST_KEY.value, db_filter, db_value)
 
     def __read_db(self, db_key):
         """ read a value from the Redis DB based on the given key
@@ -120,8 +167,13 @@ class HostHistory:
 
 class DBKeys(Enum):
     """Enum that holds the keys for Redis data lookups"""
-    VALID_HOSTS = "host_names"
-    HOST_STATUS = "host_status"
+    HOST_KEY = 'hosts'
     LAST_CHECK = "last_check_timestamp"
-    VALID_TAGS = "tag_names"
-    TAGS = "tags"
+
+class DBQueries(Enum):
+    """Enum that holds keys for JSON Queries"""
+    GET_HOST_IDS = '$[*].id'
+    GET_TAG_IDS = '$[*].services[*].tags'
+    GET_HOST = '$[?(@.id==\"{host_id}")]'
+    GET_SERVICE = '$[?(@.id=="{host_id}")].services[?(@.id=="{service_id}")]'
+    GET_TAG = '$[*].services[?(@.tags[*]=="{tag_id}")]'

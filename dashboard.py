@@ -92,7 +92,7 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
     def tags(tag_id):
         tag = history.get_tag(tag_id)
 
-        services = sorted(list(tag['services'].values()), key=lambda o: o['host']['name'])
+        services = sorted(tag['services'], key=lambda o: o['host']['name'])
         return render_template("tags.html", services=services, tag_id=tag_id, page_title=f"{tag['name']}")
 
     @app.route('/editor', methods=['GET'])
@@ -146,23 +146,18 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
 
         return jsonify(status)
 
-    @app.route('/api/tags', methods=['GET'])
+    @app.route('/api/list/tags', methods=['GET'])
     def get_tags():
-        result = {}
         tags = history.list_tags()
 
-        # get a dict {tag_name: values }
-        result = {tags[id]: list(history.get_tag(id)['services'].values()) for id in tags.keys()}
-
-        return jsonify(result)
+        return jsonify(tags)
 
     @app.route('/api/tag/<tag_id>', methods=['GET'])
     def get_tag(tag_id):
         tag = history.get_tag(tag_id)
-        tag['id'] = tag_id
 
         # convert services to an array
-        tag['services'] = sorted(list(tag['services'].values()), key=lambda o: o['host']['name'])
+        tag['services'] = sorted(tag['services'], key=lambda o: o['host']['name'])
 
         return jsonify(tag)
 

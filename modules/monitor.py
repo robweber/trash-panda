@@ -53,7 +53,6 @@ class HostMonitor:
 
         # get host description by type
         now = datetime.datetime.now()
-        tag_names = []
         for i in range(0, len(yaml_file['hosts'])):
             device = self.__create_device(yaml_file['hosts'][i])
 
@@ -66,16 +65,11 @@ class HostMonitor:
                 next_check_now = now + datetime.timedelta(minutes=-1)
                 device.next_check = next_check_now.strftime(utils.TIME_FORMAT)
 
-            tag_names = tag_names + device.get_service_tags()
             self.hosts[device.id] = device
             logging.info(f"Loading device {device.name} with check interval every {device.interval} min")
 
         # save a list of all valid hosts
         self.history.set_hosts(self.get_hosts())
-
-        # save a list of tag names in the format {slug: name}
-        tags = {slugify(t): t for t in list(set(tag_names))}
-        self.history.set_tags(tags)
 
     def __create_types(self, types_def, default_interval, default_attempts):
         """Create devices type definitions based on defined YAML"""
@@ -204,10 +198,11 @@ class HostMonitor:
         """Helper method to take the name, return_code, and output and wrap
         it in a Dict.
         """
-        service_id = slugify(service['name'])
+        service_id = f"{host.id}-{slugify(service['name'])}"
         now = datetime.datetime.now()
-        result = {"name": service['name'], "return_code": return_code, "text": text, "raw_text": text, "id": f"{host.id}-{service_id}",
+        result = {"name": service['name'], "return_code": return_code, "text": text, "raw_text": text, "id": service_id,
                   "check_attempt": 1, "state": utils.CONFIRMED_STATE, "last_state_change": now.strftime(utils.TIME_FORMAT),
+                  "host": {"id": host.id, "name": host.name},
                   "tags": service['tags'] if 'tags' in service else []}
 
         # filter the service output text
