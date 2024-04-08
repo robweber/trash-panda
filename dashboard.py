@@ -139,12 +139,9 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
     @app.route('/api/status', methods=['GET'])
     def status():
         # get a list of hosts
-        hosts = history.list_hosts()
+        hosts = history.get_hosts()
 
-        # get the status of all the hosts
-        status = [history.get_host(h) for h in hosts]
-
-        return jsonify(status)
+        return jsonify(sorted(hosts, key=lambda o: o['name']))
 
     @app.route('/api/list/tags', methods=['GET'])
     def get_tags():
