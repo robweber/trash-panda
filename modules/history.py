@@ -38,7 +38,7 @@ class HostHistory:
         reduced = [y for x in all_tags for y in x]
 
         # convert to dict in form {id: name}
-        tags = {slugify(x):x for x in list(set(reduced))}
+        tags = {slugify(x): x for x in list(set(reduced))}
 
         return tags
 
@@ -153,6 +153,7 @@ class DBKeys(Enum):
     """Enum that holds the keys for Redis data lookups"""
     HOST_KEY = 'hosts'
     LAST_CHECK = "last_check_timestamp"
+
 
 class DBQueries(Enum):
     """Enum that holds keys for JSON Queries"""
