@@ -426,6 +426,26 @@ __/api/health__ - basic program health. Status is set to _Offline_ if the main s
 }
 ```
 
+### Informational
+
+__/api/list/hosts__ - prints a list of all host ids currently configured
+
+```
+[
+  "switch-1",
+  "firewall-1"
+]
+```
+
+__/api/list/tags__ - prints a list of all tags on the system as dictionary of tag id and given name
+
+```
+{
+  "disk-space": "Disk Space",
+  "backups": "Backups"
+}
+```
+
 ### Status
 
 __/api/status/summary__ - a status summary of the overall status of all hosts. The `services` array is a list of all services currently in an error state.

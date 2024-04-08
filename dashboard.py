@@ -126,8 +126,12 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
         return jsonify(status)
 
 
+    @app.route('/api/list/hosts', methods=['GET'])
+    def list_hosts():
+        return jsonify(history.list_hosts())
+
     @app.route('/api/list/tags', methods=['GET'])
-    def get_tags():
+    def list_tags():
         tags = history.list_tags()
 
         return jsonify(tags)
