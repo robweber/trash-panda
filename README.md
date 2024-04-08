@@ -489,6 +489,8 @@ __/api/status/all__ - detailed listing of the status of each host
 ]
 ```
 
+__/api/status/host/<host_id>__ - status information for the host with the given id. Output is same as above but for a single host only
+
 __/api/status/tag/<tag_id>__ - information on the status of each service with this tag id
 
 ```
