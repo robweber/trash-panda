@@ -3,7 +3,7 @@
 <script type="text/javascript">
 
 function load_status(){
-  $.ajax({type: 'GET', url: '/api/tag/{{ tag_id }}', success: function(data, status, request){
+  $.ajax({type: 'GET', url: '/api/status/tag/{{ tag_id }}', success: function(data, status, request){
     table = $('#tag_info > tbody');
 
     // setup row objects
@@ -28,7 +28,7 @@ function load_status(){
 
       // link for the details
       host = $('<a>').html(s.host.name);
-      host.attr('href', '/status/' + s.host.id);
+      host.attr('href', '/status/host/' + s.host.id);
 
       row.append(td.clone().append(host));
 

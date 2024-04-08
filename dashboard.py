@@ -75,7 +75,7 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
     def index():
         return render_template("index.html", message=config_yaml['config']['web']['landing_page_text'])
 
-    @app.route('/status/<id>')
+    @app.route('/status/host/<id>')
     def host_status(id):
         result = _get_host(id)
 
@@ -88,7 +88,7 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
             flash('Host page not found', 'warning')
             return redirect('/')
 
-    @app.route('/tag/<tag_id>')
+    @app.route('/status/tag/<tag_id>')
     def tags(tag_id):
         tag = history.get_tag(tag_id)
 
@@ -136,12 +136,6 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
 
         return jsonify(status)
 
-    @app.route('/api/status', methods=['GET'])
-    def status():
-        # get a list of hosts
-        hosts = history.get_hosts()
-
-        return jsonify(sorted(hosts, key=lambda o: o['name']))
 
     @app.route('/api/list/tags', methods=['GET'])
     def get_tags():
@@ -149,16 +143,14 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
 
         return jsonify(tags)
 
-    @app.route('/api/tag/<tag_id>', methods=['GET'])
-    def get_tag(tag_id):
-        tag = history.get_tag(tag_id)
+    @app.route('/api/status/all', methods=['GET'])
+    def status():
+        # get a list of hosts
+        hosts = history.get_hosts()
 
-        # convert services to an array
-        tag['services'] = sorted(tag['services'], key=lambda o: o['host']['name'])
+        return jsonify(sorted(hosts, key=lambda o: o['name']))
 
-        return jsonify(tag)
-
-    @app.route('/api/overall_status', methods=['GET'])
+    @app.route('/api/status/summary', methods=['GET'])
     def overall_status():
         overall_status = 0  # 0 is the target, means all is good
         error_count = 0
@@ -188,7 +180,16 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
                         "overall_status": overall_status, "overall_status_description": utils.SERVICE_STATUSES[overall_status],
                         "services": services})
 
-    @app.route('/api/check_now/<id>', methods=['POST'])
+    @app.route('/api/status/tag/<tag_id>', methods=['GET'])
+    def get_tag(tag_id):
+        tag = history.get_tag(tag_id)
+
+        # convert services to an array
+        tag['services'] = sorted(tag['services'], key=lambda o: o['host']['name'])
+
+        return jsonify(tag)
+
+    @app.route('/api/command/check_now/<id>', methods=['POST'])
     def check_host_now(id):
         result = monitor.check_now(id)
 
@@ -200,7 +201,7 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
 
         return jsonify(result)
 
-    @app.route('/api/silence_host/<id>/<minutes>', methods=['POST'])
+    @app.route('/api/command/silence_host/<id>/<minutes>', methods=['POST'])
     def silence_host(id, minutes):
         until = datetime.datetime.now() + datetime.timedelta(minutes=int(minutes))
         result = monitor.silence_host(id, until)
@@ -213,8 +214,8 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
 
         return jsonify(result)
 
-    @app.route('/api/browse_files/', methods=['GET'], defaults={'browse_path': utils.DIR_PATH})
-    @app.route('/api/browse_files/<path:browse_path>', methods=['GET'])
+    @app.route('/api/editor/browse_files/', methods=['GET'], defaults={'browse_path': utils.DIR_PATH})
+    @app.route('/api/editor/browse_files/<path:browse_path>', methods=['GET'])
     def list_directory(browse_path):
         if(not browse_path.startswith('/')):
             browse_path = f"/{browse_path}"
@@ -231,7 +232,7 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
 
         return jsonify({'success': True, 'dirs': dirs, 'files': files, 'path': browse_path})
 
-    @app.route('/api/load_file', methods=['POST'])
+    @app.route('/api/editor/load_file', methods=['POST'])
     def load_file():
         file_path = request.form['file_path']
 
@@ -242,7 +243,7 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
 
         return Response(file_contents, mimetype='text/plain')
 
-    @app.route('/api/save_file', methods=["POST"])
+    @app.route('/api/editor/save_file', methods=["POST"])
     def save_file():
         file_path = request.form['file_path']
 

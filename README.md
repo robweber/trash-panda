@@ -414,7 +414,34 @@ For integration with other systems the API can be used. To decode the status ret
 
 The status codes are determined by the settings for the device and the output of the various check utilities. See the `check_scripts/` folder for individual scripts that are run.
 
-__/api/status__ - detailed listing of the status of each host
+### Health
+
+__/api/health__ - basic program health. Status is set to _Offline_ if the main system checking loop hasn't run in over 2 minutes. This should look for services to check every 60 seconds when running properly.
+
+```
+{
+  "last_check_time": "07-05-2022 12:00PM",
+  "text": "Online",
+  "return_code": 0
+}
+```
+
+### Status
+
+__/api/status/summary__ - a status summary of the overall status of all hosts. The `services` array is a list of all services currently in an error state.
+
+```
+{
+  "hosts_with_errors": 0,
+  "overall_status": 0,
+  "overall_status_description": "OK",
+  "total_hosts": 3,
+  "services_with_errors": 0,
+  "services": []
+}
+```
+
+__/api/status/all__ - detailed listing of the status of each host
 
 ```
 [
@@ -462,32 +489,54 @@ __/api/status__ - detailed listing of the status of each host
 ]
 ```
 
-__/api/overall_status__ - a status summary of the overall status of all hosts. The `services` array is a list of all services currently in an error state.
+__/api/status/tag/<tag_id>__ - information on the status of each service with this tag id
 
 ```
 {
-  "hosts_with_errors": 0,
-  "overall_status": 0,
-  "overall_status_description": "OK",
-  "total_hosts": 3,
-  "services_with_errors": 0,
-  "services": []
+  "id": "backups",
+  "name": "Backups",
+  "services": [
+    {
+      "check_attempt": 1,
+      "host": {
+        "id": "batman",
+        "name": "Batman"
+      },
+      "id": "batman-backups",
+      "last_state_change": "04-08-2024 02:11PM",
+      "name": "Backups",
+      "raw_text": "/home/rob/Scripts/backup/batman.complete is OK! Last Modified: Mon Apr  8 02:02:22 2024\n",
+      "return_code": 0,
+      "state": "CONFIRMED",
+      "tags": [
+        "Backups"
+      ],
+      "text": "/home/rob/Scripts/backup/batman.complete is OK! Last Modified: Mon Apr  8 02:02:22 2024"
+    },
+    {
+      "check_attempt": 1,
+      "host": {
+        "id": "brother-eye",
+        "name": "Brother Eye"
+      },
+      "id": "brother-eye-backups",
+      "last_state_change": "04-08-2024 02:11PM",
+      "name": "Backups",
+      "raw_text": "/home/rob/Scripts/backup/brother-eye.complete is OK! Last Modified: Mon Apr  8 12:12:33 2024\n",
+      "return_code": 0,
+      "state": "CONFIRMED",
+      "tags": [
+        "Backups"
+      ],
+      "text": "/home/rob/Scripts/backup/brother-eye.complete is OK! Last Modified: Mon Apr  8 12:12:33 2024"
+    }
+  }
 }
 ```
 
-__/api/health__ - basic program health. Status is set to _Offline_ if the main system checking loop hasn't run in over 2 minutes. This should look for services to check every 60 seconds when running properly.
+## Commands
 
-```
-{
-  "last_check_time": "07-05-2022 12:00PM",
-  "text": "Online",
-  "return_code": 0
-}
-```
-
-__/api/tag/<tag_id>__
-
-__/api/check_now/<host_id>__ - updates a given host's next check time to the current time. This forces a service check instead of waiting for the normal update interval. The host id can be found via the `/api/status` endpoint for each host.
+__/api/command/check_now/<host_id>__ - updates a given host's next check time to the current time. This forces a service check instead of waiting for the normal update interval. The host id can be found via the `/api/status` endpoint for each host.
 
 ```
 {
@@ -496,7 +545,7 @@ __/api/check_now/<host_id>__ - updates a given host's next check time to the cur
 }
 ```
 
-__/api/silence_host/<host_id>/<minutes>__ - sets the given hosts silenced property to True for the given amount of minutes. This will silence any notifications for this time.
+__/api/command/silence_host/<host_id>/<minutes>__ - sets the given hosts silenced property to True for the given amount of minutes. This will silence any notifications for this time.
 
 ```
 {

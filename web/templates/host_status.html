@@ -6,7 +6,7 @@
 <script type="text/javascript">
 function check_now(id){
   //set the host next check time to now to force an update
-  $.post('/api/check_now/' + id, {}, function(data, status, request){
+  $.post('/api/command/check_now/' + id, {}, function(data, status, request){
     if(data.success){
       $('#js-success-alert').html("Host check time updated to " + data.next_check);
       $('#js-success-alert').show().delay(3000).fadeOut();
@@ -21,7 +21,7 @@ function check_now(id){
 }
 
 function silence_host(id, minutes){
-  $.post('/api/silence_host/' + id + '/' + minutes, function(data, status, request){
+  $.post('/api/command/silence_host/' + id + '/' + minutes, function(data, status, request){
     if(data.success){
       if(data.is_silenced)
       {
@@ -133,7 +133,7 @@ function silence_host(id, minutes){
             <br />
             <div class="text-right mt-1">
               {% for t in row['tags'] %}
-              <a href="/tag/{{ slugify(t) }}" class="text-light"><span class="badge rounded-pill bg-dark">{{ t }}</span></a>
+              <a href="/status/tag/{{ slugify(t) }}" class="text-light"><span class="badge rounded-pill bg-dark">{{ t }}</span></a>
               {% endfor %}
             </div>
           </td>

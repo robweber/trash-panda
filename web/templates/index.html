@@ -10,7 +10,7 @@ function toggleDetails(count){
 }
 
 function load_status(){
-  $.ajax({type: 'GET', url: '/api/status', success: function(data, status, request){
+  $.ajax({type: 'GET', url: '/api/status/all', success: function(data, status, request){
     table = $('#host_info > tbody');
 
     // setup row objects
@@ -25,7 +25,7 @@ function load_status(){
 
       // link for the details
       details = $('<a>').html('<i class="mdi mdi-' + h.icon + ' icon-inline mr-2"></i><span>' + h.name + "</span>").addClass('host_title ml-2');
-      details.attr('href', '/status/' + h.id);
+      details.attr('href', '/status/host/' + h.id);
 
       row.append(td.clone().append(details));
 
