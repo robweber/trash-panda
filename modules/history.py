@@ -120,22 +120,6 @@ class HostHistory:
         # add the new value https://redis.io/docs/latest/commands/json.arrappend/
         self.db.json().arrappend(DBKeys.HOST_KEY.value, "$", host_status)
 
-    def __update_tags(self, host_status):
-        """ updates service info for all tags on this host """
-        for s in host_status['services']:
-            s['host'] = {"name": host_status['name'], "id": host_status['id']}  # save some host info
-
-            for t in s['tags']:
-                # update the service call for this tag
-                tag = self.get_tag(slugify(t))
-
-                # if tag empty set some values
-                if(not tag):
-                    tag = {"name": t, "services": {}}
-
-                tag['services'][s['id']] = s
-                self.__write_db_json(f"{DBKeys.TAGS.value}.{slugify(t)}", tag)
-
     def __read_db_json(self, query):
         """ read a value from the DB using the JSON Module - https://redis.io/docs/latest/commands/json.get/
         queries can be done as supported with JSON Paths - https://redis.io/docs/latest/develop/data-types/json/path/
