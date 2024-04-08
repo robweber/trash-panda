@@ -109,7 +109,7 @@ class HostHistory:
 
             # delete the old hosts
             for host_id in old_hosts:
-                self.db.json().delete(DBQueries.GET_HOST.value)
+                self.db.json().delete(DBKeys.HOST_KEY.value, DBQueries.GET_HOST.value.format(host_id=host_id))
 
     def save_host(self, host_id, host_status):
         """ saves the host status to the database with the given ID
