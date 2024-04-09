@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 - Service Tagging. Allows for services to be tagged within the config file. Tags will group the services so that they can display together on a common dashboard. This allows similar services across hosts to be viewed together.
 - Service Tags can set colors within the `web` key of the configuration file, default color is black.
+- New notifier type: __webhook__. This sends a JSON payload to the given url
 
 ### Changed
 

@@ -19,6 +19,7 @@ notification_types:
     - pushover
     - log
     - email
+    - webhook
 
 # service definition, used for host types and hosts
 service_definition: &service_definition
@@ -130,6 +131,7 @@ config:
                   - log
                   - pushover
                   - email
+                  - webhook
               args:
                 required: False
                 type: dict

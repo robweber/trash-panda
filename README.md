@@ -188,6 +188,29 @@ config:
           user_key: pushover_user_key
 ```
 
+__Webhook Notifier__ - sends a POST request to a given URL containing data from either the host or service affected.
+
+```
+config:
+  notifications:
+    primary: none
+    types:
+      - type: webhook
+        args:
+          url: https://url/path
+```
+
+When the webhook is trigered a POST request containing a JSON payload will be sent. For host notifications there will be a `host` key and for service notifications a `service` key.
+
+```
+{
+  "type": "host"
+  "host": {
+    ... host data ...
+  }
+}
+```
+
 ### Website Options
 
 Using the optional `web` key you can control some aspects of the web interface.
