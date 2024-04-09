@@ -149,11 +149,9 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
         error_count = 0
 
         # pull in all the hosts and get their overall status
-        hosts = history.list_hosts()
+        hosts = history.get_hosts()
         services = []
-        for name in hosts:
-            host = history.get_host(name)
-
+        for host in hosts:
             # catch for rare cases where host status hasn't been calculated yet
             if('overall_status' in host):
                 # set the higher of the two values
@@ -162,12 +160,8 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
                 if(host['overall_status'] > 0):
                     error_count = error_count + 1
 
-                    # find services in error
-                    for s in host['services']:
-                        if(s['return_code'] > 0):
-                            # add host name to dict
-                            s['host'] = host['name']
-                            services.append(s)
+                    # filter services in error
+                    services = services + list(filter(lambda s: s['return_code'] > 0, host['services']))
 
         return jsonify({"total_hosts": len(hosts), "hosts_with_errors": error_count, "services_with_errors": len(services),
                         "overall_status": overall_status, "overall_status_description": utils.SERVICE_STATUSES[overall_status],

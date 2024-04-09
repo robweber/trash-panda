@@ -14,8 +14,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Changed
 
 - Redis backend is now changed to rely on the [Redis JSON module](https://redis.io/docs/latest/develop/data-types/json/). This requires the `redis-stack-server` and not the `redis-server` for the key store.
-- Many API endpoints now have different paths. This is an attempt to organize similar calls under a tree such as `/api/status` for all status related calls and `/api/command/` for command related calls. See the API section of the README for all changes. 
+- Many API endpoints now have different paths. This is an attempt to organize similar calls under a tree such as `/api/status` for all status related calls and `/api/command/` for command related calls. See the API section of the README for all changes.
+- made `/api/status/summary` more efficient at filtering services in error
 
+### Fixed
+
+- fixed overwriting host key for services on `/api/status/summary` endpoint. This is already set when the service output is created
 
 ## Version 5.2
 
