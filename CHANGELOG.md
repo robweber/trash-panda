@@ -8,12 +8,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Added
 
-- Service Tagging. Allows for services to be tagged within the config file. Tags will group the services so that they can display together on a common dashboard. This allows similar services across hosts to be viewed together. 
+- Service Tagging. Allows for services to be tagged within the config file. Tags will group the services so that they can display together on a common dashboard. This allows similar services across hosts to be viewed together.
+- Service Tags can set colors within the `web` key of the configuration file, default color is black.
 
 ### Changed
 
 - Redis backend is now changed to rely on the [Redis JSON module](https://redis.io/docs/latest/develop/data-types/json/). This requires the `redis-stack-server` and not the `redis-server` for the key store.
-- Many API endpoints now have different paths. This is an attempt to organize similiar calls under a tree such as `/api/status` for all status related calls and `/api/command/` for command related calls.
+- Many API endpoints now have different paths. This is an attempt to organize similar calls under a tree such as `/api/status` for all status related calls and `/api/command/` for command related calls. See the API section of the README for all changes. 
 
 
 ## Version 5.2
