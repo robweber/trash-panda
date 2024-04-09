@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## Unreleased
+
+### Added
+
+- Service Tagging. Allows for services to be tagged within the config file. Tags will group the services so that they can display together on a common dashboard. This allows similar services across hosts to be viewed together. 
+
+### Changed
+
+- Redis backend is now changed to rely on the [Redis JSON module](https://redis.io/docs/latest/develop/data-types/json/). This requires the `redis-stack-server` and not the `redis-server` for the key store.
+- Many API endpoints now have different paths. This is an attempt to organize similiar calls under a tree such as `/api/status` for all status related calls and `/api/command/` for command related calls.
+
+
 ## Version 5.2
 
 ### Added
@@ -13,7 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Changed
 
-- changed behavior of the watchdog service. It now sends both __up__ and __down__ status messages. The main dashboard program does not modify the .service_down file any longer, this is done in the watchdog only. 
+- changed behavior of the watchdog service. It now sends both __up__ and __down__ status messages. The main dashboard program does not modify the .service_down file any longer, this is done in the watchdog only.
 
 ## Version 5.1
 
