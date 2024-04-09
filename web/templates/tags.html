@@ -32,7 +32,7 @@ function load_status(){
 
       row.append(td.clone().append(host));
 
-      row.append(td.clone().text(s.text.replace("\\n", "<br />")))
+      row.append(td.clone().html(s.text.replaceAll("\n", "<br />")).addClass('hide-md'))
       row.append(td.clone().text(s.last_state_change))
 
       table.append(row);
