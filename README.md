@@ -118,6 +118,9 @@ config:
     editor:
       read_only: False
     landing_page_text: "Custom text to display on the landing page"
+    tags:
+      - name: Tag 1
+        color: blue
     top_nav:
       style:
         type: button
@@ -204,6 +207,17 @@ The default text on the landing page can also be modified to give different info
 
 ```
 landing_page_text: "Custom text to display on the landing page"
+```
+
+__Tag Colors__
+
+Using the `tag` key you can specify the colors for how different [service tags](#tags) will be displayed. By default all tags are a dark gray color. Valid colors are the same as the Top Nav Style colors listed below.
+
+```
+web:
+  tags:
+    - name: Tag Name
+      color: blue
 ```
 
 __Top Nav Style__

@@ -277,16 +277,26 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
     def nav_style():
         def get_style():
             style = config_yaml['config']['web']['top_nav']['style']['type']
-            # map bootstrap names to color names
-            colors = {"black": "dark", "blue": "primary", "gray": "secondary", "green": "success",
-                      "light_blue": "info", "red": "danger", "yellow": "warning"}
 
             if(style == 'button'):
-                return colors[config_yaml['config']['web']['top_nav']['style']['color']]
+                return utils.COLOR_MAPPING[config_yaml['config']['web']['top_nav']['style']['color']]
             else:
                 return 'link'
 
         return dict(get_nav_style=get_style)
+
+    @app.context_processor
+    def tag_color():
+        def get_tag_color(tag_name):
+            color = "dark"
+            tags = config_yaml['config']['web']['tags']
+
+            for t in tags:
+                if(t['name'] == tag_name):
+                    color = utils.COLOR_MAPPING[t['color']]
+
+            return color
+        return dict(get_tag_color=get_tag_color)
 
     # run the web app
     app.run(debug=debugMode, host='0.0.0.0', port=port_number, use_reloader=False)

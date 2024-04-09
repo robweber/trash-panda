@@ -133,7 +133,7 @@ function silence_host(id, minutes){
             <br />
             <div class="text-right mt-1">
               {% for t in row['tags'] %}
-              <a href="/status/tag/{{ slugify(t) }}" class="text-light"><span class="badge rounded-pill bg-dark">{{ t }}</span></a>
+              <a href="/status/tag/{{ slugify(t) }}" class="text-light"><span class="badge rounded-pill bg-{{ get_tag_color(t) }}">{{ t }}</span></a>
               {% endfor %}
             </div>
           </td>
