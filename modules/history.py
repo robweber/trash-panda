@@ -44,7 +44,12 @@ class HostHistory:
 
     def get_hosts(self):
         """ returns all host information from the database """
-        return self.__read_db_json("$[*]")
+        all_hosts = self.__read_db_json("$[*]")
+
+        for i in range(0, len(all_hosts)):
+            all_hosts[i].pop("services")
+
+        return all_hosts
 
     def get_host(self, host_id):
         """ get host information from the database based on the ID

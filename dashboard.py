@@ -144,7 +144,7 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
 
         return jsonify(tags)
 
-    @app.route('/api/status/all', methods=['GET'])
+    @app.route('/api/status/hosts', methods=['GET'])
     def status():
         # get a list of hosts
         hosts = history.get_hosts()
@@ -168,8 +168,8 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
                 if(host['overall_status'] > 0):
                     error_count = error_count + 1
 
-                    # filter services in error
-                    services = services + list(filter(lambda s: s['return_code'] > 0, host['services']))
+        # get services in error
+        services = history.get_services([1,2])
 
         return jsonify({"total_hosts": len(hosts), "hosts_with_errors": error_count, "services_with_errors": len(services),
                         "overall_status": overall_status, "overall_status_description": utils.SERVICE_STATUSES[overall_status],

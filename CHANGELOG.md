@@ -12,7 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Service Tags can set colors within the `web` key of the configuration file, default color is black.
 - New notifier type: __webhook__. This sends a JSON payload to the given url
 - New API endpoint `/api/status/services` to list services. Filtering by the return_code is also possible
-- API endpoints that return service related data now include performance data (`perf_data`) if the service check command returns it. This is parsed according to the Nagios standards. 
+- API endpoints that return service related data now include performance data (`perf_data`) if the service check command returns it. This is parsed according to the Nagios standards.
 
 ### Changed
 
@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - made `/api/status/summary` more efficient at filtering services in error
 - modified menu to include a dropdown menu. The Dashboard is now renamed the Overview page and two new dashboards are available. Issues and Tags.
 - the built in ping check now includes some basic performance data (percent packet loss and average return time) as part of the raw data
+- `/api/status/all` is now `/api/status/hosts`. It also excludes service information from each host, this speeds up the return time and the `/api/status/host` endpoint can be used to get the full host info with service information
 
 ### Fixed
 

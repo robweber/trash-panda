@@ -449,7 +449,7 @@ For integration with other systems the API can be used. To decode the status ret
 * 1 - Warning, potential problem
 * 2 - Critical, definitely a problem
 
-The status codes are determined by the settings for the device and the output of the various check utilities. Note that for service check related data Performance Data information (`perf_data`) is available if the check command returns it. This is parsed according to the [Nagios performance data](https://nagios-plugins.org/doc/guidelines.html#AEN200) standard. If there isn't any performance data the key will not exist for that service. 
+The status codes are determined by the settings for the device and the output of the various check utilities. Note that for service check related data Performance Data information (`perf_data`) is available if the check command returns it. This is parsed according to the [Nagios performance data](https://nagios-plugins.org/doc/guidelines.html#AEN200) standard. If there isn't any performance data the key will not exist for that service.
 
 ### Health
 
@@ -498,7 +498,7 @@ __/api/status/summary__ - a status summary of the overall status of all hosts. T
 }
 ```
 
-__/api/status/all__ - detailed listing of the status of each host
+__/api/status/host__ - detailed listing of the status of each host. This does not include service information, use `/api/status/host/<host_id>` to get the full listing with services.
 
 ```
 [
@@ -517,50 +517,13 @@ __/api/status/all__ - detailed listing of the status of each host
     "service_check_attempts": 2,
     "last_check": "07-21-2022 11:01AM",
     "next_check": "07-21-2022 11:04AM",
-    "services": [
-      {
-        "check_attempt": 1,
-        "id": "alive",
-        "last_state_change": "07-02-2022 11:40AM",
-        "name": "Alive",
-        "return_code": 0,
-        "state": "CONFIRMED",
-        "text": "Ping successfull!",
-        "raw_text": "Ping successfull!|percent_packet_loss=0.0% average_return_time=0.05600000000000001ms"
-        "perf_data": [
-          {
-            "id": "percent-packet-loss",
-            "label": "percent_packet_loss",
-            "uom": "%",
-            "value": 0.0
-          },
-          {
-            "id": "average-return-time",
-            "label": "average_return_time",
-            "uom": "ms",
-            "value": 0.102
-          }
-        ]
-      },
-      {
-	      "check_attempt": 1,
-        "id": "switch-uptime",
-        "last_state_change": "07-02-2022 11:40AM",
-        "name": "Switch Uptime",
-        "return_code": 1,
-        "state": "UNCONFIRMED",
-        "text": "11 days, 2:09:34\n",
-        "raw_text": "11 days, 2:09:34\n",
-        "notifier": "none"
-      }
-    ],
     "silenced": false,
     "type": "switch"
   }
 ]
 ```
 
-__/api/status/host/<host_id>__ - status information for the host with the given id. Output is same as above but for a single host only
+__/api/status/host/<host_id>__ - status information for the host with the given id. Output is same as above but will all host services (`services` key) as well. 
 
 __/api/status/services__ - a list of services, can be filtered by return code using a query parameter. By default all services are returned.
 

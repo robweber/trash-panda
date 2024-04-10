@@ -10,7 +10,7 @@ function toggleDetails(count){
 }
 
 function load_status(){
-  $.ajax({type: 'GET', url: '/api/status/all', success: function(data, status, request){
+  $.ajax({type: 'GET', url: '/api/status/hosts', success: function(data, status, request){
     table = $('#host_info > tbody');
 
     // setup row objects
