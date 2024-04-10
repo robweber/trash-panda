@@ -142,7 +142,7 @@ class HostMonitor:
         if(len(perf_string) > 1):
             # this should get each perf data value sequence
             # this regex allows for quotes within a perf sequence
-            for p in re.finditer("(\"[^\"]*\"|'[^']*'|[\S]+)+", perf_string[1].strip()):
+            for p in re.finditer("(\"[^\"]*\"|'[^']*'|[\\S]+)+", perf_string[1].strip()):
 
                 # find all the numeric values
                 values = []
@@ -202,7 +202,7 @@ class HostMonitor:
             is_alive = self._ping(host.address)
         else:
             output = self.__run_process(self.__create_service_call(host.ping_command, host.config), [])
-            is_alive = {"success": True if output.returncode == 0 else False, "performance_data": "" }
+            is_alive = {"success": True if output.returncode == 0 else False, "performance_data": ""}
 
         if(is_alive['success']):
             logging.debug(f"{host.name}: Is Alive")
@@ -245,7 +245,7 @@ class HostMonitor:
 
         # if less than 50% packet loss
         return {"success": True if (packet_loss < .5) else False,
-                "performance_data": f"percent_packet_loss={packet_loss}% average_return_time={rta}ms" }
+                "performance_data": f"percent_packet_loss={packet_loss}% average_return_time={rta}ms"}
 
     def __make_service_output(self, host, service, return_code, text):
         """Helper method to take the name, return_code, and output and wrap

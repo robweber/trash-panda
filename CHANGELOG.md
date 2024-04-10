@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Service Tags can set colors within the `web` key of the configuration file, default color is black.
 - New notifier type: __webhook__. This sends a JSON payload to the given url
 - New API endpoint `/api/status/services` to list services. Filtering by the return_code is also possible
+- API endpoints that return service related data now include performance data (`perf_data`) if the service check command returns it. This is parsed according to the Nagios standards. 
 
 ### Changed
 

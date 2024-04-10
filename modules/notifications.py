@@ -204,6 +204,7 @@ class EmailNotification(MonitorNotification):
             with smtplib.SMTP() as server:
                 server.sendmail(self.smtp_args['sender'], self.smtp_args['recipient'], email.as_string())
 
+
 class WebhookNotification(MonitorNotification):
     """Sends a notification via a POST webhook
 

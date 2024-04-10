@@ -134,7 +134,6 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
 
         return jsonify(status)
 
-
     @app.route('/api/list/hosts', methods=['GET'])
     def list_hosts():
         return jsonify(history.list_hosts())
@@ -184,7 +183,7 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
 
     @app.route('/api/status/services')
     def get_services_by_status():
-        return_codes = [0,1,2,3]  # by default return all codes
+        return_codes = [0, 1, 2, 3]  # by default return all codes
 
         if(request.args.get('return_codes') is not None):
             return_codes = request.args.get('return_codes').split("|")
