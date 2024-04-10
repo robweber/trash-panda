@@ -159,15 +159,15 @@ class HostMonitor:
             is_alive = self._ping(host.address)
         else:
             output = self.__run_process(self.__create_service_call(host.ping_command, host.config), [])
-            is_alive = True if output.returncode == 0 else False
+            is_alive = {"success": True if output.returncode == 0 else False, "performance_data": "" }
 
-        if(is_alive):
+        if(is_alive['success']):
             logging.debug(f"{host.name}: Is Alive")
 
             # the host is alive, continue checks
             service_results = self.__custom_checks(services, host)
 
-            service_results.append(self.__make_service_output(host, {'name': "Alive"}, 0, "Ping successfull!"))
+            service_results.append(self.__make_service_output(host, {'name': "Alive"}, 0, f"Ping successfull!|{is_alive['performance_data']}"))
         else:
             logging.debug(f"{host.name}: Is Not Alive")
 
@@ -175,7 +175,7 @@ class HostMonitor:
             for service in services:
                 service_results.append(self.__make_service_output(host, service, 3, "Not attempted"))
 
-            service_results.append(self.__make_service_output(host, {'name': "Alive"}, 2, "Ping failed"))
+            service_results.append(self.__make_service_output(host, {'name': "Alive"}, 2, f"Ping failed|{is_alive['performance_data']}"))
 
         result['services'] = sorted(service_results, key=lambda s: s['name'])
 
@@ -185,14 +185,24 @@ class HostMonitor:
         """
         Will attempt to ping the IP address via ICMP and return True or False
         True will only return if 50% or more pings are responded to
+
+        :returns: a dict containing a key for succcess (true/false) and the performance data
         """
         responses = ping(address, verbose=False, count=5)
 
-        # get total of "success" responses
-        total = list(filter(lambda x: x.success is True, responses))
+        # get percent packet loss and averate return time
+        total_success = 0
+        rta = 0
+        for r in responses:
+            total_success = total_success + 1 if r.success is True else total_success
+            rta = rta + r.time_elapsed_ms
 
-        # if over 50% responded return True
-        return True if (len(total)/len(responses) > .5) else False
+        packet_loss = 1 - (total_success/len(responses))
+        rta = rta/len(responses)
+
+        # if less than 50% packet loss
+        return {"success": True if (packet_loss < .5) else False,
+                "performance_data": f"percent_packet_loss={packet_loss}% average_return_time={rta}ms" }
 
     def __make_service_output(self, host, service, return_code, text):
         """Helper method to take the name, return_code, and output and wrap
