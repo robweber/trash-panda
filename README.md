@@ -449,7 +449,7 @@ For integration with other systems the API can be used. To decode the status ret
 * 1 - Warning, potential problem
 * 2 - Critical, definitely a problem
 
-The status codes are determined by the settings for the device and the output of the various check utilities. See the `check_scripts/` folder for individual scripts that are run.
+The status codes are determined by the settings for the device and the output of the various check utilities. Note that for service check related data Performance Data information (`perf_data`) is available if the check command returns it. This is parsed according to the [Nagios performance data](https://nagios-plugins.org/doc/guidelines.html#AEN200) standard. If there isn't any performance data the key will not exist for that service. 
 
 ### Health
 
@@ -526,7 +526,21 @@ __/api/status/all__ - detailed listing of the status of each host
         "return_code": 0,
         "state": "CONFIRMED",
         "text": "Ping successfull!",
-        "raw_text": "Ping successfull!"
+        "raw_text": "Ping successfull!|percent_packet_loss=0.0% average_return_time=0.05600000000000001ms"
+        "perf_data": [
+          {
+            "id": "percent-packet-loss",
+            "label": "percent_packet_loss",
+            "uom": "%",
+            "value": 0.0
+          },
+          {
+            "id": "average-return-time",
+            "label": "average_return_time",
+            "uom": "ms",
+            "value": 0.102
+          }
+        ]
       },
       {
 	      "check_attempt": 1,
@@ -561,18 +575,27 @@ _Example:_ http://localhost:3000/api/status/services?return_codes=1|2 - only ret
   "services": [
     {
       "check_attempt": 1,
-      "id": "switch-1-switch-uptime",
-      "host" {
-        "id": "switch-1",
-        "name": "Switch 1"
-      }
+      "id": "alive",
       "last_state_change": "07-02-2022 11:40AM",
-      "name": "Switch Uptime",
-      "return_code": 1,
+      "name": "Alive",
+      "return_code": 2,
       "state": "CONFIRMED",
-      "text": "11 days, 2:09:34\n",
-      "raw_text": "11 days, 2:09:34\n",
-      "notifier": "none"
+      "text": "Ping unsuccessfull!",
+      "raw_text": "Ping unsuccessfull!|percent_packet_loss=100.0% average_return_time=20.0ms"
+      "perf_data": [
+        {
+          "id": "percent-packet-loss",
+          "label": "percent_packet_loss",
+          "uom": "%",
+          "value": 100
+        },
+        {
+          "id": "average-return-time",
+          "label": "average_return_time",
+          "uom": "ms",
+          "value": 20.0
+        }
+      ]
     }
   ]
 }
@@ -599,6 +622,16 @@ __/api/status/tag/<tag_id>__ - information on the status of each service with th
       "text": "HTTP OK: HTTP/1.1 200 OK - 4410 bytes in 0.009 second response time",
       "raw_text": "HTTP OK: HTTP/1.1 200 OK - 4410 bytes in 0.009 second response time |time=0.009410s;;;0.000000;10.000000 size=4410B;;;0\n",
       "notifier": "none"
+      "perf_data": [
+        {
+          "id": "time",
+          "label": "time",
+          "value": 0.009410,
+          "min": 0.000000,
+          "max": 10.000000,
+          "uom": "s"
+        }
+      ]
     }
   ]
 }

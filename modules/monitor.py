@@ -5,6 +5,7 @@ import logging
 import os.path
 import subprocess
 import time
+import re
 import modules.jinja_custom as jinja_custom
 import modules.utils as utils
 from random import randint
@@ -129,6 +130,48 @@ class HostMonitor:
 
         return result
 
+    def __parse_perf_data(self, service_output):
+        """ parses the perf data according to the Nagios format:
+        https://nagios-plugins.org/doc/guidelines.html#AEN200
+        """
+        result = []
+        perf_order = ["value", "warning", "critical", "min", "max"]
+
+        # determine if there is any perf data
+        perf_string = service_output.strip().split("|")
+        if(len(perf_string) > 1):
+            # this should get each perf data value sequence
+            # this regex allows for quotes within a perf sequence
+            for p in re.finditer("(\"[^\"]*\"|'[^']*'|[\S]+)+", perf_string[1].strip()):
+
+                # find all the numeric values
+                values = []
+                for t in re.finditer("(=|;)[+-]?((\\d+(\\.\\d+)?)|(\\.\\d+))|;", p.group()):
+                    values.append(t.group()[1:])
+
+                # map the values to the appropriate keys, filter out blank values
+                mapping = {perf_order[i]: values[i] for i in range(0, len(values))}
+                mapping = dict(filter(lambda i: i[1] != '', mapping.items()))
+
+                # get the label and unit of measure
+                first_key = p.group().strip().split(";")[0].split("=")
+                unit_of_measure = first_key[1][len(mapping["value"]):]
+
+                # convert values to decimals
+                mapping = {k: float(v) for k, v in mapping.items()}
+
+                # add in the label and unit of measure
+                mapping['id'] = slugify(first_key[0]) if first_key[0] != '' else 'root'
+                mapping['label'] = first_key[0]
+
+                # only add if it exists
+                if(unit_of_measure != ""):
+                    mapping['uom'] = unit_of_measure
+
+                result.append(mapping)
+
+        return result
+
     # executes a subprocess (python script) and returns the results
     def __run_process(self, program, args):
         """
@@ -225,6 +268,11 @@ class HostMonitor:
 
         jinja_template = service['output_filter'] if 'output_filter' in service else "{{ (value | string).split('|') | first }}"
         result['text'] = self.__render_template(jinja_template, jinja_vars)
+
+        # generate the performance data (per nagios spec)
+        perf_data = self.__parse_perf_data(result['raw_text'])
+        if(perf_data):
+            result['perf_data'] = perf_data
 
         # set service url if it exists
         if('service_url' in service and service['service_url'].strip() != ""):
