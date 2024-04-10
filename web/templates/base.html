@@ -1,4 +1,4 @@
-{% set page_title = page_title | default('Dashboard') %}
+{% set page_title = page_title | default('Overview') %}
 <html>
     <head>
         <title>Trash Panda</title>
@@ -20,16 +20,32 @@
         <div class="container">
         <div class="header">
           <nav class="navbar navbar-expand-lg">
-            <h3 class="navbar-brand text-muted"><img src="/static/favicon-50x50.png" class="mr-3"/><span class="tp-title"><span class="text-danger">Trash Panda</span> -</span> {{ page_title }}</h3>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo01" aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+            <h3 class="navbar-brand text-muted"><a href="/"><img src="/static/favicon-50x50.png" class="mr-3"/></a><span class="tp-title"><span class="text-danger">Trash Panda</span> -</span> {{ page_title }}</h3>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
               <span class="mdi mdi-menu icon-inline"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
-              <a class="btn btn-{{ get_nav_style() }} ml-2" href="/" aria-haspopup="false" aria-expanded="false">Dashboard</a>
-              <a class="btn btn-{{ get_nav_style() }} ml-2" href="/editor" aria-haspopup="false" aria-expanded="false">Config</a>
-              {% for button in create_nav_links() %}
-              <a class="btn btn-{{ get_nav_style() }} ml-2" href="{{ button.url }}" target="{{ '_blank' if button.new_tab else '_self'}}">{{ button.name }}</a>
-              {% endfor %}
+            <div class="collapse navbar-collapse" id="navbarToggler">
+              <ul class="navbar-nav">
+                <li class="nav-item dropdown mb-2">
+                  <a class="nav-link dropdown-toggle btn btn-{{ get_nav_style() }} ml-2" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
+                    Dashboards
+                  </a>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item" href="/">Overview</a>
+                    <a class="dropdown-item" href="/status/issues">Issues</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="/tags">Tags</a>
+                  </div>
+                </li>
+                <li class="nav-item mb-2">
+                  <a class="nav-link btn btn-{{ get_nav_style() }} ml-2" href="/editor" aria-haspopup="false" aria-expanded="false">Config</a>
+                </li>
+                {% for button in create_nav_links() %}
+                <li class="nav-item">
+                  <a class="nav-link btn btn-{{ get_nav_style() }} ml-2" href="{{ button.url }}" target="{{ '_blank' if button.new_tab else '_self'}}">{{ button.name }}</a>
+                </li>
+                {% endfor %}
+              </ul>
             </div>
           </nav>
         </div>

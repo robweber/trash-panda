@@ -77,12 +77,15 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
             flash('Host page not found', 'warning')
             return redirect('/')
 
+    @app.route('/status/issues')
+    def list_issues():
+        return render_template("services.html", url="/api/status/services?return_codes=1|2", page_title="Issues")
+
     @app.route('/status/tag/<tag_id>')
     def tags(tag_id):
         tag = history.get_tag(tag_id)
 
-        services = sorted(tag['services'], key=lambda o: o['host']['name'])
-        return render_template("tags.html", services=services, tag_id=tag_id, page_title=f"{tag['name']}")
+        return render_template("services.html", url=f"/api/status/tag/{tag_id}", page_title=f"{tag['name']}")
 
     @app.route('/editor', methods=['GET'])
     def editor():
@@ -94,6 +97,12 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
 
         return render_template("editor.html", config_file=file_path, editor_config=config_yaml['config']['web']['editor'],
                                page_title='Config Editor')
+
+    @app.route('/tags', methods=['GET'])
+    def view_tags():
+        tags = dict(sorted(history.list_tags().items()))  # sort by id
+
+        return render_template("view_tags.html", tags=tags, page_title="Tags")
 
     @app.route('/docs/<file>', methods=['GET'])
     def load_doc(file):
@@ -172,6 +181,20 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
         host = history.get_host(host_id)
 
         return jsonify(host)
+
+    @app.route('/api/status/services')
+    def get_services_by_status():
+        return_codes = [0,1,2,3]  # by default return all codes
+
+        if(request.args.get('return_codes') is not None):
+            return_codes = request.args.get('return_codes').split("|")
+
+        services = history.get_services(return_codes)
+
+        # sort by return code, then name
+        services = sorted(services, key=lambda o: (o['return_code'] * -1, o['host']['name']))
+
+        return jsonify({"return_codes": return_codes, "services": services})
 
     @app.route('/api/status/tag/<tag_id>', methods=['GET'])
     def get_tag(tag_id):

@@ -548,47 +548,59 @@ __/api/status/all__ - detailed listing of the status of each host
 
 __/api/status/host/<host_id>__ - status information for the host with the given id. Output is same as above but for a single host only
 
+__/api/status/services__ - a list of services, can be filtered by return code using a query parameter. By default all services are returned.
+
+_Example:_ http://localhost:3000/api/status/services?return_codes=1|2 - only return services with a status of 1 or 2 (warning or critical)
+
+```
+{
+  "return_codes": [
+    "1",
+    "2"
+  ],
+  "services": [
+    {
+      "check_attempt": 1,
+      "id": "switch-1-switch-uptime",
+      "host" {
+        "id": "switch-1",
+        "name": "Switch 1"
+      }
+      "last_state_change": "07-02-2022 11:40AM",
+      "name": "Switch Uptime",
+      "return_code": 1,
+      "state": "CONFIRMED",
+      "text": "11 days, 2:09:34\n",
+      "raw_text": "11 days, 2:09:34\n",
+      "notifier": "none"
+    }
+  ]
+}
+```
+
 __/api/status/tag/<tag_id>__ - information on the status of each service with this tag id
 
 ```
 {
-  "id": "backups",
-  "name": "Backups",
+  "id": "http",
+  "name": "HTTP",
   "services": [
     {
       "check_attempt": 1,
-      "host": {
-        "id": "batman",
-        "name": "Batman"
-      },
-      "id": "batman-backups",
-      "last_state_change": "04-08-2024 02:11PM",
-      "name": "Backups",
-      "raw_text": "/home/rob/Scripts/backup/batman.complete is OK! Last Modified: Mon Apr  8 02:02:22 2024\n",
+      "id": "web-server-http",
+      "host" {
+        "id": "web-server",
+        "name": "Web Server"
+      }
+      "last_state_change": "07-02-2022 11:40AM",
+      "name": "HTTP",
       "return_code": 0,
       "state": "CONFIRMED",
-      "tags": [
-        "Backups"
-      ],
-      "text": "/home/rob/Scripts/backup/batman.complete is OK! Last Modified: Mon Apr  8 02:02:22 2024"
-    },
-    {
-      "check_attempt": 1,
-      "host": {
-        "id": "brother-eye",
-        "name": "Brother Eye"
-      },
-      "id": "brother-eye-backups",
-      "last_state_change": "04-08-2024 02:11PM",
-      "name": "Backups",
-      "raw_text": "/home/rob/Scripts/backup/brother-eye.complete is OK! Last Modified: Mon Apr  8 12:12:33 2024\n",
-      "return_code": 0,
-      "state": "CONFIRMED",
-      "tags": [
-        "Backups"
-      ],
-      "text": "/home/rob/Scripts/backup/brother-eye.complete is OK! Last Modified: Mon Apr  8 12:12:33 2024"
+      "text": "HTTP OK: HTTP/1.1 200 OK - 4410 bytes in 0.009 second response time",
+      "raw_text": "HTTP OK: HTTP/1.1 200 OK - 4410 bytes in 0.009 second response time |time=0.009410s;;;0.000000;10.000000 size=4410B;;;0\n",
+      "notifier": "none"
     }
+  ]
 }
 
 ```

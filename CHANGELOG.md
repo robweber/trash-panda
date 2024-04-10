@@ -11,12 +11,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - Service Tagging. Allows for services to be tagged within the config file. Tags will group the services so that they can display together on a common dashboard. This allows similar services across hosts to be viewed together.
 - Service Tags can set colors within the `web` key of the configuration file, default color is black.
 - New notifier type: __webhook__. This sends a JSON payload to the given url
+- New API endpoint `/api/status/services` to list services. Filtering by the return_code is also possible
 
 ### Changed
 
 - Redis backend is now changed to rely on the [Redis JSON module](https://redis.io/docs/latest/develop/data-types/json/). This requires the `redis-stack-server` and not the `redis-server` for the key store.
 - Many API endpoints now have different paths. This is an attempt to organize similar calls under a tree such as `/api/status` for all status related calls and `/api/command/` for command related calls. See the API section of the README for all changes.
 - made `/api/status/summary` more efficient at filtering services in error
+- modified menu to include a dropdown menu. The Dashboard is now renamed the Overview page and two new dashboards are available. Issues and Tags. 
 
 ### Fixed
 

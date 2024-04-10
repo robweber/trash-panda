@@ -76,6 +76,14 @@ class HostHistory:
 
         return result
 
+    def get_services(self, return_codes=[0]):
+        """ returns a list of services where the status is one of the the given return_codes """
+
+        # turn the list into a JPath query ()
+        query = " || ".join([f"@.return_code == {r}" for r in return_codes])
+
+        return self.__read_db_json(DBQueries.GET_SERVICES_BY_STATUS.value.format(return_codes=query))
+
     def get_service(self, host_id, service_id):
         """ get information on a specific service from a specific host
 
@@ -128,7 +136,6 @@ class HostHistory:
         """ read a value from the DB using the JSON Module - https://redis.io/docs/latest/commands/json.get/
         queries can be done as supported with JSON Paths - https://redis.io/docs/latest/develop/data-types/json/path/
         """
-
         result = self.db.json().get(DBKeys.HOST_KEY.value, query)
 
         return result
@@ -163,6 +170,7 @@ class DBQueries(Enum):
     """Enum that holds keys for JSON Queries"""
     GET_HOST_IDS = '$[*].id'
     GET_TAG_IDS = '$[*].services[*].tags'
-    GET_HOST = '$[?(@.id==\"{host_id}")]'
+    GET_HOST = '$[?(@.id=="{host_id}")]'
     GET_SERVICE = '$[?(@.id=="{host_id}")].services[?(@.id=="{service_id}")]'
     GET_TAG = '$[*].services[?(@.tags[*]=="{tag_id}")]'
+    GET_SERVICES_BY_STATUS = "$[*].services[?({return_codes})]"
