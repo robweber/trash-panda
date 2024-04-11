@@ -137,6 +137,9 @@ class HostHistory:
         # add the new value https://redis.io/docs/latest/commands/json.arrappend/
         self.db.json().arrappend(DBKeys.HOST_KEY.value, "$", host_status)
 
+    def __exists(self, key):
+        return self.db.exists(key) > 0
+
     def __read_db_json(self, query):
         """ read a value from the DB using the JSON Module - https://redis.io/docs/latest/commands/json.get/
         queries can be done as supported with JSON Paths - https://redis.io/docs/latest/develop/data-types/json/path/
