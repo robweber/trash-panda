@@ -94,6 +94,10 @@ p {
     font-size: .8em;
   }
 
+  .hide-sm {
+    display:none;
+  }
+
   .host_title span::before {
     content: "\A";
     white-space: pre;

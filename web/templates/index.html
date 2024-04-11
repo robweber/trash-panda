@@ -36,10 +36,10 @@ function load_status(){
         aLink.attr('target', "_blank");
         aLink.attr('class', 'mdi mdi-launch icon-sm icon-inline');
 
-        row.append(td.clone().text(h.address + ' ').append(aLink));
+        row.append(td.clone().text(h.address + ' ').append(aLink).addClass('hide-sm'));
       }
       else {
-        row.append(td.clone().text(h.address));
+        row.append(td.clone().text(h.address).addClass('hide-sm'));
       }
 
       row.append(td.clone().text(h.last_check).addClass('hide-md'));
@@ -85,7 +85,7 @@ function load_status(){
     <thead class="thead-dark">
       <tr>
         <th>Host</th>
-        <th>IP</th>
+        <th class="hide-sm">IP</th>
         <th class="hide-md">Last Check</th>
         <th class="hide-md">Next Check</th>
         <th>Overall Status</th>
