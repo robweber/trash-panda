@@ -130,7 +130,7 @@ class HostMonitor:
 
         return result
 
-    def __parse_perf_data(self, service_output):
+    def __parse_perf_data(self, service_id, service_output):
         """ parses the perf data according to the Nagios format:
         https://nagios-plugins.org/doc/guidelines.html#AEN200
         """
@@ -161,7 +161,8 @@ class HostMonitor:
                 mapping = {k: float(v) for k, v in mapping.items()}
 
                 # add in the label and unit of measure
-                mapping['id'] = slugify(first_key[0]) if first_key[0] != '' else 'root'
+                p_id = slugify(first_key[0]) if slugify(first_key[0].strip()) != '' else 'root'
+                mapping['id'] = f"{service_id}-{p_id}"
                 mapping['label'] = first_key[0]
 
                 # only add if it exists
@@ -270,7 +271,7 @@ class HostMonitor:
         result['text'] = self.__render_template(jinja_template, jinja_vars)
 
         # generate the performance data (per nagios spec)
-        perf_data = self.__parse_perf_data(result['raw_text'])
+        perf_data = self.__parse_perf_data(service_id, result['raw_text'])
         if(perf_data):
             result['perf_data'] = perf_data
 
@@ -283,7 +284,7 @@ class HostMonitor:
             result['notifier'] = service['notifier']
 
         # determine check attempts and service state (skip OK and Unknown states)
-        old_service = self.history.get_service(host.id, service_id)
+        old_service = self.history.get_service(service_id)
         if(old_service):
             # check if return code has changed to non-OK state - if max_check is = 1 skip unconfirmed states
             if(old_service['return_code'] != return_code and return_code in [1, 2] and host.check_attempts > 1):

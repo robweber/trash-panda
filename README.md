@@ -523,7 +523,7 @@ __/api/status/host__ - detailed listing of the status of each host. This does no
 ]
 ```
 
-__/api/status/host/<host_id>__ - status information for the host with the given id. Output is same as above but will all host services (`services` key) as well. 
+__/api/status/host/<host_id>__ - status information for the host with the given id. Output is same as above but will all host services (`services` key) as well.
 
 __/api/status/services__ - a list of services, can be filtered by return code using a query parameter. By default all services are returned.
 
@@ -563,6 +563,8 @@ _Example:_ http://localhost:3000/api/status/services?return_codes=1|2 - only ret
   ]
 }
 ```
+
+__/api/status/service/<service_id>__ - returns service information for a specific service Id. Output is the same as when service is part of host output. 
 
 __/api/status/tag/<tag_id>__ - information on the status of each service with this tag id
 

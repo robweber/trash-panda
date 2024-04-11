@@ -87,6 +87,11 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
 
         return render_template("services.html", url=f"/api/status/tag/{tag_id}", page_title=f"{tag['name']}")
 
+    @app.route('/perf_data/<service_id>')
+    def get_perf_data(service_id):
+        service = history.get_service(service_id)
+        return render_template('performance_data.html', service=service, page_title=f"{service['host']['name']} {service['name']}")
+
     @app.route('/editor', methods=['GET'])
     def editor():
 
@@ -195,12 +200,31 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
 
         return jsonify({"return_codes": return_codes, "services": services})
 
+    @app.route("/api/status/service/<service_id>")
+    def get_service(service_id):
+        return jsonify(history.get_service(service_id))
+
     @app.route('/api/status/tag/<tag_id>', methods=['GET'])
     def get_tag(tag_id):
         tag = history.get_tag(tag_id)
 
         # convert services to an array
         tag['services'] = sorted(tag['services'], key=lambda o: o['host']['name'])
+
+        return jsonify(tag)
+
+    @app.route('/api/time/<id>', methods=['GET'], defaults={'start': None, 'end': None})
+    @app.route('/api/time/<id>/<start>/<end>', methods=['GET'])
+    def get_ts(id, start, end):
+        # if end is blank, set to now
+        if(end is None):
+            end = int(time.time())
+
+        # if start is blank, set to 1 hr
+        if(start is None):
+            start = end - 3600
+
+        tag = history.get_ts_data(id, start, end)
 
         return jsonify(tag)
 

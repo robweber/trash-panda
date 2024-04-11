@@ -1,6 +1,7 @@
 import datetime
 import json
 import redis
+import time
 from enum import Enum
 from slugify import slugify
 
@@ -89,20 +90,32 @@ class HostHistory:
 
         return self.__read_db_json(DBQueries.GET_SERVICES_BY_STATUS.value.format(return_codes=query))
 
-    def get_service(self, host_id, service_id):
+    def get_service(self, service_id):
         """ get information on a specific service from a specific host
 
-        :param host_id: a valid host
-        :param service_id: a valid service
+        :param service_id: a valid service id
 
         :returns: a dict with the service information, empty if not found
         """
-        service = self.__read_db_json(DBQueries.GET_SERVICE.value.format(host_id=host_id, service_id=service_id))
+        service = self.__read_db_json(DBQueries.GET_SERVICE.value.format(service_id=service_id))
 
         if(not service):
             service = [{}]
 
         return service[0]
+
+    def get_ts_data(self, key, start, end):
+        result = {"times": [], "values": [], 'unix_times': []}
+
+        # turn seconds into milliseconds
+        ts_data = self.db.ts().range(key, start * 1000, end * 1000)
+
+        for d in ts_data:
+            result['unix_times'].append(d[0]/1000)
+            result['times'].append(datetime.datetime.fromtimestamp(d[0]/1000).strftime("%m/%d/%y %H:%M:%S"))
+            result['values'].append(d[1])
+
+        return result
 
     def set_hosts(self, host_ids):
         """ takes a list of host names and compares against the DB,
@@ -136,6 +149,19 @@ class HostHistory:
 
         # add the new value https://redis.io/docs/latest/commands/json.arrappend/
         self.db.json().arrappend(DBKeys.HOST_KEY.value, "$", host_status)
+
+        # save perf data
+        for s in host_status['services']:
+            unix_time = int(datetime.datetime.timestamp(datetime.datetime.strptime(host_status['last_check'], "%m-%d-%Y %I:%M%p")))
+
+            # make sure perf data exists
+            if('perf_data' in s):
+                for p in s['perf_data']:
+                    if(not self.__exists(p['id'])):
+                        self.db.ts().create(p['id'], retention_msecs=86400000)
+
+                    # add the value
+                    self.db.ts().add(p['id'], unix_time * 1000, p['value'])
 
     def __exists(self, key):
         return self.db.exists(key) > 0
@@ -179,6 +205,6 @@ class DBQueries(Enum):
     GET_HOST_IDS = '$[*].id'
     GET_TAG_IDS = '$[*].services[*].tags'
     GET_HOST = '$[?(@.id=="{host_id}")]'
-    GET_SERVICE = '$[?(@.id=="{host_id}")].services[?(@.id=="{service_id}")]'
+    GET_SERVICE = '$[*].services[?(@.id=="{service_id}")]'
     GET_TAG = '$[*].services[?(@.tags[*]=="{tag_id}")]'
     GET_SERVICES_BY_STATUS = "$[*].services[?({return_codes})]"
