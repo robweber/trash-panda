@@ -123,22 +123,29 @@ function silence_host(id, minutes){
         {% for row in host['services']: %}
         <tr>
           <td class="{{ current_status[row['return_code']] }} row_1">
-            {{ row['name'] }}
-            {% if(row['state'] == 'UNCONFIRMED') %}
-            (check {{ row['check_attempt'] }}/{{ host['service_check_attempts'] }})
-            {% endif %}
+            <div class="row">
+              <div class="col-sm-12">
+                {{ row['name'] }}
+                {% if(row['state'] == 'UNCONFIRMED') %}
+                (check {{ row['check_attempt'] }}/{{ host['service_check_attempts'] }})
+                {% endif %}
+              </div>
+            </div>
 
-            {% if('service_url' in row) %}
-            <a href="{{ row['service_url'] }}" target="_blank" class="mdi mdi-launch icon-sm icon-inline"></a>
-            {% endif %}
-            <br />
-            <div class="text-right mt-1">
-              {% if 'perf_data' in row: %}
-              <a href="/perf_data/{{ row['id'] }}" class="mdi mdi-chart-areaspline-variant icon-sm icon-inline"></a>
-              {% endif %}
-              {% for t in row['tags'] %}
-              <a href="/status/tag/{{ slugify(t) }}" class="text-light"><span class="badge rounded-pill bg-{{ get_tag_color(t) }}">{{ t }}</span></a>
-              {% endfor %}
+            <div class="row align-items-end mt-2">
+              <div class="col-sm-6 text-left">
+                {% if('service_url' in row) %}
+                <a href="{{ row['service_url'] }}" target="_blank" class="mdi mdi-launch icon-sm icon-inline"></a>
+                {% endif %}
+                {% if 'perf_data' in row: %}
+                <a href="/perf_data/{{ row['id'] }}" class="mdi mdi-chart-areaspline-variant icon-sm icon-inline"></a>
+                {% endif %}
+              </div>
+              <div class="col-sm-6 text-right">
+                {% for t in row['tags'] %}
+                <a href="/status/tag/{{ slugify(t) }}" class="text-light"><span class="badge rounded-pill bg-{{ get_tag_color(t) }}">{{ t }}</span></a>
+                {% endfor %}
+              </div>
             </div>
           </td>
           <td class="{{ status_text[row['return_code']] }} row_2 hide-md">{{ row['text'].replace("\n", '<br />') | safe }}</td>
