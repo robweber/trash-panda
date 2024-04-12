@@ -1,7 +1,6 @@
 import datetime
 import json
 import redis
-import time
 from enum import Enum
 from slugify import slugify
 

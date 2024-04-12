@@ -180,7 +180,7 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
                     error_count = error_count + 1
 
         # get services in error
-        services = history.get_services([1,2])
+        services = history.get_services([1, 2])
 
         return jsonify({"total_hosts": len(hosts), "hosts_with_errors": error_count, "services_with_errors": len(services),
                         "overall_status": overall_status, "overall_status_description": utils.SERVICE_STATUSES[overall_status],
