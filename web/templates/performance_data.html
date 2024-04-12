@@ -91,7 +91,10 @@ function load_graph(){
 <div class="container">
   <div class="mt-2 pt-1" align="right">
     <div class="dropdown div-inline silence_btn">
-      <button class="btn btn-success dropdown-toggle silence_btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ minutes }} min</button>
+      {% set time_display = ((minutes/60) | round | int ) if minutes > 60 else minutes %}
+      <button class="btn btn-success dropdown-toggle silence_btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        {{ time_display }} {{ 'hours' if minutes > 60 else 'min'}}
+      </button>
       <div class="dropdown-menu dropdown-mobile" aria-labelledby="dropdownMenuButton">
         <a href="?minutes=30" class="btn dropdown-item">30 min</a>
         <a href="?minutes=60" class="btn dropdown-item">60 min</a>
