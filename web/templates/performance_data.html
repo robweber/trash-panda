@@ -104,12 +104,25 @@ function load_graph(){
     </div>
     <a href="/status/host/{{ service['host']['id'] }}" class="btn btn-primary host_back_btn"> Host Status</a>
   </div>
-  {% if 'perf_data' in service %}
-  {% for p in service['perf_data']: %}
-  <p class="mt-3"><b>Data point: {{ p['label'] }}</b></p>
-  <canvas id="graph-{{ p['id'] }}" class="mb-4"></canvas>
-  {% endfor %}
-  {% endif %}
+
+  <div class="accordion mt-3" id="graph_accordian">
+
+    {% if 'perf_data' in service %}
+    {% set first_graph = service['perf_data'][0]['id'] %}
+    {% for p in service['perf_data']: %}
+    <div class="card">
+      <div class="card-header" id="heading_{{p['id']}}">
+        <h5 class="mb-0">
+            Data Point: {{ p['label'] }}
+        </h5>
+      </div>
+      <div class="card-body">
+        <canvas id="graph-{{ p['id'] }}" class="mb-4"></canvas>
+      </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+  </div>
 </div>
 {% endblock %}
 {% block onload_scripts %}
