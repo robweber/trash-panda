@@ -5,10 +5,12 @@
 
 <script type="text/javascript">
 function load_graph(){
+  end_time = Math.floor(Date.now()/1000);
+  start_time = end_time - ({{ minutes }} * 60)
 
   {% if 'perf_data' in service %}
   {% for p in service['perf_data']: %}
-  $.ajax({type: 'GET', url: '/api/time/{{ p["id"] }}', success: function(data, status, request){
+  $.ajax({type: 'GET', url: '/api/time/{{ p["id"] }}/' + start_time + '/' + end_time, success: function(data, status, request){
     const ctx = document.getElementById('graph-{{ p["id"] }}');
 
     data_array = [{
@@ -88,7 +90,19 @@ function load_graph(){
 {% block content %}
 <div class="container">
   <div class="mt-2 pt-1" align="right">
-    <a href="/status/host/{{ service['host']['id'] }}" class="btn btn-primary"><i class="mdi mdi-keyboard-return icon-sm icon-inline"></i> Host Status</a>
+    <div class="dropdown div-inline silence_btn">
+      <button class="btn btn-success dropdown-toggle silence_btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ minutes }} min</button>
+      <div class="dropdown-menu dropdown-mobile" aria-labelledby="dropdownMenuButton">
+        <a href="?minutes=30" class="btn dropdown-item">30 min</a>
+        <a href="?minutes=60" class="btn dropdown-item">60 min</a>
+        <a href="?minutes=120" class="btn dropdown-item">2 hours</a>
+        <a href="?minutes=240" class="btn dropdown-item">4 hours</a>
+        <a href="?minutes=360" class="btn dropdown-item">6 hours</a>
+        <a href="?minutes=720" class="btn dropdown-item">12 hours</a>
+        <a href="?minutes=1440" class="btn dropdown-item">24 hours</a>
+      </div>
+    </div>
+    <a href="/status/host/{{ service['host']['id'] }}" class="btn btn-primary host_back_btn"> Host Status</a>
   </div>
   {% if 'perf_data' in service %}
   {% for p in service['perf_data']: %}

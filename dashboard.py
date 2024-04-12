@@ -89,8 +89,14 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
 
     @app.route('/perf_data/<service_id>')
     def get_perf_data(service_id):
+
+        minutes = 60
+        if(request.args.get('minutes') is not None):
+            minutes = int(request.args.get('minutes'))
+
         service = history.get_service(service_id)
-        return render_template('performance_data.html', service=service, page_title=f"{service['host']['name']} {service['name']}")
+        return render_template('performance_data.html', service=service, minutes=minutes,
+                               page_title=f"{service['host']['name']} {service['name']}")
 
     @app.route('/editor', methods=['GET'])
     def editor():
@@ -214,7 +220,7 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
         return jsonify(tag)
 
     @app.route('/api/time/<id>', methods=['GET'], defaults={'start': None, 'end': None})
-    @app.route('/api/time/<id>/<start>/<end>', methods=['GET'])
+    @app.route('/api/time/<id>/<int:start>/<int:end>', methods=['GET'])
     def get_ts(id, start, end):
         # if end is blank, set to now
         if(end is None):

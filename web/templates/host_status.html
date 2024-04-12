@@ -127,14 +127,15 @@ function silence_host(id, minutes){
             {% if(row['state'] == 'UNCONFIRMED') %}
             (check {{ row['check_attempt'] }}/{{ host['service_check_attempts'] }})
             {% endif %}
-            {% if 'perf_data' in row: %}
-            <a href="/perf_data/{{ row['id'] }}" class="mdi mdi-chart-areaspline-variant icon-sm icon-inline"></a>
-            {% endif %}
+
             {% if('service_url' in row) %}
             <a href="{{ row['service_url'] }}" target="_blank" class="mdi mdi-launch icon-sm icon-inline"></a>
             {% endif %}
             <br />
             <div class="text-right mt-1">
+              {% if 'perf_data' in row: %}
+              <a href="/perf_data/{{ row['id'] }}" class="mdi mdi-chart-areaspline-variant icon-sm icon-inline"></a>
+              {% endif %}
               {% for t in row['tags'] %}
               <a href="/status/tag/{{ slugify(t) }}" class="text-light"><span class="badge rounded-pill bg-{{ get_tag_color(t) }}">{{ t }}</span></a>
               {% endfor %}

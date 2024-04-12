@@ -13,6 +13,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - New notifier type: __webhook__. This sends a JSON payload to the given url
 - New API endpoint `/api/status/services` to list services. Filtering by the return_code is also possible
 - API endpoints that return service related data now include performance data (`perf_data`) if the service check command returns it. This is parsed according to the Nagios standards.
+- Redis Time Series integration is used to save perf data for each host for 24 hours.
+- performance data web pages with ChartJS integration to view perf data if available
 
 ### Changed
 
