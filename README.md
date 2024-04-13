@@ -10,6 +10,9 @@ This is a _very_ basic monitoring solution meant for simple home use. It will mo
 - [Install](#install)
 - [Usage](#usage)
 - [Dashboard](#dashboard)
+  - [Issues](#issues)
+  - [Tags](#tags)
+  - [Performance Data](#performance-data)
 - [Config File](#config-file)
   - [Global Configuration](#global-configuration)
   - [Notifications](#notifications)
@@ -18,7 +21,7 @@ This is a _very_ basic monitoring solution meant for simple home use. It will mo
 - [Host Types](#host-types)
 - [Host Definitions](#host-definitions)
   - [Optional Attributes](#optional-attributes)
-- [Tags](#tags)
+- [Service Tags](#service-tags)
 - [Host Documentation](#host-documentation)
   - [Direct Documentation Links](#direct-documentation-links)
 - [Templating](#templating)
@@ -71,9 +74,23 @@ optional arguments:
 
 ## Dashboard
 
-Once running the dashboard page can be loaded. The landing page will display all currently configured hosts and their overall status. If the host is down, or any configured service unavailable, the overall status will change. This page is refreshed every __15 seconds__. Data will change depending on the update interval set when the program is loaded.
+Once running the dashboard page can be loaded. The Overview page will display all currently configured hosts and their overall status. If the host is down, or any configured service unavailable, the overall status will change. This page is refreshed every __15 seconds__. Data will change depending on the update interval set when the program is loaded.
 
 Clicking on a host name will show you more information about that device. Individual services will be listed along with any output to indicate their current status. From the host status page a check of all services can be forced, and notifications temporarily silenced. If configured, a management page for the host can also be launched from here. For additional flexibility more host information can be displayed in the [documentation](#host-documentation) tab via custom Markdown files.
+
+### Issues
+
+On the Dashboards menu you can find a link to the Issues dashboard. This page shows all services that currently are in either a warning or critical state.
+
+### Tags
+
+Also on the Dashboards menu is the Tags dashboard. Here you can find a list of all configured tags. Clicking one will show all services configured with that [Service Tag](#service-tags). Tags will also been shown on the Host Status page next to each service.
+
+### Performance Data
+
+Any [service](#services) that returns performance data will have it logged with a timestamp for each data point. Performance data is parsed according to the [Nagios specification](https://nagios-plugins.org/doc/guidelines.html#AEN200) for performance data. Services that have data available will show a chart icon beneath the service. Clicking the chart will load the performance data graphs.
+
+On the Performance Data page line charts are rendered for any performance metrics available for that service. These can be shown in different time increments, by default the last 60 minutes are shown. When available, warning and critical values are also drawn on the chart.
 
 ## Config File
 
@@ -234,7 +251,7 @@ landing_page_text: "Custom text to display on the landing page"
 
 __Tag Colors__
 
-Using the `tag` key you can specify the colors for how different [service tags](#tags) will be displayed. By default all tags are black. Valid colors are the same as the Top Nav Style colors listed below.
+Using the `tag` key you can specify the colors for how different [service tags](#service-tags) will be displayed. By default all tags are black. Valid colors are the same as the Top Nav Style colors listed below.
 
 ```
 web:
@@ -332,7 +349,7 @@ Also of note are some optional variables.
 * __notifier__: Again, by default the global notification type will be used but hosts types can set their own. This will apply to the host and all services under it.
 * __service_check_attempts__: Override the global service check value with a custom value for this host
 * __ping_command__: Override the built in ICMP Ping check with a custom check defined in the [services](#services) list.
-* __tags__: a list of tags that apply to this service. See the (tags documentation)[#tags]
+* __tags__: a list of tags that apply to this service. See the (tags documentation)[#service-tags]
 
 ## Host Definitions
 
@@ -379,7 +396,7 @@ It is possible to define a custom `output_filter` for a service that parses the 
 * `return_code` - The service `return_code` as an integer 0-3.  
 * Global variables set via `jinja_constants` in the [global config](#global-configuration).
 
-## Tags
+## Service Tags
 
 Tags are a grouping feature that can be applied to services. This allows you to easily create separate dashboards for all services that match the tag. A common use case for this is a Disk Space service that may be applied to multiple hosts. By applying a tag to this service you can see that status of all the Disk Space services for each host in one place instead of looking at them individually. Another use could be tagging services that all interact with each other in some way across hosts (like a web server and database server).
 
@@ -564,7 +581,7 @@ _Example:_ http://localhost:3000/api/status/services?return_codes=1|2 - only ret
 }
 ```
 
-__/api/status/service/<service_id>__ - returns service information for a specific service Id. Output is the same as when service is part of host output. 
+__/api/status/service/<service_id>__ - returns service information for a specific service Id. Output is the same as when service is part of host output.
 
 __/api/status/tag/<tag_id>__ - information on the status of each service with this tag id
 
