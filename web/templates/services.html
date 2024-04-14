@@ -28,14 +28,11 @@ function load_status(){
         text_highlight = 'text-danger';
       }
 
-      //create a row for the service name
+      //create a row for the service name and links
+      col_size = 12;  // use whole col by default
       col1 = $('<div>').text(s.name);
-      col1.attr('class', 'col-sm-12 ' + text_highlight);
 
-      row1 = $('<div>').append(col1);
-      row1.attr('class', 'row');
-
-      //create a row for the links (if any)
+      //create a column for the links (if any)
       link1 = '';
       if(s.hasOwnProperty('service_url'))
       {
@@ -43,6 +40,7 @@ function load_status(){
         link1.attr('href', s.service_url);
         link1.attr('target', "_blank");
         link1.attr('class', 'mdi mdi-launch icon-sm icon-inline');
+        col_size = 8;
       }
 
       link2 = '';
@@ -51,19 +49,25 @@ function load_status(){
         link2 = $('<a>');
         link2.attr('href', '/perf_data/' + s.id);
         link2.attr('class', 'mdi mdi-chart-areaspline-variant icon-sm icon-inline');
+        col_size = 8;
       }
 
-      col2 = $('<div>').append(link1).append(link2);
-      col2.attr('class', 'col-sm-12 text-left');
+      //set width of the name column
+      col1.attr('class', 'col-' + col_size + ' ' + text_highlight);
+      row1 = $('<div>').append(col1);
+      row1.attr('class', 'row');
 
-      row2 = $('<div>').append(col2);
-      row2.attr('class', 'row align-items-end mt-2');
+      //if links exist add those as well
+      if(col_size != 12)
+      {
+        col2 = $('<div>').append(link1).append(link2);
+        col2.attr('class', 'col-4 text-right');
+        row1.append(col2);
+      }
 
-      row.append(td.clone().append(row1).append(row2));
+      row.append(td.clone().append(row1));
 
-
-
-      // link for the details
+      // link the host name
       host = $('<a>').html(s.host.name);
       host.attr('href', '/status/host/' + s.host.id);
 

@@ -124,24 +124,27 @@ function silence_host(id, minutes){
         <tr>
           <td class="{{ current_status[row['return_code']] }} row_1">
             <div class="row">
-              <div class="col-sm-12">
+              <div class="col-{{ 8 if ('perf_data' in row or 'service_url' in row) else 12 }}">
                 {{ row['name'] }}
                 {% if(row['state'] == 'UNCONFIRMED') %}
                 (check {{ row['check_attempt'] }}/{{ host['service_check_attempts'] }})
                 {% endif %}
               </div>
-            </div>
-
-            <div class="row align-items-end mt-2">
-              <div class="col-sm-6 text-left">
-                {% if('service_url' in row) %}
-                <a href="{{ row['service_url'] }}" target="_blank" class="mdi mdi-launch icon-sm icon-inline"></a>
-                {% endif %}
+              {% if 'perf_data' in row or 'service_url' in row %}
+              <div class="col-4 text-right">
                 {% if 'perf_data' in row: %}
                 <a href="/perf_data/{{ row['id'] }}" class="mdi mdi-chart-areaspline-variant icon-sm icon-inline"></a>
                 {% endif %}
+                {% if('service_url' in row) %}
+                <a href="{{ row['service_url'] }}" target="_blank" class="mdi mdi-launch icon-sm icon-inline"></a>
+                {% endif %}
               </div>
-              <div class="col-sm-6 text-right">
+              {% endif %}
+            </div>
+
+            <div class="row align-items-end mt-2">
+
+              <div class="col-sm-12 text-left">
                 {% for t in row['tags'] %}
                 <a href="/status/tag/{{ slugify(t) }}" class="text-light"><span class="badge rounded-pill bg-{{ get_tag_color(t) }}">{{ t }}</span></a>
                 {% endfor %}
