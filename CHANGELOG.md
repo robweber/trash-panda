@@ -15,6 +15,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - API endpoints that return service related data now include performance data (`perf_data`) if the service check command returns it. This is parsed according to the Nagios standards.
 - Redis Time Series integration is used to save perf data for each host for 24 hours.
 - performance data web pages with ChartJS integration to view perf data if available
+- New API endpoint `/api/status/service/<service_id>` to get information about a specific service
+- New API endpoint `/api/time/<perf_id>/<int:start>/<int:end>` to retieve time series information from a performance data point. start and end are unix timestamps
 
 ### Changed
 
@@ -28,6 +30,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Fixed
 
 - fixed overwriting host key for services on `/api/status/summary` endpoint. This is already set when the service output is created
+
+### Removed
+
+- removed `commands.html`. This was file wasn't used and was part of an older version of the project
 
 ## Version 5.2
 

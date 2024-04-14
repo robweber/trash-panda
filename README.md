@@ -620,6 +620,42 @@ __/api/status/tag/<tag_id>__ - information on the status of each service with th
 
 ```
 
+## Performance Data
+
+__/api/time/<perf_id>/start>/<end>__ - lookup Performance Data information for a specified time period. The __start__ and __end__ times should be unix timestamps. If these are omitted the last 60 minutes are returned by default.
+
+```
+{
+  "times": [
+    "04/14/24 10:03:00",
+    "04/14/24 10:08:00",
+    "04/14/24 10:13:00",
+    "04/14/24 10:17:00",
+    "04/14/24 10:21:00",
+    "04/14/24 10:26:00",
+    "04/14/24 10:31:00"
+  ],
+  "unix_times": [
+    1713106980.0,
+    1713107280.0,
+    1713107580.0,
+    1713107820.0,
+    1713108060.0,
+    1713108360.0,
+    1713108660.0
+  ],
+  "values": [
+    0.07799999999999999,
+    0.082,
+    0.146,
+    0.074,
+    0.066,
+    0.076,
+    0.132
+  ]
+}
+```
+
 ## Commands
 
 __/api/command/check_now/<host_id>__ - updates a given host's next check time to the current time. This forces a service check instead of waiting for the normal update interval. The host id can be found via the `/api/status` endpoint for each host.
