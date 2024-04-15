@@ -242,7 +242,7 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
             # update the next check time in the DB as well
             aHost = history.get_host(id)
             aHost['next_check'] = result['next_check']
-            history.save_host(id, aHost)
+            history.save_host(id, aHost, update_perf_data=False)
 
         return jsonify(result)
 
@@ -255,7 +255,7 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
             # update the host in the history DB as well
             aHost = history.get_host(id)
             aHost['silenced'] = result['is_silenced']
-            history.save_host(id, aHost)
+            history.save_host(id, aHost, update_perf_data=False)
 
         return jsonify(result)
 
