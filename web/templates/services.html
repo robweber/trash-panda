@@ -40,7 +40,7 @@ function load_status(){
         link1.attr('href', s.service_url);
         link1.attr('target', "_blank");
         link1.attr('class', 'mdi mdi-launch icon-sm icon-inline');
-        col_size = 8;
+        col_size = 6;
       }
 
       link2 = '';
@@ -49,7 +49,7 @@ function load_status(){
         link2 = $('<a>');
         link2.attr('href', '/perf_data/' + s.id);
         link2.attr('class', 'mdi mdi-chart-areaspline-variant icon-sm icon-inline');
-        col_size = 8;
+        col_size = 6;
       }
 
       //set width of the name column
@@ -61,7 +61,7 @@ function load_status(){
       if(col_size != 12)
       {
         col2 = $('<div>').append(link1).append(link2);
-        col2.attr('class', 'col-4 text-right');
+        col2.attr('class', 'col-6 text-right');
         row1.append(col2);
       }
 
