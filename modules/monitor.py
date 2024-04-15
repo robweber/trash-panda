@@ -150,8 +150,7 @@ class HostMonitor:
                     values.append(t.group()[1:])
 
                 # map the values to the appropriate keys, filter out blank values
-                mapping = {perf_order[i]: values[i] for i in range(0, len(values))}
-                mapping = dict(filter(lambda i: i[1] != '', mapping.items()))
+                mapping = {perf_order[i]: values[i] for i in range(0, len(values)) if values[i].strip() != ''}
 
                 # get the label and unit of measure
                 first_key = p.group().strip().split(";")[0].split("=")
@@ -163,7 +162,7 @@ class HostMonitor:
                 # add in the label and unit of measure
                 p_id = slugify(first_key[0]) if slugify(first_key[0].strip()) != '' else 'root'
                 mapping['id'] = f"{service_id}-{p_id}"
-                mapping['label'] = first_key[0]
+                mapping['label'] = first_key[0].replace("'","")
 
                 # only add if it exists
                 if(unit_of_measure != ""):
