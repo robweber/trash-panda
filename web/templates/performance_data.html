@@ -119,6 +119,7 @@ function load_graph(){
       </div>
       <div class="card-body">
         <canvas id="graph-{{ p['id'] }}" class="mb-4"></canvas>
+        <p class="card-text"><small class="text-muted">Perf ID: {{ p['id'] }}</small></p>
       </div>
     </div>
     {% endfor %}
