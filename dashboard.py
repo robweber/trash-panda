@@ -27,6 +27,7 @@ from modules.monitor import HostMonitor
 from modules.history import HostHistory
 from modules.notifications import NotificationGroup
 from flask import Flask, flash, render_template, jsonify, redirect, request, Response
+from slugify import slugify
 
 history = HostHistory()
 
@@ -40,6 +41,8 @@ def signal_handler(signum, frame):
 def webapp_thread(port_number, config_file, config_yaml, notifier_configured, debugMode=False, logHandlers=[]):
     app = Flask(import_name="trash-panda", static_folder=os.path.join(utils.DIR_PATH, 'web', 'static'),
                 template_folder=os.path.join(utils.DIR_PATH, 'web', 'templates'))
+    # add use of slugify for templates
+    app.jinja_env.globals.update(slugify=slugify)
 
     # generate random number for session secret key
     app.secret_key = os.urandom(24)
@@ -57,24 +60,13 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
         werkzeug = logging.getLogger('werkzeug')
         werkzeug.disabled = True
 
-    def _get_host(id):
-        result = None
-
-        # get the host status from the db
-        host = history.get_host(id)
-
-        if(len(host) > 0):
-            result = host
-
-        return result
-
     @app.route('/', methods=["GET"])
     def index():
         return render_template("index.html", message=config_yaml['config']['web']['landing_page_text'])
 
-    @app.route('/status/<id>')
+    @app.route('/status/host/<id>')
     def host_status(id):
-        result = _get_host(id)
+        result = history.get_host(id)
 
         if(result is not None):
             # set if a notifier is configured to toggle silent mode controls
@@ -84,6 +76,27 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
         else:
             flash('Host page not found', 'warning')
             return redirect('/')
+
+    @app.route('/status/issues')
+    def list_issues():
+        return render_template("services.html", url="/api/status/services?return_codes=1|2", page_title="Issues")
+
+    @app.route('/status/tag/<tag_id>')
+    def tags(tag_id):
+        tag = history.get_tag(tag_id)
+
+        return render_template("services.html", url=f"/api/status/tag/{tag_id}", page_title=f"{tag['name']}")
+
+    @app.route('/perf_data/<service_id>')
+    def get_perf_data(service_id):
+
+        minutes = 60
+        if(request.args.get('minutes') is not None):
+            minutes = int(request.args.get('minutes'))
+
+        service = history.get_service(service_id)
+        return render_template('performance_data.html', service=service, minutes=minutes,
+                               page_title=f"{service['host']['name']} {service['name']}")
 
     @app.route('/editor', methods=['GET'])
     def editor():
@@ -95,6 +108,12 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
 
         return render_template("editor.html", config_file=file_path, editor_config=config_yaml['config']['web']['editor'],
                                page_title='Config Editor')
+
+    @app.route('/tags', methods=['GET'])
+    def view_tags():
+        tags = dict(sorted(history.list_tags().items()))  # sort by id
+
+        return render_template("view_tags.html", tags=tags, page_title="Tags")
 
     @app.route('/docs/<file>', methods=['GET'])
     def load_doc(file):
@@ -126,27 +145,32 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
 
         return jsonify(status)
 
-    @app.route('/api/status', methods=['GET'])
+    @app.route('/api/list/hosts', methods=['GET'])
+    def list_hosts():
+        return jsonify(history.list_hosts())
+
+    @app.route('/api/list/tags', methods=['GET'])
+    def list_tags():
+        tags = history.list_tags()
+
+        return jsonify(tags)
+
+    @app.route('/api/status/hosts', methods=['GET'])
     def status():
         # get a list of hosts
-        hosts = history.list_hosts()
+        hosts = history.get_hosts()
 
-        # get the status of all the hosts
-        status = [history.get_host(h) for h in hosts]
+        return jsonify(sorted(hosts, key=lambda o: o['name']))
 
-        return jsonify(status)
-
-    @app.route('/api/overall_status', methods=['GET'])
+    @app.route('/api/status/summary', methods=['GET'])
     def overall_status():
         overall_status = 0  # 0 is the target, means all is good
         error_count = 0
 
         # pull in all the hosts and get their overall status
-        hosts = history.list_hosts()
+        hosts = history.get_hosts()
         services = []
-        for name in hosts:
-            host = history.get_host(name)
-
+        for host in hosts:
             # catch for rare cases where host status hasn't been calculated yet
             if('overall_status' in host):
                 # set the higher of the two values
@@ -155,18 +179,62 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
                 if(host['overall_status'] > 0):
                     error_count = error_count + 1
 
-                    # find services in error
-                    for s in host['services']:
-                        if(s['return_code'] > 0):
-                            # add host name to dict
-                            s['host'] = host['name']
-                            services.append(s)
+        # get services in error
+        services = history.get_services([1, 2])
 
         return jsonify({"total_hosts": len(hosts), "hosts_with_errors": error_count, "services_with_errors": len(services),
                         "overall_status": overall_status, "overall_status_description": utils.SERVICE_STATUSES[overall_status],
                         "services": services})
 
-    @app.route('/api/check_now/<id>', methods=['POST'])
+    @app.route('/api/status/host/<host_id>', methods=['GET'])
+    def get_host(host_id):
+        host = history.get_host(host_id)
+
+        return jsonify(host)
+
+    @app.route('/api/status/services')
+    def get_services_by_status():
+        return_codes = [0, 1, 2, 3]  # by default return all codes
+
+        if(request.args.get('return_codes') is not None):
+            return_codes = request.args.get('return_codes').split("|")
+
+        services = history.get_services(return_codes)
+
+        # sort by return code, then name
+        services = sorted(services, key=lambda o: (o['return_code'] * -1, o['host']['name']))
+
+        return jsonify({"return_codes": return_codes, "services": services})
+
+    @app.route("/api/status/service/<service_id>")
+    def get_service(service_id):
+        return jsonify(history.get_service(service_id))
+
+    @app.route('/api/status/tag/<tag_id>', methods=['GET'])
+    def get_tag(tag_id):
+        tag = history.get_tag(tag_id)
+
+        # convert services to an array
+        tag['services'] = sorted(tag['services'], key=lambda o: o['host']['name'])
+
+        return jsonify(tag)
+
+    @app.route('/api/time/<id>', methods=['GET'], defaults={'start': None, 'end': None})
+    @app.route('/api/time/<id>/<int:start>/<int:end>', methods=['GET'])
+    def get_ts(id, start, end):
+        # if end is blank, set to now
+        if(end is None):
+            end = int(time.time())
+
+        # if start is blank, set to 1 hr
+        if(start is None):
+            start = end - 3600
+
+        tag = history.get_ts_data(id, start, end)
+
+        return jsonify(tag)
+
+    @app.route('/api/command/check_now/<id>', methods=['POST'])
     def check_host_now(id):
         result = monitor.check_now(id)
 
@@ -174,11 +242,11 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
             # update the next check time in the DB as well
             aHost = history.get_host(id)
             aHost['next_check'] = result['next_check']
-            history.save_host(id, aHost)
+            history.save_host(id, aHost, update_perf_data=False)
 
         return jsonify(result)
 
-    @app.route('/api/silence_host/<id>/<minutes>', methods=['POST'])
+    @app.route('/api/command/silence_host/<id>/<minutes>', methods=['POST'])
     def silence_host(id, minutes):
         until = datetime.datetime.now() + datetime.timedelta(minutes=int(minutes))
         result = monitor.silence_host(id, until)
@@ -187,12 +255,12 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
             # update the host in the history DB as well
             aHost = history.get_host(id)
             aHost['silenced'] = result['is_silenced']
-            history.save_host(id, aHost)
+            history.save_host(id, aHost, update_perf_data=False)
 
         return jsonify(result)
 
-    @app.route('/api/browse_files/', methods=['GET'], defaults={'browse_path': utils.DIR_PATH})
-    @app.route('/api/browse_files/<path:browse_path>', methods=['GET'])
+    @app.route('/api/editor/browse_files/', methods=['GET'], defaults={'browse_path': utils.DIR_PATH})
+    @app.route('/api/editor/browse_files/<path:browse_path>', methods=['GET'])
     def list_directory(browse_path):
         if(not browse_path.startswith('/')):
             browse_path = f"/{browse_path}"
@@ -209,7 +277,7 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
 
         return jsonify({'success': True, 'dirs': dirs, 'files': files, 'path': browse_path})
 
-    @app.route('/api/load_file', methods=['POST'])
+    @app.route('/api/editor/load_file', methods=['POST'])
     def load_file():
         file_path = request.form['file_path']
 
@@ -220,7 +288,7 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
 
         return Response(file_contents, mimetype='text/plain')
 
-    @app.route('/api/save_file', methods=["POST"])
+    @app.route('/api/editor/save_file', methods=["POST"])
     def save_file():
         file_path = request.form['file_path']
 
@@ -255,16 +323,26 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
     def nav_style():
         def get_style():
             style = config_yaml['config']['web']['top_nav']['style']['type']
-            # map bootstrap names to color names
-            colors = {"black": "dark", "blue": "primary", "gray": "secondary", "green": "success",
-                      "light_blue": "info", "red": "danger", "yellow": "warning"}
 
             if(style == 'button'):
-                return colors[config_yaml['config']['web']['top_nav']['style']['color']]
+                return utils.COLOR_MAPPING[config_yaml['config']['web']['top_nav']['style']['color']]
             else:
                 return 'link'
 
         return dict(get_nav_style=get_style)
+
+    @app.context_processor
+    def tag_color():
+        def get_tag_color(tag_name):
+            color = "dark"
+            tags = config_yaml['config']['web']['tags']
+
+            for t in tags:
+                if(t['name'] == tag_name):
+                    color = utils.COLOR_MAPPING[t['color']]
+
+            return color
+        return dict(get_tag_color=get_tag_color)
 
     # run the web app
     app.run(debug=debugMode, host='0.0.0.0', port=port_number, use_reloader=False)

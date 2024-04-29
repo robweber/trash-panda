@@ -8,5 +8,6 @@ python-pushover
 pythonping
 python-slugify
 redis
+requests
 pyyaml
 Jinja2

@@ -10,7 +10,9 @@ This is a _very_ basic monitoring solution meant for simple home use. It will mo
 - [Install](#install)
 - [Usage](#usage)
 - [Dashboard](#dashboard)
-  - [API](#api)
+  - [Issues](#issues)
+  - [Tags](#tags)
+  - [Performance Data](#performance-data)
 - [Config File](#config-file)
   - [Global Configuration](#global-configuration)
   - [Notifications](#notifications)
@@ -19,6 +21,7 @@ This is a _very_ basic monitoring solution meant for simple home use. It will mo
 - [Host Types](#host-types)
 - [Host Definitions](#host-definitions)
   - [Optional Attributes](#optional-attributes)
+- [Service Tags](#service-tags)
 - [Host Documentation](#host-documentation)
   - [Direct Documentation Links](#direct-documentation-links)
 - [Templating](#templating)
@@ -26,6 +29,7 @@ This is a _very_ basic monitoring solution meant for simple home use. It will mo
   - [Service](#service)
   - [Script Paths](#script-paths)
   - [Custom Functions](#custom-functions)
+- [API](#api)
 - [Watchdog](#watchdog)
 - [Credits](#credits)
 - [License](#license)
@@ -70,109 +74,23 @@ optional arguments:
 
 ## Dashboard
 
-Once running the dashboard page can be loaded. The landing page will display all currently configured hosts and their overall status. If the host is down, or any configured service unavailable, the overall status will change. This page is refreshed every __15 seconds__. Data will change depending on the update interval set when the program is loaded.
+Once running the dashboard page can be loaded. The Overview page will display all currently configured hosts and their overall status. If the host is down, or any configured service unavailable, the overall status will change. This page is refreshed every __15 seconds__. Data will change depending on the update interval set when the program is loaded.
 
 Clicking on a host name will show you more information about that device. Individual services will be listed along with any output to indicate their current status. From the host status page a check of all services can be forced, and notifications temporarily silenced. If configured, a management page for the host can also be launched from here. For additional flexibility more host information can be displayed in the [documentation](#host-documentation) tab via custom Markdown files.
 
-### API
+### Issues
 
-For integration with other systems the API can be used. To decode the status return codes use the following:
+On the Dashboards menu you can find a link to the Issues dashboard. This page shows all services that currently are in either a warning or critical state.
 
-* 0 - OK, everything normal
-* 1 - Warning, potential problem
-* 2 - Critical, definitely a problem
+### Tags
 
-The status codes are determined by the settings for the device and the output of the various check utilities. See the `check_scripts/` folder for individual scripts that are run.
+Also on the Dashboards menu is the Tags dashboard. Here you can find a list of all configured tags. Clicking one will show all services configured with that [Service Tag](#service-tags). Tags will also been shown on the Host Status page next to each service.
 
-__/api/status__ - detailed listing of the status of each host
+### Performance Data
 
-```
-[
-  {
-    "alive": 0,
-    "config": {
-      "community": "public"
-    },
-    "icon": "router-network",
-    "id": "switch-1",
-    "info": "This device type will work with generic managed switches. SNMP information must be correct and setup on the switch for services to properly be queried.",
-    "ip": "192.168.0.1",
-    "name": "Switch 1",
-    "overall_status": 1,
-    "interval": 3,
-    "service_check_attempts": 2,
-    "last_check": "07-21-2022 11:01AM",
-    "next_check": "07-21-2022 11:04AM",
-    "services": [
-      {
-        "check_attempt": 1,
-        "id": "alive",
-        "last_state_change": "07-02-2022 11:40AM",
-        "name": "Alive",
-        "return_code": 0,
-        "state": "CONFIRMED",
-        "text": "Ping successfull!",
-        "raw_text": "Ping successfull!"
-      },
-      {
-	      "check_attempt": 1,
-        "id": "switch-uptime",
-        "last_state_change": "07-02-2022 11:40AM",
-        "name": "Switch Uptime",
-        "return_code": 1,
-        "state": "UNCONFIRMED",
-        "text": "11 days, 2:09:34\n",
-        "raw_text": "11 days, 2:09:34\n",
-        "notifier": "none"
-      }
-    ],
-    "silenced": false,
-    "type": "switch"
-  }
-]
-```
+Any [service](#services) that returns performance data will have it logged with a timestamp for each data point. Performance data is parsed according to the [Nagios specification](https://nagios-plugins.org/doc/guidelines.html#AEN200) for performance data. Services that have data available will show a chart icon beneath the service. Clicking the chart will load the performance data graphs.
 
-__/api/overall_status__ - a status summary of the overall status of all hosts. The `services` array is a list of all services currently in an error state.
-
-```
-{
-  "hosts_with_errors": 0,
-  "overall_status": 0,
-  "overall_status_description": "OK",
-  "total_hosts": 3,
-  "services_with_errors": 0,
-  "services": []
-}
-```
-
-__/api/health__ - basic program health. Status is set to _Offline_ if the main system checking loop hasn't run in over 2 minutes. This should look for services to check every 60 seconds when running properly.
-
-```
-{
-  "last_check_time": "07-05-2022 12:00PM",
-  "text": "Online",
-  "return_code": 0
-}
-```
-
-__/api/check_now/<host_id>__ - updates a given host's next check time to the current time. This forces a service check instead of waiting for the normal update interval. The host id can be found via the `/api/status` endpoint for each host.
-
-```
-{
-  "success": true
-  "next_check": "09-14-2022 09:44AM"
-}
-```
-
-__/api/silence_host/<host_id>/<minutes>__ - sets the given hosts silenced property to True for the given amount of minutes. This will silence any notifications for this time.
-
-```
-{
-  "is_silenced": true,
-  "success": true,
-  "until": "05-02-2023 01:31PM"
-}
-```
+On the Performance Data page line charts are rendered for any performance metrics available for that service. These can be shown in different time increments, by default the last 60 minutes are shown. When available, warning and critical values are also drawn on the chart.
 
 ## Config File
 
@@ -217,6 +135,9 @@ config:
     editor:
       read_only: False
     landing_page_text: "Custom text to display on the landing page"
+    tags:
+      - name: Tag 1
+        color: blue
     top_nav:
       style:
         type: button
@@ -284,6 +205,29 @@ config:
           user_key: pushover_user_key
 ```
 
+__Webhook Notifier__ - sends a POST request to a given URL containing data from either the host or service affected.
+
+```
+config:
+  notifications:
+    primary: none
+    types:
+      - type: webhook
+        args:
+          url: https://url/path
+```
+
+When the webhook is trigered a POST request containing a JSON payload will be sent. For host notifications there will be a `host` key and for service notifications a `service` key.
+
+```
+{
+  "type": "host"
+  "host": {
+    ... host data ...
+  }
+}
+```
+
 ### Website Options
 
 Using the optional `web` key you can control some aspects of the web interface.
@@ -303,6 +247,17 @@ The default text on the landing page can also be modified to give different info
 
 ```
 landing_page_text: "Custom text to display on the landing page"
+```
+
+__Tag Colors__
+
+Using the `tag` key you can specify the colors for how different [service tags](#service-tags) will be displayed. By default all tags are black. Valid colors are the same as the Top Nav Style colors listed below.
+
+```
+web:
+  tags:
+    - name: Tag Name
+      color: blue
 ```
 
 __Top Nav Style__
@@ -394,6 +349,7 @@ Also of note are some optional variables.
 * __notifier__: Again, by default the global notification type will be used but hosts types can set their own. This will apply to the host and all services under it.
 * __service_check_attempts__: Override the global service check value with a custom value for this host
 * __ping_command__: Override the built in ICMP Ping check with a custom check defined in the [services](#services) list.
+* __tags__: a list of tags that apply to this service. See the (tags documentation)[#service-tags]
 
 ## Host Definitions
 
@@ -440,6 +396,31 @@ It is possible to define a custom `output_filter` for a service that parses the 
 * `return_code` - The service `return_code` as an integer 0-3.  
 * Global variables set via `jinja_constants` in the [global config](#global-configuration).
 
+## Service Tags
+
+Tags are a grouping feature that can be applied to services. This allows you to easily create separate dashboards for all services that match the tag. A common use case for this is a Disk Space service that may be applied to multiple hosts. By applying a tag to this service you can see that status of all the Disk Space services for each host in one place instead of looking at them individually. Another use could be tagging services that all interact with each other in some way across hosts (like a web server and database server).
+
+Adding a tag to a service can be done when creating either the [Host Type](#host-types) or [Host definition](#host-definitions).
+
+```
+type: web_server
+name: "My Web Server"
+address: 192.168.0.2
+management_page: "http://myserver:5000/admin"
+config:
+  virtual_host: "myserver"
+services:
+  - type: http
+    name: "Admin Page"
+    output_filter: "{{ value.trim() }}"
+    tags:
+      - Website
+    args:
+      port: 5000
+      path: "/admin"
+```
+
+The tag will automatically show on the services it's applied to. Clicking the tag name will bring up the status page for that tag, listing all the services. This page is similar to the dashboard in that it will refresh every 15 seconds. For quick access to a tag you can set it up as a [link on the dashboard](#website-options).
 
 ## Host Documentation
 
@@ -477,6 +458,225 @@ The following custom functions are available in addition to any standard [Jinja 
 * `path()` - this is a shortcut for the Python os.path.join() method to easily join paths together.
 * `default()` - allows for setting a default in cases where the user may or may not set a variable. If the user variable doesn't exist the default is used.
 
+## API
+
+For integration with other systems the API can be used. To decode the status return codes use the following:
+
+* 0 - OK, everything normal
+* 1 - Warning, potential problem
+* 2 - Critical, definitely a problem
+
+The status codes are determined by the settings for the device and the output of the various check utilities. Note that for service check related data Performance Data information (`perf_data`) is available if the check command returns it. This is parsed according to the [Nagios performance data](https://nagios-plugins.org/doc/guidelines.html#AEN200) standard. If there isn't any performance data the key will not exist for that service.
+
+### Health
+
+__/api/health__ - basic program health. Status is set to _Offline_ if the main system checking loop hasn't run in over 2 minutes. This should look for services to check every 60 seconds when running properly.
+
+```
+{
+  "last_check_time": "07-05-2022 12:00PM",
+  "text": "Online",
+  "return_code": 0
+}
+```
+
+### Informational
+
+__/api/list/hosts__ - prints a list of all host ids currently configured
+
+```
+[
+  "switch-1",
+  "firewall-1"
+]
+```
+
+__/api/list/tags__ - prints a list of all tags on the system as dictionary of tag id and given name
+
+```
+{
+  "disk-space": "Disk Space",
+  "backups": "Backups"
+}
+```
+
+### Status
+
+__/api/status/summary__ - a status summary of the overall status of all hosts. The `services` array is a list of all services currently in an error state.
+
+```
+{
+  "hosts_with_errors": 0,
+  "overall_status": 0,
+  "overall_status_description": "OK",
+  "total_hosts": 3,
+  "services_with_errors": 0,
+  "services": []
+}
+```
+
+__/api/status/host__ - detailed listing of the status of each host. This does not include service information, use `/api/status/host/<host_id>` to get the full listing with services.
+
+```
+[
+  {
+    "alive": 0,
+    "config": {
+      "community": "public"
+    },
+    "icon": "router-network",
+    "id": "switch-1",
+    "info": "This device type will work with generic managed switches. SNMP information must be correct and setup on the switch for services to properly be queried.",
+    "ip": "192.168.0.1",
+    "name": "Switch 1",
+    "overall_status": 1,
+    "interval": 3,
+    "service_check_attempts": 2,
+    "last_check": "07-21-2022 11:01AM",
+    "next_check": "07-21-2022 11:04AM",
+    "silenced": false,
+    "type": "switch"
+  }
+]
+```
+
+__/api/status/host/<host_id>__ - status information for the host with the given id. Output is same as above but will all host services (`services` key) as well.
+
+__/api/status/services__ - a list of services, can be filtered by return code using a query parameter. By default all services are returned.
+
+_Example:_ http://localhost:3000/api/status/services?return_codes=1|2 - only return services with a status of 1 or 2 (warning or critical)
+
+```
+{
+  "return_codes": [
+    "1",
+    "2"
+  ],
+  "services": [
+    {
+      "check_attempt": 1,
+      "id": "alive",
+      "last_state_change": "07-02-2022 11:40AM",
+      "name": "Alive",
+      "return_code": 2,
+      "state": "CONFIRMED",
+      "text": "Ping unsuccessfull!",
+      "raw_text": "Ping unsuccessfull!|percent_packet_loss=100.0% average_return_time=20.0ms"
+      "perf_data": [
+        {
+          "id": "percent-packet-loss",
+          "label": "percent_packet_loss",
+          "uom": "%",
+          "value": 100
+        },
+        {
+          "id": "average-return-time",
+          "label": "average_return_time",
+          "uom": "ms",
+          "value": 20.0
+        }
+      ]
+    }
+  ]
+}
+```
+
+__/api/status/service/<service_id>__ - returns service information for a specific service Id. Output is the same as when service is part of host output.
+
+__/api/status/tag/<tag_id>__ - information on the status of each service with this tag id
+
+```
+{
+  "id": "http",
+  "name": "HTTP",
+  "services": [
+    {
+      "check_attempt": 1,
+      "id": "web-server-http",
+      "host" {
+        "id": "web-server",
+        "name": "Web Server"
+      }
+      "last_state_change": "07-02-2022 11:40AM",
+      "name": "HTTP",
+      "return_code": 0,
+      "state": "CONFIRMED",
+      "text": "HTTP OK: HTTP/1.1 200 OK - 4410 bytes in 0.009 second response time",
+      "raw_text": "HTTP OK: HTTP/1.1 200 OK - 4410 bytes in 0.009 second response time |time=0.009410s;;;0.000000;10.000000 size=4410B;;;0\n",
+      "notifier": "none"
+      "perf_data": [
+        {
+          "id": "time",
+          "label": "time",
+          "value": 0.009410,
+          "min": 0.000000,
+          "max": 10.000000,
+          "uom": "s"
+        }
+      ]
+    }
+  ]
+}
+
+```
+
+## Performance Data
+
+__/api/time/<perf_id>/start>/<end>__ - lookup Performance Data information for a specified time period. The __start__ and __end__ times should be unix timestamps. If these are omitted the last 60 minutes are returned by default.
+
+```
+{
+  "times": [
+    "04/14/24 10:03:00",
+    "04/14/24 10:08:00",
+    "04/14/24 10:13:00",
+    "04/14/24 10:17:00",
+    "04/14/24 10:21:00",
+    "04/14/24 10:26:00",
+    "04/14/24 10:31:00"
+  ],
+  "unix_times": [
+    1713106980.0,
+    1713107280.0,
+    1713107580.0,
+    1713107820.0,
+    1713108060.0,
+    1713108360.0,
+    1713108660.0
+  ],
+  "values": [
+    0.07799999999999999,
+    0.082,
+    0.146,
+    0.074,
+    0.066,
+    0.076,
+    0.132
+  ]
+}
+```
+
+## Commands
+
+__/api/command/check_now/<host_id>__ - updates a given host's next check time to the current time. This forces a service check instead of waiting for the normal update interval. The host id can be found via the `/api/status` endpoint for each host.
+
+```
+{
+  "success": true
+  "next_check": "09-14-2022 09:44AM"
+}
+```
+
+__/api/command/silence_host/<host_id>/<minutes>__ - sets the given hosts silenced property to True for the given amount of minutes. This will silence any notifications for this time.
+
+```
+{
+  "is_silenced": true,
+  "success": true,
+  "until": "05-02-2023 01:31PM"
+}
+```
+
 ## Watchdog
 
 Trash Panda will check if defined hosts and services are running, but what keeps track of Trash Panda? The `watchdog.py` script can be used to externally check the Trash Panda web service via the [health api](#api) endpoint. This script should be setup to run via a cron job and can read in the same YAML config file to trigger monitoring notifications. If the health service is either not running, or it reports that the monitoring system checker is not running, a notification will be sent using the configured notifier from the YAML file. When the service returns to normal operation a recovery notification is also sent.
@@ -485,7 +685,7 @@ Trash Panda will check if defined hosts and services are running, but what keeps
 python3 watchdog.py -c conf/monitor.yaml
 ```
 
-Once a notification is sent a flag file is created in the Trash Panda repo directory named `.service_down`. This file prevents further notifications and will be deleted when the Trash Panda service recovers. 
+Once a notification is sent a flag file is created in the Trash Panda repo directory named `.service_down`. This file prevents further notifications and will be deleted when the Trash Panda service recovers.
 
 ## Credits
 

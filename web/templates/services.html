@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block header %}
+<script type="text/javascript">
+
+function load_status(){
+  $.ajax({type: 'GET', url: '{{ url }}', success: function(data, status, request){
+    table = $('#tag_info > tbody');
+
+    // setup row objects
+    var tr = $('<tr>');
+    var td = $('<td>');
+    var div = $('<div>');
+
+    //clear existing data
+    table.empty();
+
+    data.services.forEach(function(s){
+      row = tr.clone();
+
+      text_highlight = 'text-secondary';
+      if(s.return_code == 0){
+        text_highlight = 'text-success';
+      }
+      else if(s.return_code == 1){
+        text_highlight = 'text-warning';
+      }
+      else if(s.return_code == 2){
+        text_highlight = 'text-danger';
+      }
+
+      //create a row for the service name and links
+      col_size = 12;  // use whole col by default
+      col1 = $('<div>').text(s.name);
+
+      //create a column for the links (if any)
+      link1 = '';
+      if(s.hasOwnProperty('service_url'))
+      {
+        link1 = $('<a>');
+        link1.attr('href', s.service_url);
+        link1.attr('target', "_blank");
+        link1.attr('class', 'mdi mdi-launch icon-sm icon-inline');
+        col_size = 6;
+      }
+
+      link2 = '';
+      if(s.hasOwnProperty('perf_data'))
+      {
+        link2 = $('<a>');
+        link2.attr('href', '/perf_data/' + s.id);
+        link2.attr('class', 'mdi mdi-chart-areaspline-variant icon-sm icon-inline');
+        col_size = 6;
+      }
+
+      //set width of the name column
+      col1.attr('class', 'col-' + col_size + ' ' + text_highlight);
+      row1 = $('<div>').append(col1);
+      row1.attr('class', 'row');
+
+      //if links exist add those as well
+      if(col_size != 12)
+      {
+        col2 = $('<div>').append(link1).append(link2);
+        col2.attr('class', 'col-6 text-right');
+        row1.append(col2);
+      }
+
+      row.append(td.clone().append(row1));
+
+      // link the host name
+      host = $('<a>').html(s.host.name);
+      host.attr('href', '/status/host/' + s.host.id);
+
+      row.append(td.clone().append(host));
+
+      row.append(td.clone().html(s.text.replaceAll("\n", "<br />")).addClass('hide-md'))
+      row.append(td.clone().text(s.last_state_change))
+
+      table.append(row);
+
+    });
+
+    // refresh in 15 seconds
+    setTimeout(load_status, 15000);
+  }});
+
+}
+
+</script>
+{% endblock %}
+{% block content %}
+{% set current_status = ['text-success', 'text-warning', 'text-danger', 'text-secondary'] %}
+{% set overall_status = ['OK', 'Warning', 'Critical', 'Unknown'] %}
+{% set status_text = ['', '', '', 'text-secondary'] %}
+<div class="container">
+  <table class="table table-striped" id="tag_info">
+    <thead class="thead-dark">
+      <tr>
+        <th>Service</th>
+        <th>Host</th>
+        <th class="hide-md">Output</th>
+        <th>Last Change</th>
+      </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
+{% block onload_scripts %}
+load_status();
+{% endblock %}

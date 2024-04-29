@@ -34,6 +34,10 @@ ALLOWED_EDITOR_TYPES = ('.yaml', '.py', '.md')
 # time format when converting datetime objects
 TIME_FORMAT = "%m-%d-%Y %I:%M%p"
 
+# Bootstrap color mappings
+COLOR_MAPPING = {"black": "dark", "blue": "primary", "gray": "secondary", "green": "success",
+                 "light_blue": "info", "red": "danger", "yellow": "warning"}
+
 
 def custom_yaml_loader(loader, node):
     """custom YAML loader for !include syntax"""

@@ -1,4 +1,5 @@
 import logging
+import requests
 import smtplib
 import ssl
 import modules.utils as utils
@@ -33,6 +34,8 @@ class NotificationGroup:
             result = PushoverNotification(notifier['args'])
         elif(notifier['type'] == 'email'):
             result = EmailNotification(notifier['args'])
+        elif(notifier['type'] == 'webhook'):
+            result = WebhookNotification(notifier['args'])
 
         return result
 
@@ -200,3 +203,29 @@ class EmailNotification(MonitorNotification):
         else:
             with smtplib.SMTP() as server:
                 server.sendmail(self.smtp_args['sender'], self.smtp_args['recipient'], email.as_string())
+
+
+class WebhookNotification(MonitorNotification):
+    """Sends a notification via a POST webhook
+
+    Custom Config:
+    * url
+    """
+
+    url = None
+
+    def __init__(self, args):
+        super().__init__('webhook')
+        self.url = args['url']
+
+    def notify_host(self, host, status):
+        """ this overrides the parent class """
+
+        # send the post request with the host payload
+        requests.post(self.url, json={"type": "host", "status": status, "host": host}, timeout=30)
+
+    def notify_service(self, host, service):
+        """ this overrides the parent class """
+
+        # send the post request with the host and service payload
+        requests.post(self.url, json={"type": "service", "status": service['return_code'], "service": service}, timeout=30)

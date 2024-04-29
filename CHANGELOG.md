@@ -4,6 +4,37 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## Unreleased
+
+### Added
+
+- Service Tagging. Allows for services to be tagged within the config file. Tags will group the services so that they can display together on a common dashboard. This allows similar services across hosts to be viewed together.
+- Service Tags can set colors within the `web` key of the configuration file, default color is black.
+- New notifier type: __webhook__. This sends a JSON payload to the given url
+- New API endpoint `/api/status/services` to list services. Filtering by the return_code is also possible
+- API endpoints that return service related data now include performance data (`perf_data`) if the service check command returns it. This is parsed according to the Nagios standards.
+- Redis Time Series integration is used to save perf data for each host for 24 hours.
+- performance data web pages with ChartJS integration to view perf data if available
+- New API endpoint `/api/status/service/<service_id>` to get information about a specific service
+- New API endpoint `/api/time/<perf_id>/<int:start>/<int:end>` to retieve time series information from a performance data point. start and end are unix timestamps
+
+### Changed
+
+- Redis backend is now changed to rely on the [Redis JSON module](https://redis.io/docs/latest/develop/data-types/json/). This requires the `redis-stack-server` and not the `redis-server` for the key store.
+- Many API endpoints now have different paths. This is an attempt to organize similar calls under a tree such as `/api/status` for all status related calls and `/api/command/` for command related calls. See the API section of the README for all changes.
+- made `/api/status/summary` more efficient at filtering services in error
+- modified menu to include a dropdown menu. The Dashboard is now renamed the Overview page and two new dashboards are available. Issues and Tags.
+- the built in ping check now includes some basic performance data (percent packet loss and average return time) as part of the raw data
+- `/api/status/all` is now `/api/status/hosts`. It also excludes service information from each host, this speeds up the return time and the `/api/status/host` endpoint can be used to get the full host info with service information
+
+### Fixed
+
+- fixed overwriting host key for services on `/api/status/summary` endpoint. This is already set when the service output is created
+
+### Removed
+
+- removed `commands.html`. This was file wasn't used and was part of an older version of the project
+
 ## Version 5.2
 
 ### Added
@@ -13,7 +44,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Changed
 
-- changed behavior of the watchdog service. It now sends both __up__ and __down__ status messages. The main dashboard program does not modify the .service_down file any longer, this is done in the watchdog only. 
+- changed behavior of the watchdog service. It now sends both __up__ and __down__ status messages. The main dashboard program does not modify the .service_down file any longer, this is done in the watchdog only.
 
 ## Version 5.1
 

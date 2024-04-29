@@ -19,6 +19,7 @@ notification_types:
     - pushover
     - log
     - email
+    - webhook
 
 # service definition, used for host types and hosts
 service_definition: &service_definition
@@ -45,6 +46,12 @@ service_definition: &service_definition
       output_filter:
         required: False
         type: string
+      tags:
+        required: False
+        type: list
+        default: []
+        schema:
+          type: string
       args:
         required: False
         type: dict
@@ -124,6 +131,7 @@ config:
                   - log
                   - pushover
                   - email
+                  - webhook
               args:
                 required: False
                 type: dict
@@ -152,6 +160,19 @@ config:
           type: string
           required: False
           default: none
+        tags:
+          type: list
+          default: []
+          schema:
+            type: dict
+            schema:
+              name:
+                required: True
+                type: string
+              color:
+                required: True
+                type: string
+                allowed: *allowed_colors
         top_nav:
           required: False
           type: dict

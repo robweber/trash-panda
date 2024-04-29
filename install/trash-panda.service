@@ -1,6 +1,6 @@
 [Unit]
 Description=Trash Panda Monitoring Service
-Requires=redis-server.service
+Requires=redis-stack-server.service
 
 [Service]
 User=root

@@ -44,7 +44,7 @@ function makePathLink(path, name, funcName = 'loadFiles'){
 function loadFiles(path){
 
   // send request to load file listings
-  $.ajax({type: 'GET', contentType: 'application/json', url: '/api/browse_files/' + path, success: function(data, status, request){
+  $.ajax({type: 'GET', contentType: 'application/json', url: '/api/editor/browse_files/' + path, success: function(data, status, request){
 
     if(data.success)
     {
@@ -82,7 +82,7 @@ function loadFiles(path){
 }
 
 function loadEditor(){
-  $.ajax({type: 'POST', url: '/api/load_file', data: {'file_path': $('#config_path').html()}, success: function(data, status, request){
+  $.ajax({type: 'POST', url: '/api/editor/load_file', data: {'file_path': $('#config_path').html()}, success: function(data, status, request){
     editor.setValue(data,1);
 
     fileInfo = pathInfo($('#config_path').html());
@@ -109,7 +109,7 @@ function loadEditor(){
 }
 
 function saveFile(){
-    $.post('/api/save_file', {'file_path': $('#config_path').html(), "file_contents":editor.getValue()}, function(data){
+    $.post('/api/editor/save_file', {'file_path': $('#config_path').html(), "file_contents":editor.getValue()}, function(data){
         //show success
         if(data.success)
         {
