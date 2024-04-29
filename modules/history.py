@@ -158,7 +158,8 @@ class HostHistory:
                 if('perf_data' in s):
                     for p in s['perf_data']:
                         if(not self.__exists(p['id'])):
-                            self.db.ts().create(p['id'], retention_msecs=86400000)
+                            # save for 30 days
+                            self.db.ts().create(p['id'], retention_msecs=(86400000 * 30))
 
                         # add the value
                         self.db.ts().add(p['id'], unix_time * 1000, p['value'])
