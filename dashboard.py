@@ -29,8 +29,6 @@ from modules.notifications import NotificationGroup
 from flask import Flask, flash, render_template, jsonify, redirect, request, Response
 from slugify import slugify
 
-history = HostHistory()
-
 
 # function to handle when the is killed and exit gracefully
 def signal_handler(signum, frame):
@@ -394,6 +392,9 @@ logging.basicConfig(datefmt='%m/%d %H:%M:%S',
                     level=getattr(logging, logLevel),
                     handlers=logHandlers)
 logging.getLogger('asyncio').setLevel(logging.WARNING)  # only show warning or above from this module
+
+# connect to redis DB
+history = HostHistory()
 
 # load the config file
 yaml_check = utils.load_config_file(args.file)
