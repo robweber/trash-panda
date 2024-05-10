@@ -375,6 +375,8 @@ parser.add_argument('-f', '--file', default='conf/monitor.yaml',
                     help="Path to the config file for the host data, %(default)s by default")
 parser.add_argument('-p', '--port', default=5000,
                     help="Port number to run the web server on, %(default)d by default")
+parser.add_argument('-d', '--database', default="127.0.0.1",
+                    help="IP or hostname of Redis database, %(default)s by default")
 parser.add_argument('-D', '--debug', action='store_true',
                     help='If the program should run in debug mode')
 
@@ -394,7 +396,7 @@ logging.basicConfig(datefmt='%m/%d %H:%M:%S',
 logging.getLogger('asyncio').setLevel(logging.WARNING)  # only show warning or above from this module
 
 # connect to redis DB
-history = HostHistory()
+history = HostHistory(args.database)
 
 # load the config file
 yaml_check = utils.load_config_file(args.file)

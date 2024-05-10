@@ -10,8 +10,8 @@ class HostHistory:
 
     db = None
 
-    def __init__(self):
-        self.db = redis.Redis('127.0.0.1', decode_responses=True)
+    def __init__(self, db_host):
+        self.db = redis.Redis(db_host, decode_responses=True)
 
     def save_last_check(self):
         """sets the last check time using the current time as a unix timestamp"""
