@@ -162,7 +162,7 @@ class HostMonitor:
                 # add in the label and unit of measure
                 p_id = slugify(first_key[0]) if slugify(first_key[0].strip()) != '' else 'root'
                 mapping['id'] = f"{service_id}-{p_id}"
-                mapping['label'] = first_key[0].replace("'","")
+                mapping['label'] = first_key[0].replace("'", "")
 
                 # only add if it exists
                 if(unit_of_measure != ""):

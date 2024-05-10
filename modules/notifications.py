@@ -152,6 +152,7 @@ class PushoverNotification(MonitorNotification):
     """
     client = None
     user_key = None
+
     def __init__(self, args):
         super().__init__('pushover')
 
