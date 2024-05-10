@@ -412,7 +412,7 @@ if('notifications' in yaml_file['config']):
                                yaml_file['config']['notifications']['types'])
 
 logging.info('Starting monitoring check daemon')
-monitor = HostMonitor(yaml_file)
+monitor = HostMonitor(history, yaml_file)
 
 # start the web app
 logging.info('Starting Trash Panda Web Service')

@@ -32,12 +32,12 @@ class HostMonitor:
     _jinja = None
     lock = Lock()  # lock for host updating functions
 
-    def __init__(self, yaml_file):
+    def __init__(self, history, yaml_file):
         # create the host type and services definitions, load history
         self.types = self.__create_types(yaml_file['types'], yaml_file['config']['default_interval'], yaml_file['config']['service_check_attempts'])
         self.services = yaml_file['services']
         self.hosts = {}
-        self.history = HostHistory()
+        self.history = history
 
         # load jinja environment
         self._jinja = jinja2.Environment()
