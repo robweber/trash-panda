@@ -3,7 +3,7 @@ import requests
 import smtplib
 import ssl
 import modules.utils as utils
-from pushover import Client
+from chump import Application
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
@@ -144,21 +144,24 @@ class LogNotification(MonitorNotification):
 class PushoverNotification(MonitorNotification):
     """Sends notification messages through the Pushover messenger service
     https://pushover.net/
-    https://pypi.org/project/python-pushover/
+    https://chump.readthedocs.io/en/latest/
 
     Custom config:
     * application key
     * user identifiction key
     """
     client = None
-
+    user_key = None
     def __init__(self, args):
         super().__init__('pushover')
 
-        self.client = Client(args['user_key'], api_token=args['api_key'])
+        self.client = Application(args['api_key'])
+        self.user_key = args['user_key']
 
     def _send_message(self, message):
-        self.client.send_message(message, title="Monitoring Notification")
+        user = self.client.get_user(self.user_key)
+
+        user.send_message(message, title="Monitoring Notification")
 
 
 class EmailNotification(MonitorNotification):
