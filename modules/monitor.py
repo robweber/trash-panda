@@ -32,12 +32,12 @@ class HostMonitor:
     _jinja = None
     lock = Lock()  # lock for host updating functions
 
-    def __init__(self, yaml_file):
+    def __init__(self, history, yaml_file):
         # create the host type and services definitions, load history
         self.types = self.__create_types(yaml_file['types'], yaml_file['config']['default_interval'], yaml_file['config']['service_check_attempts'])
         self.services = yaml_file['services']
         self.hosts = {}
-        self.history = HostHistory()
+        self.history = history
 
         # load jinja environment
         self._jinja = jinja2.Environment()
@@ -162,7 +162,7 @@ class HostMonitor:
                 # add in the label and unit of measure
                 p_id = slugify(first_key[0]) if slugify(first_key[0].strip()) != '' else 'root'
                 mapping['id'] = f"{service_id}-{p_id}"
-                mapping['label'] = first_key[0].replace("'","")
+                mapping['label'] = first_key[0].replace("'", "")
 
                 # only add if it exists
                 if(unit_of_measure != ""):

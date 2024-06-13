@@ -57,7 +57,7 @@ A full list of arguments can be found by using the `-h` flag.
 ```
 python3 dashboard.py -h
 
-usage: dashboard.py [-h] [-c CONFIG] [-f FILE] [-p PORT] [-D]
+usage: dashboard.py [-h] [-c CONFIG] [-f FILE] [-p PORT] [-d DATABASE] [-D]
 
 Trash Panda
 
@@ -68,6 +68,8 @@ optional arguments:
   -f FILE, --file FILE  Path to the config file for the host data,
                         conf/monitor.json by default
   -p PORT, --port PORT  Port number to run the web server on, 5000 by default
+  -d DATABASE, --database DATABASE
+                        IP or hostname of Redis database, 127.0.0.1 by default
   -D, --debug           If the program should run in debug mode
 
 ```

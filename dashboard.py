@@ -29,8 +29,6 @@ from modules.notifications import NotificationGroup
 from flask import Flask, flash, render_template, jsonify, redirect, request, Response
 from slugify import slugify
 
-history = HostHistory()
-
 
 # function to handle when the is killed and exit gracefully
 def signal_handler(signum, frame):
@@ -377,6 +375,8 @@ parser.add_argument('-f', '--file', default='conf/monitor.yaml',
                     help="Path to the config file for the host data, %(default)s by default")
 parser.add_argument('-p', '--port', default=5000,
                     help="Port number to run the web server on, %(default)d by default")
+parser.add_argument('-d', '--database', default="127.0.0.1",
+                    help="IP or hostname of Redis database, %(default)s by default")
 parser.add_argument('-D', '--debug', action='store_true',
                     help='If the program should run in debug mode')
 
@@ -395,6 +395,9 @@ logging.basicConfig(datefmt='%m/%d %H:%M:%S',
                     handlers=logHandlers)
 logging.getLogger('asyncio').setLevel(logging.WARNING)  # only show warning or above from this module
 
+# connect to redis DB
+history = HostHistory(args.database)
+
 # load the config file
 yaml_check = utils.load_config_file(args.file)
 
@@ -412,7 +415,7 @@ if('notifications' in yaml_file['config']):
                                yaml_file['config']['notifications']['types'])
 
 logging.info('Starting monitoring check daemon')
-monitor = HostMonitor(yaml_file)
+monitor = HostMonitor(history, yaml_file)
 
 # start the web app
 logging.info('Starting Trash Panda Web Service')

@@ -1,7 +1,6 @@
 # Install
 
-Instructions to install the system with all required libraries and binary files.
-
+Instructions to install the system with all required libraries and binary files. This installation will run both the service and database on the same machine. Installation of the Redis database can be done on a different device. 
 
 ### Initial OS setup and Python library install
 

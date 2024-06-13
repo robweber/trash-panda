@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## 6.1
+
+### Added
+
+- The host of the Redis database can be passed in with a `--database` argument at runtime
+
+### Changed
+
+- migrated Pushover to use [chump](https://chump.readthedocs.io/en/latest/) instead of python-pushover library
+- DB can be set at runtime, no longer assumed localhost
+
 ## 6.0
 
 ### Added

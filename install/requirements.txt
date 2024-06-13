@@ -1,10 +1,10 @@
 asyncio
 cerberus
+chump
 configargparse
 Flask
 markdown
 natsort
-python-pushover
 pythonping
 python-slugify
 redis
