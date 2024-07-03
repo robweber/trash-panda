@@ -544,9 +544,10 @@ __/api/status/host__ - detailed listing of the status of each host. This does no
 
 __/api/status/host/<host_id>__ - status information for the host with the given id. Output is same as above but will all host services (`services` key) as well.
 
-__/api/status/services__ - a list of services, can be filtered by return code using a query parameter. By default all services are returned.
+__/api/status/services__ - a list of services, can be filtered by return code and service ID using query parameters. By default all services are returned.
 
-_Example:_ http://localhost:3000/api/status/services?return_codes=1|2 - only return services with a status of 1 or 2 (warning or critical)
+_Return Code Example:_ http://localhost:3000/api/status/services?return_codes=1|2 - only return services with a status of 1 or 2 (warning or critical)
+_Service Filter Example:_ http://localhost:3000/api/status/services?service_filter=alive - return any services where the ID contains the word _alive_
 
 ```
 {

@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## Unreleased
+
+### Added
+
+- `/api/status/services` now accepts a __service_filter__ parameter. This can filter the service list based on a regular expression matching the service ID. By default all services are returned. 
+
 ## 6.1
 
 ### Added
