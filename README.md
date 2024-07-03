@@ -584,8 +584,6 @@ _Service Filter Example:_ http://localhost:3000/api/status/services?service_filt
 }
 ```
 
-__/api/status/service/<service_id>__ - returns service information for a specific service Id. Output is the same as when service is part of host output.
-
 __/api/status/tag/<tag_id>__ - information on the status of each service with this tag id
 
 ```

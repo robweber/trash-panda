@@ -208,10 +208,6 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
 
         return jsonify({"return_codes": return_codes, "service_filter": service_filter, "services": services})
 
-    @app.route("/api/status/service/<service_id>")
-    def get_service(service_id):
-        return jsonify(history.get_service(service_id))
-
     @app.route('/api/status/tag/<tag_id>', methods=['GET'])
     def get_tag(tag_id):
         tag = history.get_tag(tag_id)

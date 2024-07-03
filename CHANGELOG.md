@@ -8,7 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Added
 
-- `/api/status/services` now accepts a __service_filter__ parameter. This can filter the service list based on a regular expression matching the service ID. By default all services are returned. 
+- `/api/status/services` now accepts a __service_filter__ parameter. This can filter the service list based on a regular expression matching the service ID. By default all services are returned.
+
+### Removed
+
+- removed the `/api/status/services/<host>` endpoint. This can be done with `/services?service_filter=` syntax now. 
 
 ## 6.1
 
