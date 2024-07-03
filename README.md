@@ -78,7 +78,7 @@ optional arguments:
 
 Once running the dashboard page can be loaded. The Overview page will display all currently configured hosts and their overall status. If the host is down, or any configured service unavailable, the overall status will change. This page is refreshed every __15 seconds__. Data will change depending on the update interval set when the program is loaded.
 
-Clicking on a host name will show you more information about that device. Individual services will be listed along with any output to indicate their current status. From the host status page a check of all services can be forced, and notifications temporarily silenced. If configured, a management page for the host can also be launched from here. For additional flexibility more host information can be displayed in the [documentation](#host-documentation) tab via custom Markdown files.
+Clicking on a host name will show you more information about that device. Individual services will be listed along with any output to indicate their current status. Clicking a service name will show you all services of that type across all hosts. From the host status page a check of all services can be also forced, or notifications temporarily silenced. If configured, a management page for the host can also be launched from here. For additional flexibility more host information can be displayed in the [documentation](#host-documentation) tab via custom Markdown files.
 
 ### Issues
 
