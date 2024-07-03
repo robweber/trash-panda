@@ -81,13 +81,20 @@ class HostHistory:
 
         return result
 
-    def get_services(self, return_codes=[0]):
-        """ returns a list of services where the status is one of the the given return_codes """
+    def get_services(self, return_codes=[0], service_filter=".*"):
+        """ returns a list of services where the status is one of the the given return_codes
+        AND the id matches the given service filter
+
+        :param return_codes: list of return codes to find as an array
+        :param service_filter: service_id syntax to match - this is a regular expression
+
+        :returns: list of services that meet these criteria
+        """
 
         # turn the list into a JPath query ()
         query = " || ".join([f"@.return_code == {r}" for r in return_codes])
 
-        return self.__read_db_json(DBQueries.GET_SERVICES_BY_STATUS.value.format(return_codes=query))
+        return self.__read_db_json(DBQueries.GET_SERVICES_BY_QUERY.value.format(return_codes=query, service_regex=service_filter))
 
     def get_service(self, service_id):
         """ get information on a specific service from a specific host
@@ -208,4 +215,4 @@ class DBQueries(Enum):
     GET_HOST = '$[?(@.id=="{host_id}")]'
     GET_SERVICE = '$[*].services[?(@.id=="{service_id}")]'
     GET_TAG = '$[*].services[?(@.tags[*]=="{tag_id}")]'
-    GET_SERVICES_BY_STATUS = "$[*].services[?({return_codes})]"
+    GET_SERVICES_BY_QUERY = '$[*].services[?(({return_codes}) && @.id=~"{service_regex}")]'

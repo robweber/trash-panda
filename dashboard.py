@@ -191,18 +191,22 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
         return jsonify(host)
 
     @app.route('/api/status/services')
-    def get_services_by_status():
+    def get_services_by_query():
         return_codes = [0, 1, 2, 3]  # by default return all codes
+        service_filter = ".*"  # by default list all services
 
         if(request.args.get('return_codes') is not None):
             return_codes = request.args.get('return_codes').split("|")
 
-        services = history.get_services(return_codes)
+        if(request.args.get('service_filter') is not None):
+            service_filter = request.args.get('service_filter')
+
+        services = history.get_services(return_codes, service_filter)
 
         # sort by return code, then name
         services = sorted(services, key=lambda o: (o['return_code'] * -1, o['host']['name']))
 
-        return jsonify({"return_codes": return_codes, "services": services})
+        return jsonify({"return_codes": return_codes, "service_filter": service_filter, "services": services})
 
     @app.route("/api/status/service/<service_id>")
     def get_service(service_id):
