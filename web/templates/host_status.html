@@ -122,10 +122,10 @@ function silence_host(id, minutes){
         </thead>
         {% for row in host['services']: %}
         <tr>
-          <td class="{{ current_status[row['return_code']] }} row_1">
+          <td class="row_1">
             <div class="row">
               <div class="col-{{ 6 if ('perf_data' in row or 'service_url' in row) else 12 }}">
-                {{ row['name'] }}
+                <a href="/status/services/-{{ slugify(row['name']) }}$" class="{{ current_status[row['return_code']] }}">{{ row['name'] }}</a>
                 {% if(row['state'] == 'UNCONFIRMED') %}
                 (check {{ row['check_attempt'] }}/{{ host['service_check_attempts'] }})
                 {% endif %}

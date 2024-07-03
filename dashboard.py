@@ -85,6 +85,10 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
 
         return render_template("services.html", url=f"/api/status/tag/{tag_id}", page_title=f"{tag['name']}")
 
+    @app.route('/status/services/<service_filter>')
+    def list_services(service_filter):
+        return render_template("services.html", url=f"/api/status/services?service_filter={service_filter}", page_title="Services")
+
     @app.route('/perf_data/<service_id>')
     def get_perf_data(service_id):
 
