@@ -53,6 +53,10 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
     logLevel = 'INFO' if not debugMode else 'DEBUG'
     app.logger.setLevel(getattr(logging, logLevel))
 
+    # re-map the tag colors
+    for tag in config_yaml['tags'].keys():
+        config_yaml['tags'][tag]['color'] = utils.COLOR_MAPPING[config_yaml['tags'][tag]['color']]
+
     # turn of web server logging if not in debug mode
     if(not debugMode):
         werkzeug = logging.getLogger('werkzeug')
@@ -70,7 +74,7 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
             # set if a notifier is configured to toggle silent mode controls
             doc_file = os.path.join(config_yaml['config']['docs_dir'], f"{id}.md")
             return render_template("host_status.html", host=result, page_title='Host Status', has_notifier=notifier_configured,
-                                   docs=utils.load_documentation(doc_file), doc_file=doc_file)
+                                   docs=utils.load_documentation(doc_file), doc_file=doc_file, tags=config_yaml['tags'])
         else:
             flash('Host page not found', 'warning')
             return redirect('/')

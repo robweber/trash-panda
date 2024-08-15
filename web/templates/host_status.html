@@ -6,6 +6,7 @@
 <script type="text/javascript">
 var STATUS_COLORS = ['text-success', 'text-warning', 'text-danger', 'text-secondary'];
 var OVERALL_STATUS = ['OK', 'Warning', 'Critical', 'Unknown'];
+var TAGS = {{ tags | safe }};
 
 function slugify(str) {
   str = str.replace(/^\s+|\s+$/g, ''); // trim leading/trailing white space
@@ -119,9 +120,9 @@ function load_status(){
 
       tag_div = $('<div>').addClass('col-sm-12').addClass('text-left');
       s.tags.forEach(function(aTag){
-        tagPill = $('<span>').text(aTag).addClass('badge').addClass('rounded-pill').addClass('bg-success');
+        tagPill = $('<span>').text(TAGS[aTag]['name']).addClass('badge').addClass('rounded-pill').addClass('bg-' + TAGS[aTag]['color']);
         tagLink = $('<a>').append(tagPill).addClass('text-light');
-        tagLink.attr('href', '/status/tag/' + slugify(aTag));
+        tagLink.attr('href', '/status/tag/' + aTag);
         tag_div.append(tagLink);
       });
 
@@ -140,7 +141,7 @@ function load_status(){
     $('#host-overall-status').removeClass();
     $('#host-overall-status').html(OVERALL_STATUS[data.overall_status]).addClass(STATUS_COLORS[data.overall_status]);
     $('#host-last-check').html(data.last_check);
-    $('#host-next-check').html(data.next_check);
+    $('#host-next-check').html(test['something']);
 
     // refresh in 15 seconds
     setTimeout(load_status, 15000);
