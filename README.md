@@ -102,6 +102,7 @@ The monitor file is where the configuration is set for services, device type, an
 * services - an array of service definitions that can be included in device types or individual hosts
 * types - definitions for specific device types and required configuration variables needed.
 * hosts - a list of the actual hosts to be monitored on the network. Each one must inherit a device type but can add their own service checks.
+* tags - definitions for any [service tags](#service-tags)
 
 Example file where these are imported from separate files:
 ```
@@ -137,9 +138,6 @@ config:
     editor:
       read_only: False
     landing_page_text: "Custom text to display on the landing page"
-    tags:
-      - name: Tag 1
-        color: blue
     top_nav:
       style:
         type: button
@@ -249,17 +247,6 @@ The default text on the landing page can also be modified to give different info
 
 ```
 landing_page_text: "Custom text to display on the landing page"
-```
-
-__Tag Colors__
-
-Using the `tag` key you can specify the colors for how different [service tags](#service-tags) will be displayed. By default all tags are black. Valid colors are the same as the Top Nav Style colors listed below.
-
-```
-web:
-  tags:
-    - name: Tag Name
-      color: blue
 ```
 
 __Top Nav Style__
@@ -402,6 +389,15 @@ It is possible to define a custom `output_filter` for a service that parses the 
 
 Tags are a grouping feature that can be applied to services. This allows you to easily create separate dashboards for all services that match the tag. A common use case for this is a Disk Space service that may be applied to multiple hosts. By applying a tag to this service you can see that status of all the Disk Space services for each host in one place instead of looking at them individually. Another use could be tagging services that all interact with each other in some way across hosts (like a web server and database server).
 
+Before applying tags must be setup within the main configuration with the `tags` key. By default all tags are black. Valid colors are the same as the [Top Nav Style colors][#website-options].
+
+```
+tags:
+  website:
+    name: Website
+    tag: light_blue
+```
+
 Adding a tag to a service can be done when creating either the [Host Type](#host-types) or [Host definition](#host-definitions).
 
 ```
@@ -416,7 +412,7 @@ services:
     name: "Admin Page"
     output_filter: "{{ value.trim() }}"
     tags:
-      - Website
+      - website
     args:
       port: 5000
       path: "/admin"
