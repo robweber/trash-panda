@@ -141,7 +141,7 @@ function load_status(){
     $('#host-overall-status').removeClass();
     $('#host-overall-status').html(OVERALL_STATUS[data.overall_status]).addClass(STATUS_COLORS[data.overall_status]);
     $('#host-last-check').html(data.last_check);
-    $('#host-next-check').html(test['something']);
+    $('#host-next-check').html(data.next_check);
 
     // refresh in 15 seconds
     setTimeout(load_status, 15000);
