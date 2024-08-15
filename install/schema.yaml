@@ -160,19 +160,6 @@ config:
           type: string
           required: False
           default: none
-        tags:
-          type: list
-          default: []
-          schema:
-            type: dict
-            schema:
-              name:
-                required: True
-                type: string
-              color:
-                required: True
-                type: string
-                allowed: *allowed_colors
         top_nav:
           required: False
           type: dict
@@ -318,3 +305,18 @@ hosts:
             - string
             - integer
       services: *service_definition
+tags:
+  required: False
+  type: dict
+  default: {}
+  valueschema:
+    type: dict
+    schema:
+      name:
+        required: True
+        type: string
+      color:
+        required: False
+        type: string
+        default: black
+        allowed: *allowed_colors
