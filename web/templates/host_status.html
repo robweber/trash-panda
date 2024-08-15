@@ -4,6 +4,18 @@
 <link rel="stylesheet" href="/static/css/highlightjs.min.css" />
 <script src="/static/js/highlight.min.js"></script>
 <script type="text/javascript">
+var STATUS_COLORS = ['text-success', 'text-warning', 'text-danger', 'text-secondary'];
+var OVERALL_STATUS = ['OK', 'Warning', 'Critical', 'Unknown'];
+
+function slugify(str) {
+  str = str.replace(/^\s+|\s+$/g, ''); // trim leading/trailing white space
+  str = str.toLowerCase(); // convert string to lowercase
+  str = str.replace(/[^a-z0-9 -]/g, '') // remove any non-alphanumeric characters
+           .replace(/\s+/g, '-') // replace spaces with hyphens
+           .replace(/-+/g, '-'); // remove consecutive hyphens
+  return str;
+}
+
 function check_now(id){
   //set the host next check time to now to force an update
   $.post('/api/command/check_now/' + id, {}, function(data, status, request){
@@ -51,12 +63,95 @@ function silence_host(id, minutes){
   });
 }
 
+function load_status(){
+  $.ajax({type: 'GET', url: '/api/status/host/{{ host['id'] }}', success: function(data, status, request){
+    table = $('#service_status > tbody');
+
+    // setup row objects
+    var tr = $('<tr>');
+    var td = $('<td>');
+    var div = $('<div>');
+
+    //clear existing data
+    table.empty();
+
+    data.services.forEach(function(s){
+      row = tr.clone();
+
+      //create a row for the service name and links
+      col_size = 12;  // use whole col by default
+      serviceLink = $('<a>').text(s.name).addClass(STATUS_COLORS[s.return_code]);
+      serviceLink.attr('href', '/status/services/' + slugify(s.name));
+      col1 = $('<div>').append(serviceLink);
+
+      //create a column for the links (if any)
+      link1 = '';
+      if(s.hasOwnProperty('service_url'))
+      {
+        link1 = $('<a>');
+        link1.attr('href', s.service_url);
+        link1.attr('target', "_blank");
+        link1.attr('class', 'mdi mdi-launch icon-sm icon-inline');
+        col_size = 6;
+      }
+
+      link2 = '';
+      if(s.hasOwnProperty('perf_data'))
+      {
+        link2 = $('<a>');
+        link2.attr('href', '/perf_data/' + s.id);
+        link2.attr('class', 'mdi mdi-chart-areaspline-variant icon-sm icon-inline');
+        col_size = 6;
+      }
+
+      //set width of the name column
+      col1.attr('class', 'col-' + col_size + ' ' + STATUS_COLORS[s.return_code]);
+      row1 = $('<div>').append(col1);
+      row1.attr('class', 'row');
+
+      //if links exist add those as well
+      if(col_size != 12)
+      {
+        col2 = $('<div>').append(link1).append(link2);
+        col2.attr('class', 'col-6 text-right');
+        row1.append(col2);
+      }
+
+      tag_div = $('<div>').addClass('col-sm-12').addClass('text-left');
+      s.tags.forEach(function(aTag){
+        tagPill = $('<span>').text(aTag).addClass('badge').addClass('rounded-pill').addClass('bg-success');
+        tagLink = $('<a>').append(tagPill).addClass('text-light');
+        tagLink.attr('href', '/status/tag/' + slugify(aTag));
+        tag_div.append(tagLink);
+      });
+
+      row2 = $('<div>').append(tag_div).addClass('row').addClass('align-items-end').addClass('mt-2');
+
+      row.append(td.clone().append(row1).append(row2).addClass('row_1'));
+
+      row.append(td.clone().html(s.text.replaceAll("\n", "<br />")).addClass('hide-md').addClass('row_2'));
+      row.append(td.clone().text(s.last_state_change));
+
+      table.append(row);
+
+    });
+
+    // set overall status and update times
+    $('#host-overall-status').removeClass();
+    $('#host-overall-status').html(OVERALL_STATUS[data.overall_status]).addClass(STATUS_COLORS[data.overall_status]);
+    $('#host-last-check').html(data.last_check);
+    $('#host-next-check').html(data.next_check);
+
+    // refresh in 15 seconds
+    setTimeout(load_status, 15000);
+  }});
+
+}
+
 </script>
 {% endblock %}
 {% block content %}
-{% set current_status = ['text-success', 'text-warning', 'text-danger', 'text-secondary'] %}
 {% set overall_status = ['OK', 'Warning', 'Critical', 'Unknown'] %}
-{% set status_text = ['', '', '', 'text-secondary'] %}
 <div class="container">
   <div class="row">
     <div class="col-lg-8">
@@ -68,8 +163,8 @@ function silence_host(id, minutes){
         <div class="card-body">
           <h5 class="card-title">Type: <span class="text-info">{{ host['type'] | replace('_',' ') | title }}</span></h5>
           <p class="card-text">
-            Overall Status: <span class="{{ current_status[host['overall_status']] }}">{{ overall_status[host['overall_status']] }}</span> <br />
-            Last Check: {{ host['last_check'] }} <br />
+            Overall Status: <span id="host-overall-status">{{ overall_status[host['overall_status']] }}</span> <br />
+            Last Check: <span id="host-last-check">{{ host['last_check'] }}</span> <br />
             Next Check: <span id="host-next-check">{{ host['next_check'] }}</span> <br />
             IP Address: {{ host['address'] }}
           </p>
@@ -120,41 +215,8 @@ function silence_host(id, minutes){
             <th>Last Change</th>
           </tr>
         </thead>
-        {% for row in host['services']: %}
-        <tr>
-          <td class="row_1">
-            <div class="row">
-              <div class="col-{{ 6 if ('perf_data' in row or 'service_url' in row) else 12 }}">
-                <a href="/status/services/-{{ slugify(row['name']) }}$" class="{{ current_status[row['return_code']] }}">{{ row['name'] }}</a>
-                {% if(row['state'] == 'UNCONFIRMED') %}
-                (check {{ row['check_attempt'] }}/{{ host['service_check_attempts'] }})
-                {% endif %}
-              </div>
-              {% if 'perf_data' in row or 'service_url' in row %}
-              <div class="col-6 text-right">
-                {% if 'perf_data' in row: %}
-                <a href="/perf_data/{{ row['id'] }}" class="mdi mdi-chart-areaspline-variant icon-sm icon-inline"></a>
-                {% endif %}
-                {% if('service_url' in row) %}
-                <a href="{{ row['service_url'] }}" target="_blank" class="mdi mdi-launch icon-sm icon-inline"></a>
-                {% endif %}
-              </div>
-              {% endif %}
-            </div>
-
-            <div class="row align-items-end mt-2">
-
-              <div class="col-sm-12 text-left">
-                {% for t in row['tags'] %}
-                <a href="/status/tag/{{ slugify(t) }}" class="text-light"><span class="badge rounded-pill bg-{{ get_tag_color(t) }}">{{ t }}</span></a>
-                {% endfor %}
-              </div>
-            </div>
-          </td>
-          <td class="{{ status_text[row['return_code']] }} row_2 hide-md">{{ row['text'].replace("\n", '<br />') | safe }}</td>
-          <td class="{{ status_text[row['return_code']] }}">{{ row['last_state_change'] }}</td>
-        </tr>
-        {% endfor %}
+        <tbody>
+        </tbody>
       </table>
       {% endif %}
     </div>
@@ -173,4 +235,5 @@ function silence_host(id, minutes){
 {% endblock %}
 {% block onload_scripts %}
 hljs.highlightAll();
+load_status();
 {% endblock %}
