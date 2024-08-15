@@ -31,17 +31,6 @@ class HostHistory:
     def list_hosts(self):
         return self.__read_db_json(DBQueries.GET_HOST_IDS.value)
 
-    def list_tags(self):
-        all_tags = self.__read_db_json(DBQueries.GET_TAG_IDS.value)
-
-        # flatten down to unique names
-        reduced = [y for x in all_tags for y in x]
-
-        # convert to dict in form {id: name}
-        tags = {slugify(x): x for x in list(set(reduced))}
-
-        return tags
-
     def get_hosts(self):
         """ returns all host information from the database """
         all_hosts = self.__read_db_json("$[*]")
@@ -72,12 +61,10 @@ class HostHistory:
 
         :returns: list of services that include this tag
         """
-        # get a list of all tags
-        all_tags = self.list_tags()
 
         # get list of services matching this tag id
-        result = {"id": tag_id, "name": all_tags[tag_id]}
-        result['services'] = self.__read_db_json(DBQueries.GET_TAG.value.format(tag_id=all_tags[tag_id]))
+        result = {"id": tag_id}
+        result['services'] = self.__read_db_json(DBQueries.GET_TAG.value.format(tag_id=tag_id))
 
         return result
 

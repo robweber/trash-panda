@@ -86,7 +86,8 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
     @app.route('/status/tag/<tag_id>')
     def tags(tag_id):
         tag = history.get_tag(tag_id)
-
+        tag['name'] = config_yaml['tags'][tag_id]['name']
+        
         return render_template("services.html", url=f"/api/status/tag/{tag_id}", page_title=f"{tag['name']}")
 
     @app.route('/status/services/<service_filter>')
@@ -117,7 +118,7 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
 
     @app.route('/tags', methods=['GET'])
     def view_tags():
-        tags = dict(sorted(history.list_tags().items()))  # sort by id
+        tags = dict(sorted(config_yaml['tags'].items()))  # sort by id
 
         return render_template("view_tags.html", tags=tags, page_title="Tags")
 
@@ -157,9 +158,7 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
 
     @app.route('/api/list/tags', methods=['GET'])
     def list_tags():
-        tags = history.list_tags()
-
-        return jsonify(tags)
+        return jsonify(config_yaml['tags'])
 
     @app.route('/api/status/hosts', methods=['GET'])
     def status():
@@ -336,19 +335,6 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
                 return 'link'
 
         return dict(get_nav_style=get_style)
-
-    @app.context_processor
-    def tag_color():
-        def get_tag_color(tag_name):
-            color = "dark"
-            tags = config_yaml['config']['web']['tags']
-
-            for t in tags:
-                if(t['name'] == tag_name):
-                    color = utils.COLOR_MAPPING[t['color']]
-
-            return color
-        return dict(get_tag_color=get_tag_color)
 
     # run the web app
     app.run(debug=debugMode, host='0.0.0.0', port=port_number, use_reloader=False)
