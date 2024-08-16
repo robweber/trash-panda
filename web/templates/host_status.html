@@ -91,7 +91,7 @@ function load_status(){
 
       // create service link
       serviceLink = $('<a>').text(s.name).addClass(STATUS_COLORS[s.return_code]);
-      serviceLink.attr('href', '/status/services/' + slugify(s.name));
+      serviceLink.attr('href', '/status/services/-' + slugify(s.name) + "$");
       col1 = $('<div>').append(serviceLink).append(check_attempts);
 
       //create a column for the links (if any)
