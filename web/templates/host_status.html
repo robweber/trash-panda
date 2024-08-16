@@ -81,9 +81,18 @@ function load_status(){
 
       //create a row for the service name and links
       col_size = 12;  // use whole col by default
+
+      // add check attempts if unconfirmed
+      check_attempts = '';
+      if(s.state == 'UNCONFIRMED')
+      {
+        check_attempts = "<br />(check " + s.check_attempt + "/" + data.service_check_attempts + ")";
+      }
+
+      // create service link
       serviceLink = $('<a>').text(s.name).addClass(STATUS_COLORS[s.return_code]);
       serviceLink.attr('href', '/status/services/' + slugify(s.name));
-      col1 = $('<div>').append(serviceLink);
+      col1 = $('<div>').append(serviceLink).append(check_attempts);
 
       //create a column for the links (if any)
       link1 = '';
@@ -106,7 +115,7 @@ function load_status(){
       }
 
       //set width of the name column
-      col1.attr('class', 'col-' + col_size + ' ' + STATUS_COLORS[s.return_code]);
+      col1.attr('class', 'pr-0 col-' + col_size + ' ' + STATUS_COLORS[s.return_code]);
       row1 = $('<div>').append(col1);
       row1.attr('class', 'row');
 
@@ -114,7 +123,7 @@ function load_status(){
       if(col_size != 12)
       {
         col2 = $('<div>').append(link1).append(link2);
-        col2.attr('class', 'col-6 text-right');
+        col2.attr('class', 'pl-0 col-6 text-right');
         row1.append(col2);
       }
 
