@@ -96,7 +96,7 @@ class MonitorNotification:
         """
         # create the message
         status_msg = "Up" if status == 0 else "Down"
-        message = f"{host['name']} is {status_msg}"
+        message = f"{status_msg} - {host['name']} is {status_msg}"
 
         self._send_message(message)
 
@@ -105,7 +105,7 @@ class MonitorNotification:
         to the implementing class via the _send_message() function
         """
         # create the message
-        message = f"{service['name']} on host {host['name']} is {utils.SERVICE_STATUSES[service['return_code']]}"
+        message = f"Service {utils.SERVICE_STATUSES[service['return_code']]} - {service['name']} on host {host['name']}"
 
         # send message
         self._send_message(message)
