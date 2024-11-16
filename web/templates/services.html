@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block header %}
+<script src="/static/js/countdown.js"></script>
 <script type="text/javascript">
 
 function load_status(){
@@ -80,8 +81,7 @@ function load_status(){
 
     });
 
-    // refresh in 15 seconds
-    setTimeout(load_status, 15000);
+    reset_countdown();
   }});
 
 }
@@ -103,12 +103,18 @@ function load_status(){
       </tr>
     </thead>
     <tbody>
-
     </tbody>
+    <tfoot>
+      <tr>
+        <td colSpan="5" align="center">Last Refresh <span id="last_updated">0</span> seconds ago</td>
+      </tr>
+    </tfoot>
   </table>
 </div>
 
 {% endblock %}
 {% block onload_scripts %}
 load_status();
+setInterval(load_status, 15000);
+start_countdown();
 {% endblock %}

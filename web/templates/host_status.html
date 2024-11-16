@@ -3,6 +3,7 @@
 <link rel="stylesheet" href="/static/css/documentation.css" />
 <link rel="stylesheet" href="/static/css/highlightjs.min.css" />
 <script src="/static/js/highlight.min.js"></script>
+<script src="/static/js/countdown.js"></script>
 <script type="text/javascript">
 var STATUS_COLORS = ['text-success', 'text-warning', 'text-danger', 'text-secondary'];
 var OVERALL_STATUS = ['OK', 'Warning', 'Critical', 'Unknown'];
@@ -152,8 +153,7 @@ function load_status(){
     $('#host-last-check').html(data.last_check);
     $('#host-next-check').html(data.next_check);
 
-    // refresh in 15 seconds
-    setTimeout(load_status, 15000);
+    reset_countdown();
   }});
 
 }
@@ -227,6 +227,11 @@ function load_status(){
         </thead>
         <tbody>
         </tbody>
+        <tfoot>
+          <tr>
+            <td colSpan="5" align="center">Last Refresh <span id="last_updated">0</span> seconds ago</td>
+          </tr>
+        </tfoot>
       </table>
       {% endif %}
     </div>
@@ -246,4 +251,6 @@ function load_status(){
 {% block onload_scripts %}
 hljs.highlightAll();
 load_status();
+setInterval(load_status, 15000);
+start_countdown()
 {% endblock %}
