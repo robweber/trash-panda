@@ -10,12 +10,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 - `/api/status/services` now accepts a __service_filter__ query parameter. This can filter the service list based on a regular expression matching the service ID. By default all services are returned.
 - clicking a service name on the Host Status page will now list all services of this type across any host. This is done with Regex matching. This removes the need to tag the same service to achieve grouping dashboard behavior.
+- show seconds since last update on data tables
 
 ### Changed
 
 - Service tags must now be set within their own `tags` key in the config file prior to use
 - The Host Status page refreshed every 15 seconds automatically, now all status pages refresh at intervals
 - notifications put status at the front of the message instead of the end
+- use `setInterval` instead of `setTimeout` to update data displays
 
 ### Removed
 
