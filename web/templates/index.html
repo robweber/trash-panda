@@ -1,17 +1,11 @@
 {% extends "base.html" %}
 {% block header %}
+<script src="/static/js/countdown.js"></script>
 <script type="text/javascript">
-
-function toggleDetails(count){
-  alert(count);
-  row = $("#host_info > tbody > tr").eq(count + 1);
-
-  row.toggle();
-}
 
 function load_status(){
   $.ajax({type: 'GET', url: '/api/status/hosts', success: function(data, status, request){
-    table = $('#host_info > tbody');
+    var table = $('#host_info > tbody');
 
     // setup row objects
     var tr = $('<tr>');
@@ -31,7 +25,7 @@ function load_status(){
 
       if(h.hasOwnProperty('management_page'))
       {
-        aLink = $('<a>');
+        var aLink = $('<a>');
         aLink.attr('href', h.management_page);
         aLink.attr('target', "_blank");
         aLink.attr('class', 'mdi mdi-launch icon-sm icon-inline');
@@ -45,7 +39,7 @@ function load_status(){
       row.append(td.clone().text(h.last_check).addClass('hide-md'));
       row.append(td.clone().text(h.next_check).addClass('hide-md'));
 
-      silent_mode = '';
+      var silent_mode = '';
       if(h.silenced)
       {
         silent_mode = $('<i>');
@@ -66,12 +60,10 @@ function load_status(){
 
     });
 
-    // refresh in 15 seconds
-    setTimeout(load_status, 15000);
+    // reset countdown
+    reset_countdown()
   }});
-
 }
-
 </script>
 {% endblock %}
 {% block content %}
@@ -94,10 +86,18 @@ function load_status(){
     <tbody>
 
     </tbody>
+    <tfoot>
+      <tr>
+        <td colSpan="5" align="center">Last Refresh <span id="last_updated">0</span> seconds ago</td>
+      </tr>
+    </tfoot>
   </table>
 </div>
 
 {% endblock %}
 {% block onload_scripts %}
+// load status and then update every 15 seconds
 load_status();
+setInterval(load_status, 15000);
+start_countdown()
 {% endblock %}
