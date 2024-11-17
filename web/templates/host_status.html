@@ -5,6 +5,7 @@
 <script src="/static/js/highlight.min.js"></script>
 <script src="/static/js/countdown.js"></script>
 <script type="text/javascript">
+var countdown = new UpdateCountdown();
 var STATUS_COLORS = ['text-success', 'text-warning', 'text-danger', 'text-secondary'];
 var OVERALL_STATUS = ['OK', 'Warning', 'Critical', 'Unknown'];
 var TAGS = {{ tags | safe }};
@@ -153,7 +154,7 @@ function load_status(){
     $('#host-last-check').html(data.last_check);
     $('#host-next-check').html(data.next_check);
 
-    reset_countdown();
+    countdown.reset_countdown();
   }});
 
 }
@@ -252,5 +253,5 @@ function load_status(){
 hljs.highlightAll();
 load_status();
 setInterval(load_status, 15000);
-start_countdown()
+countdown.start_countdown()
 {% endblock %}

@@ -1,22 +1,28 @@
 /*
 use this to display a countdown timer
-page must contain an element "update_countdown" to display the countdown in seconds
+page must contain an element "last_updated" to display the countdown in seconds
 implementing class should call "reset_countdown()" to reset the timer to 0
 
 start countdown with call to start_countdown()
 */
 
-UPDATE_COUNTDOWN = 0;
+class UpdateCountdown {
 
-function start_countdown(){
-  setInterval(show_countdown, 1000);
-}
+  constructor(){
+    this.UPDATE_COUNTDOWN = 0;
+  }
 
-function show_countdown(){
-  UPDATE_COUNTDOWN ++;
-  $('#last_updated').html(UPDATE_COUNTDOWN);
-}
+  start_countdown(){
+    setInterval(this.show_countdown.bind(this), 1000);
+  }
 
-function reset_countdown(){
-  UPDATE_COUNTDOWN = 0;
+  show_countdown(){
+    this.UPDATE_COUNTDOWN ++;
+    $('#last_updated').html(this.UPDATE_COUNTDOWN);
+  }
+
+  reset_countdown(){
+    this.UPDATE_COUNTDOWN = 0;
+  }
+
 }

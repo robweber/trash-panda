@@ -2,6 +2,7 @@
 {% block header %}
 <script src="/static/js/countdown.js"></script>
 <script type="text/javascript">
+var countdown = new UpdateCountdown();
 
 function load_status(){
   $.ajax({type: 'GET', url: '/api/status/hosts', success: function(data, status, request){
@@ -61,7 +62,7 @@ function load_status(){
     });
 
     // reset countdown
-    reset_countdown();
+    countdown.reset_countdown();
   }});
 }
 </script>
@@ -99,5 +100,5 @@ function load_status(){
 // load status and then update every 15 seconds
 load_status();
 setInterval(load_status, 15000);
-start_countdown()
+countdown.start_countdown()
 {% endblock %}
