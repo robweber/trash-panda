@@ -8,8 +8,9 @@ start countdown with call to start_countdown()
 
 class UpdateCountdown {
 
-  constructor(){
+  constructor(target_div){
     this.UPDATE_COUNTDOWN = 0;
+    this.TARGET_DIV = target_div;  // div to update countdown info
   }
 
   start_countdown(){
@@ -18,7 +19,7 @@ class UpdateCountdown {
 
   show_countdown(){
     this.UPDATE_COUNTDOWN ++;
-    $('#last_updated').html(this.UPDATE_COUNTDOWN);
+    $(`#${this.TARGET_DIV}`).html(this.UPDATE_COUNTDOWN);
   }
 
   reset_countdown(){

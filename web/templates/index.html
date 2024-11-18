@@ -2,7 +2,7 @@
 {% block header %}
 <script src="/static/js/countdown.js"></script>
 <script type="text/javascript">
-var countdown = new UpdateCountdown();
+var countdown = new UpdateCountdown("last_updated");
 
 function load_status(){
   $.ajax({type: 'GET', url: '/api/status/hosts', success: function(data, status, request){
