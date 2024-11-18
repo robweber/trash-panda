@@ -87,7 +87,7 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
     def tags(tag_id):
         tag = history.get_tag(tag_id)
         tag['name'] = config_yaml['tags'][tag_id]['name']
-        
+
         return render_template("services.html", url=f"/api/status/tag/{tag_id}", page_title=f"{tag['name']}")
 
     @app.route('/status/services/<service_filter>')
@@ -436,4 +436,4 @@ while 1:
     logging.debug("Host check complete")
     # record the last time this loop ran
     history.save_last_check()
-    time.sleep(60-datetime.datetime.now().second)  # sleep until the top of the next minute
+    time.sleep(60 - datetime.datetime.now().second)  # sleep until the top of the next minute

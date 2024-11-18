@@ -2,7 +2,6 @@ import datetime
 import json
 import redis
 from enum import Enum
-from slugify import slugify
 
 
 class HostHistory:
@@ -104,8 +103,8 @@ class HostHistory:
         ts_data = self.db.ts().range(key, start * 1000, end * 1000)
 
         for d in ts_data:
-            result['unix_times'].append(d[0]/1000)
-            result['times'].append(datetime.datetime.fromtimestamp(d[0]/1000).strftime("%m/%d/%y %H:%M:%S"))
+            result['unix_times'].append(d[0] / 1000)
+            result['times'].append(datetime.datetime.fromtimestamp(d[0] / 1000).strftime("%m/%d/%y %H:%M:%S"))
             result['values'].append(d[1])
 
         return result
@@ -124,7 +123,7 @@ class HostHistory:
             self.__write_db_json("$", [])
         else:
             # get items that are not in current list
-            old_hosts = list(set(all_hosts)-set(host_ids))
+            old_hosts = list(set(all_hosts) - set(host_ids))
 
             # delete the old hosts
             for host_id in old_hosts:

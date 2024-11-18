@@ -14,7 +14,6 @@ from threading import Lock
 from functools import reduce
 from modules.device import HostType
 from pythonping import ping
-from modules.history import HostHistory
 from modules.exceptions import DeviceNotFoundError, ServiceNotFoundError
 
 
@@ -240,8 +239,8 @@ class HostMonitor:
             total_success = total_success + 1 if r.success is True else total_success
             rta = rta + r.time_elapsed_ms
 
-        packet_loss = 1 - (total_success/len(responses))
-        rta = rta/len(responses)
+        packet_loss = 1 - (total_success / len(responses))
+        rta = rta / len(responses)
 
         # if less than 50% packet loss
         return {"success": True if (packet_loss < .5) else False,
