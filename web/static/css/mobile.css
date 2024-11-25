@@ -92,6 +92,10 @@ p {
   .navbar-expand-lg .navbar-collapse {
     text-align: right;
   }
+
+  #performance_refresh_counter {
+    text-align: center;
+  }
 }
 
 @media screen and (max-width:500px) {

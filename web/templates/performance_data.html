@@ -2,8 +2,12 @@
 {% block header %}
 <script src="/static/js/chart.min.js"></script>
 <script src="/static/js/chartjs-plugin-annotation.min.js"></script>
+<script src="/static/js/countdown.js"></script>
 
 <script type="text/javascript">
+var countdown = new UpdateCountdown("last_updated", 60);
+var canvases = new Map();
+
 function load_graph(){
   end_time = Math.floor(Date.now()/1000);
   start_time = end_time - ({{ minutes }} * 60)
@@ -29,7 +33,7 @@ function load_graph(){
       yMin: {{ p['warning'] }},
       yMax: {{ p['warning'] }},
       borderColor: '#EEC118',
-      borderWidth: 2,
+      borderWidth: 3,
       label: {
         content: "Warning",
         color: '#EEC118'
@@ -43,7 +47,7 @@ function load_graph(){
       yMin: {{ p['critical'] }},
       yMax: {{ p['critical'] }},
       borderColor: '#EE2518',
-      borderWidth: 2,
+      borderWidth: 3,
       label: {
         content: "Critical",
         color: '#EE2518'
@@ -51,13 +55,22 @@ function load_graph(){
     }
     {% endif %}
 
-    new Chart(ctx, {
+    // destroy the old chart, if loaded
+    shouldAnimate = true;
+    if(canvases.has(ctx))
+    {
+      shouldAnimate = false;
+      canvases.get(ctx).destroy();
+    }
+
+    canvases.set(ctx, new Chart(ctx, {
       type: 'line',
       data: {
         labels: data.times,
         datasets: data_array
       },
       options: {
+        animation: shouldAnimate,
         {% if 'critical' in p or 'warning' in p %}
         plugins:{
           annotation:{
@@ -79,7 +92,9 @@ function load_graph(){
           }
         }
       }
-    });
+    }));
+
+  countdown.reset_countdown();
   }});
   {% endfor %}
   {% endif %}
@@ -89,25 +104,31 @@ function load_graph(){
 {% endblock %}
 {% block content %}
 <div class="container">
-  <div class="mt-2 pt-1" align="right">
-    <div class="dropdown div-inline silence_btn">
-      {% set time_display = ((minutes/60) | round | int ) if minutes > 60 else minutes %}
-      <button class="btn btn-success dropdown-toggle silence_btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        {{ time_display }} {{ 'hours' if minutes > 60 else 'min'}}
-      </button>
-      <div class="dropdown-menu dropdown-mobile" aria-labelledby="dropdownMenuButton">
-        <a href="?minutes=30" class="btn dropdown-item">30 min</a>
-        <a href="?minutes=60" class="btn dropdown-item">60 min</a>
-        <a href="?minutes=120" class="btn dropdown-item">2 hours</a>
-        <a href="?minutes=240" class="btn dropdown-item">4 hours</a>
-        <a href="?minutes=360" class="btn dropdown-item">6 hours</a>
-        <a href="?minutes=720" class="btn dropdown-item">12 hours</a>
-        <a href="?minutes=1440" class="btn dropdown-item">24 hours</a>
-      </div>
+  <div class="row mt-2 pt-1">
+    <div class="col-lg-6 align-self-end" id="performance_refresh_counter">
+      Last Refresh <span id="last_updated">0</span> seconds ago
     </div>
-    <a href="/status/host/{{ service['host']['id'] }}" class="btn btn-primary host_back_btn"> Host Status</a>
+    <div class="col-lg-6" align="right">
+      <div class="dropdown div-inline silence_btn">
+        {% set time_display = ((minutes/60) | round | int ) if minutes > 60 else minutes %}
+        <button class="btn btn-success dropdown-toggle silence_btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          {{ time_display }} {{ 'hours' if minutes > 60 else 'min'}}
+        </button>
+        <div class="dropdown-menu dropdown-mobile" aria-labelledby="dropdownMenuButton">
+          <a href="?minutes=30" class="btn dropdown-item">30 min</a>
+          <a href="?minutes=60" class="btn dropdown-item">60 min</a>
+          <a href="?minutes=120" class="btn dropdown-item">2 hours</a>
+          <a href="?minutes=240" class="btn dropdown-item">4 hours</a>
+          <a href="?minutes=360" class="btn dropdown-item">6 hours</a>
+          <a href="?minutes=720" class="btn dropdown-item">12 hours</a>
+          <a href="?minutes=1440" class="btn dropdown-item">24 hours</a>
+        </div>
+      </div>
+      <a href="/status/host/{{ service['host']['id'] }}" class="btn btn-primary host_back_btn"> Host Status</a>
+    </div>
   </div>
-
+</div>
+<div class="container">
   <div class="mt-3">
     {% if 'perf_data' in service %}
     {% for p in service['perf_data']: %}
@@ -129,4 +150,6 @@ function load_graph(){
 {% endblock %}
 {% block onload_scripts %}
 load_graph()
+setInterval(load_graph, 60000);
+countdown.start_countdown();
 {% endblock %}
