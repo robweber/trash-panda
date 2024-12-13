@@ -3,6 +3,10 @@
 <link rel="stylesheet" href="/static/css/documentation.css" />
 <link rel="stylesheet" href="/static/css/highlightjs.min.css" />
 <script src="/static/js/highlight.min.js"></script>
+<script src="/static/js/documentation.js"></script>
+<script type="text/javascript">
+var copier = new DocumentationCopy();
+</script>
 {% endblock %}
 {% block content %}
 <div class="container">
@@ -18,4 +22,5 @@
 {% endblock %}
 {% block onload_scripts %}
 hljs.highlightAll();
+copier.prepare();
 {% endblock %}
