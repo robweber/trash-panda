@@ -4,7 +4,9 @@
 <link rel="stylesheet" href="/static/css/highlightjs.min.css" />
 <script src="/static/js/highlight.min.js"></script>
 <script src="/static/js/countdown.js"></script>
+<script src="/static/js/documentation.js"></script>
 <script type="text/javascript">
+var copier = new DocumentationCopy();
 var countdown = new UpdateCountdown("last_updated");
 var STATUS_COLORS = ['text-success', 'text-warning', 'text-danger', 'text-secondary'];
 var OVERALL_STATUS = ['OK', 'Warning', 'Critical', 'Unknown'];
@@ -253,5 +255,6 @@ function load_status(){
 hljs.highlightAll();
 load_status();
 setInterval(load_status, 15000);
-countdown.start_countdown()
+countdown.start_countdown();
+copier.prepare();
 {% endblock %}

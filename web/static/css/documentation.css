@@ -20,7 +20,26 @@
 }
 
 #documentation pre code {
+  position: relative;
+  padding-top: 1em;
   color: #e83e8c;
+}
+
+#documentation .code-copy-block {
+  position:absolute;
+  top:5px;
+  right: 5px
+}
+
+#documentation a.code {
+  color: #e83e8c;
+  text-decoration: none;
+}
+
+#documentation a.code:hover {
+  color: #e83e8c;
+  text-decoration: none;
+  cursor: copy;
 }
 
 #documentation table {

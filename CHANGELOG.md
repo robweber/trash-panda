@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## Unreleased
+
+### Added
+
+- code blocks in documentation are now able to be copied to the clipboard. Code blocks include a copy icon while inline code can simply be clicked
+
 ## 6.2
 
 ### Added
