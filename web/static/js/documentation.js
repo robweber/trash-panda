@@ -22,12 +22,21 @@ class DocumentationCopy {
     // copy text within this link
     this.copyText($(element).text());
 
+    // flash text to indicate success
+    $(element).fadeOut(400).fadeIn(400);
     return false;
   }
 
   copyTextBlock(element){
     // copy entire text block
     this.copyText($(element).parent().text());
+
+    // show check mark to user
+    $(element).removeClass('mdi-content-copy').addClass('mdi-check text-success');
+    setTimeout(function(){
+      $(element).removeClass('mdi-check text-success').addClass('mdi-content-copy');
+    }, 700);
+
     return false;
   }
 
