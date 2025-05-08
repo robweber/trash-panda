@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 - code blocks in documentation are now able to be copied to the clipboard. Code blocks include a copy icon while inline code can simply be clicked
 
+### Changed
+
+- sleep between service calls cut by 75%, speeds up individual host calls (still no threading)
+
 ## 6.2
 
 ### Added

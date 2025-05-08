@@ -308,7 +308,7 @@ class HostMonitor:
         for s in services:
             output = self.__run_process(self.__create_service_call(s, host.config), [])
             result.append(self.__make_service_output(host, s, output.returncode, output.stdout))
-            time.sleep(1)
+            time.sleep(.25)
 
         return result
 
