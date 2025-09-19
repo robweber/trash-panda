@@ -28,7 +28,22 @@ from modules.history import HostHistory
 from modules.notifications import NotificationGroup
 from flask import Flask, flash, render_template, jsonify, redirect, request, Response
 from slugify import slugify
+from typing import Generator
+import uvicorn
+import contextlib
 
+class Server(uvicorn.Server):
+    @contextlib.contextmanager
+    def run_in_thread(self) -> Generator:
+        thread = threading.Thread(target=self.run)
+        thread.start()
+        try:
+            while not self.started:
+                time.sleep(0.001)
+            yield
+        finally:
+            self.should_exit = True
+            thread.join()
 
 # function to handle when the is killed and exit gracefully
 def signal_handler(signum, frame):
@@ -337,7 +352,8 @@ def webapp_thread(port_number, config_file, config_yaml, notifier_configured, de
         return dict(get_nav_style=get_style)
 
     # run the web app
-    app.run(debug=debugMode, host='0.0.0.0', port=port_number, use_reloader=False)
+    #app.run(debug=debugMode, host='0.0.0.0', port=port_number, use_reloader=False)
+    return app
 
 
 async def check_notifications(notify, old_host, new_host):
@@ -367,7 +383,7 @@ parser.add_argument('-c', '--config', is_config_file=True,
                     help='Path to custom config file')
 parser.add_argument('-f', '--file', default='conf/monitor.yaml',
                     help="Path to the config file for the host data, %(default)s by default")
-parser.add_argument('-p', '--port', default=5000,
+parser.add_argument('-p', '--port', default=5000, type=int,
                     help="Port number to run the web server on, %(default)d by default")
 parser.add_argument('-d', '--database', default="127.0.0.1",
                     help="IP or hostname of Redis database, %(default)s by default")
@@ -410,30 +426,39 @@ if('notifications' in yaml_file['config']):
 
 logging.info('Starting monitoring check daemon')
 monitor = HostMonitor(history, yaml_file)
-
+from starlette.applications import Starlette
+from starlette.middleware.wsgi import WSGIMiddleware
+from starlette.routing import Mount
 # start the web app
 logging.info('Starting Trash Panda Web Service')
-webAppThread = threading.Thread(name='Web App', target=webapp_thread,
-                                args=(args.port, args.file, yaml_file, notify is not None, True, logHandlers))
-webAppThread.setDaemon(True)
-webAppThread.start()
+flask_app = webapp_thread(args.port, args.file, yaml_file, notify is not None, True, logHandlers)
+starlette_app = Starlette(
+    debug=True,
+    routes = [
+        Mount('/', app=WSGIMiddleware(flask_app))
+    ]
+)
 
-while 1:
-    logging.debug("Running host check")
-    status = monitor.check_hosts()
+web_config = uvicorn.Config(app=starlette_app, host="0.0.0.0", port=args.port)
+web_server = Server(config=web_config)
 
-    for host in status:
-        # send notifications, if there are any
-        if(notify is not None):
-            if(not host['silenced']):
-                asyncio.run(check_notifications(notify, history.get_host(host['id']), host))
-            else:
-                logging.info(f"{ host['name'] } is in silent mode, skipping notifications")
+with web_server.run_in_thread():
+    while 1:
+        logging.debug("Running host check")
+        status = monitor.check_hosts()
 
-        # save the updated host
-        history.save_host(host['id'], host)
+        for host in status:
+            # send notifications, if there are any
+            if(notify is not None):
+                if(not host['silenced']):
+                    asyncio.run(check_notifications(notify, history.get_host(host['id']), host))
+                else:
+                    logging.info(f"{ host['name'] } is in silent mode, skipping notifications")
 
-    logging.debug("Host check complete")
-    # record the last time this loop ran
-    history.save_last_check()
-    time.sleep(60 - datetime.datetime.now().second)  # sleep until the top of the next minute
+            # save the updated host
+            history.save_host(host['id'], host)
+
+        logging.debug("Host check complete")
+        # record the last time this loop ran
+        history.save_last_check()
+        time.sleep(60 - datetime.datetime.now().second)  # sleep until the top of the next minute

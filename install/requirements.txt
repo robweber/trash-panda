@@ -11,3 +11,5 @@ redis
 requests
 pyyaml
 Jinja2
+starlette
+uvicorn
