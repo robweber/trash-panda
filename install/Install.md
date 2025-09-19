@@ -1,10 +1,10 @@
 # Install
 
-Instructions to install the system with all required libraries and binary files. This installation will run both the service and database on the same machine. Installation of the Redis database can be done on a different device. 
+Instructions to install the system with all required libraries and binary files. This installation will run both the service and database on the same machine. Installation of the Redis database can be done on a different device if desired.
 
 ### Initial OS setup and Python library install
 
-This commands will setup the operating system and install the required Python libraries.
+This commands will setup the operating system and install the Python virtual environment. If installing the [trash-panda-scripts](https://github.com/robweber/trash-panda-scripts) repository please note you'll also need to install any dependencies needed for those scripts to work separately.
 
 ```
 cd ~
@@ -32,6 +32,18 @@ PROJECT_DIR=$(pwd)
 sudo -H pip3 install -r install/requirements.txt
 ```
 
+Next, create the Python virtual environment and install the required Python libraries
+
+```
+
+python3 -m venv .venv
+
+source .venv/bin/activate
+
+pip3 install -r install/requirements.txt
+
+```
+
 ### Running the program
 
 A configuration file is needed. This will copy the example config to the default directory for editing and copy an example custom page to the docs directory. Edit the config file according to the instructions in the README document and run the `dashboard.py` file.
@@ -41,6 +53,12 @@ A configuration file is needed. This will copy the example config to the default
 mkdir conf
 cp install/monitor_example.yaml conf/monitor.yaml
 mv docs/wiki.example docs/wiki.md
+
+```
+
+Run the program from the command line.
+
+```
 
 ```
 

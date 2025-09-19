@@ -43,19 +43,19 @@ Install the repository according to the instructions in the [Install](install/In
 Before the program can be used services, device types, and hosts need to be configured in the `monitor.yaml` file created during the install. Detailed instructions for how to do this are below. Running the program must be done with `sudo` as root privileges are needed to bind to a socket. Once running the dashboard page will be available at `http://server_ip:5000/`. _Note the port may be different if you change it using the arguments below._
 
 ```
-sudo python3 dashboard.py
+sudo .venv/bin/python3 dashboard.py
 ```
 
 You can also specify the `-c` flag to read in a config file instead of passing in arguments from the command line.
 
 ```
-sudo python3 dashboard.py -c /path/to/config.conf
+sudo .venv/bin/python3 dashboard.py -c /path/to/config.conf
 ```
 
 A full list of arguments can be found by using the `-h` flag.
 
 ```
-python3 dashboard.py -h
+.venv/bin/python3 dashboard.py -h
 
 usage: dashboard.py [-h] [-c CONFIG] [-f FILE] [-p PORT] [-d DATABASE] [-D]
 
@@ -66,7 +66,7 @@ optional arguments:
   -c CONFIG, --config CONFIG
                         Path to custom config file
   -f FILE, --file FILE  Path to the config file for the host data,
-                        conf/monitor.json by default
+                        conf/monitor.yaml by default
   -p PORT, --port PORT  Port number to run the web server on, 5000 by default
   -d DATABASE, --database DATABASE
                         IP or hostname of Redis database, 127.0.0.1 by default
@@ -679,7 +679,7 @@ __/api/command/silence_host/<host_id>/<minutes>__ - sets the given hosts silence
 Trash Panda will check if defined hosts and services are running, but what keeps track of Trash Panda? The `watchdog.py` script can be used to externally check the Trash Panda web service via the [health api](#api) endpoint. This script should be setup to run via a cron job and can read in the same YAML config file to trigger monitoring notifications. If the health service is either not running, or it reports that the monitoring system checker is not running, a notification will be sent using the configured notifier from the YAML file. When the service returns to normal operation a recovery notification is also sent.
 
 ```
-python3 watchdog.py -c conf/monitor.yaml
+.venv/bin/python3 watchdog.py -c conf/monitor.yaml
 ```
 
 Once a notification is sent a flag file is created in the Trash Panda repo directory named `.service_down`. This file prevents further notifications and will be deleted when the Trash Panda service recovers.

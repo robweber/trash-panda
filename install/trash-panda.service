@@ -5,7 +5,7 @@ Requires=redis-stack-server.service
 [Service]
 User=root
 WorkingDirectory=/home/trash-panda
-ExecStart=/usr/bin/python3 /home/trash-panda/dashboard.py -c /etc/default/trash-panda
+ExecStart=/home/trash-panda/.venv/bin/python3 /home/trash-panda/dashboard.py -c /etc/default/trash-panda
 
 [Install]
 WantedBy=multi-user.target
