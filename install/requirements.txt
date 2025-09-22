@@ -13,3 +13,4 @@ pyyaml
 Jinja2
 starlette
 uvicorn
+fastapi[standard]

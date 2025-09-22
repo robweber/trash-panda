@@ -20,7 +20,7 @@
         <div class="container">
         <div class="header">
           <nav class="navbar navbar-expand-lg">
-            <h3 class="navbar-brand text-muted"><a href="/"><img src="/static/favicon-50x50.png" class="mr-3"/></a><span class="tp-title"><span class="text-danger">Trash Panda</span> -</span> {{ page_title }}</h3>
+            <h3 class="navbar-brand text-muted"><a href="/web/"><img src="/static/favicon-50x50.png" class="mr-3"/></a><span class="tp-title"><span class="text-danger">Trash Panda</span> -</span> {{ page_title }}</h3>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
               <span class="mdi mdi-menu icon-inline"></span>
             </button>
@@ -31,14 +31,14 @@
                     Dashboards
                   </a>
                   <div class="dropdown-menu">
-                    <a class="dropdown-item" href="/">Overview</a>
-                    <a class="dropdown-item" href="/status/issues">Issues</a>
+                    <a class="dropdown-item" href="/web/">Overview</a>
+                    <a class="dropdown-item" href="/web/status/issues">Issues</a>
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="/tags">Tags</a>
+                    <a class="dropdown-item" href="/web/tags">Tags</a>
                   </div>
                 </li>
                 <li class="nav-item mb-2">
-                  <a class="nav-link btn btn-{{ get_nav_style() }} ml-2" href="/editor" aria-haspopup="false" aria-expanded="false">Config</a>
+                  <a class="nav-link btn btn-{{ get_nav_style() }} ml-2" href="/web/editor" aria-haspopup="false" aria-expanded="false">Config</a>
                 </li>
                 {% for button in create_nav_links() %}
                 <li class="nav-item">
@@ -65,7 +65,7 @@
         </script>
         <footer class="footer mt-5" align="center">
            <p>
-             <a href="/guide" class="mr-3"><i class="mdi mdi-book-open-page-variant-outline icon-2x"></i></a>
+             <a href="/web/guide" class="mr-3"><i class="mdi mdi-book-open-page-variant-outline icon-2x"></i></a>
              <a href="https://github.com/robweber/trash-panda"><i class="mdi mdi-github icon-2x"></i></a>
            </p>
            <p>Version 6.3</p>

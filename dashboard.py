@@ -28,9 +28,11 @@ from natsort import natsorted
 from modules.monitor import HostMonitor
 from modules.history import HostHistory
 from modules.notifications import NotificationGroup
-from modules.http.dashboard import webapp_thread
+from modules.http.dashboard import flask_app
+from modules.http.api import api_app
 from starlette.applications import Starlette
 from starlette.middleware.wsgi import WSGIMiddleware
+from starlette.staticfiles import StaticFiles
 from starlette.routing import Mount
 from slugify import slugify
 from typing import Generator
@@ -127,11 +129,14 @@ monitor = HostMonitor(history, yaml_file)
 
 # start the web app
 logging.info('Starting Trash Panda Web Service')
-flask_app = webapp_thread(args.file, yaml_file, history, notify is not None, True, logHandlers)
+web_app = flask_app(args.file, yaml_file, history, notify is not None, True, logHandlers)
+api = api_app(args.file, yaml_file, history, notify is not None, True, logHandlers)
 starlette_app = Starlette(
     debug=True,
     routes = [
-        Mount('/', app=WSGIMiddleware(flask_app))
+        Mount('/static', StaticFiles(directory=os.path.join(utils.DIR_PATH, 'web', 'static'))),
+        Mount('/web', app=WSGIMiddleware(web_app)),
+        Mount('/api', app=api)
     ]
 )
 

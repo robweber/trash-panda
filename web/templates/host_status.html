@@ -95,7 +95,7 @@ function load_status(){
 
       // create service link
       serviceLink = $('<a>').text(s.name).addClass(STATUS_COLORS[s.return_code]);
-      serviceLink.attr('href', '/status/services/-' + slugify(s.name) + "$");
+      serviceLink.attr('href', '/web/status/services/-' + slugify(s.name) + "$");
       col1 = $('<div>').append(serviceLink).append(check_attempts);
 
       //create a column for the links (if any)
@@ -113,7 +113,7 @@ function load_status(){
       if(s.hasOwnProperty('perf_data'))
       {
         link2 = $('<a>');
-        link2.attr('href', '/perf_data/' + s.id);
+        link2.attr('href', '/web/perf_data/' + s.id);
         link2.attr('class', 'mdi mdi-chart-areaspline-variant icon-sm icon-inline');
         col_size = 6;
       }
@@ -135,7 +135,7 @@ function load_status(){
       s.tags.forEach(function(aTag){
         tagPill = $('<span>').text(TAGS[aTag]['name']).addClass('badge').addClass('rounded-pill').addClass('bg-' + TAGS[aTag]['color']);
         tagLink = $('<a>').append(tagPill).addClass('text-light');
-        tagLink.attr('href', '/status/tag/' + aTag);
+        tagLink.attr('href', '/web/status/tag/' + aTag);
         tag_div.append(tagLink);
       });
 
@@ -241,7 +241,7 @@ function load_status(){
     <div class="tab-pane mt-3" id="documentation">
       {% if docs | length %}
       <div align="right">
-        <a href="/editor?path={{ doc_file }}" class="btn btn-sm btn-outline-secondary">Edit File</a>
+        <a href="/web/editor?path={{ doc_file }}" class="btn btn-sm btn-outline-secondary">Edit File</a>
       </div>
       {{ docs | safe }}
       {% else %}

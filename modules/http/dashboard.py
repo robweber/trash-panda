@@ -6,7 +6,7 @@ from .. import utils as utils
 from flask import Flask, flash, render_template, jsonify, redirect, request, Response
 from slugify import slugify
 
-def webapp_thread(config_file, config_yaml, history, notifier_configured, debugMode=False, logHandlers=[]):
+def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=False, logHandlers=[]):
     app = Flask(import_name="trash-panda", static_folder=os.path.join(utils.DIR_PATH, 'web', 'static'),
                 template_folder=os.path.join(utils.DIR_PATH, 'web', 'templates'))
     # add use of slugify for templates
@@ -105,111 +105,8 @@ def webapp_thread(config_file, config_yaml, history, notifier_configured, debugM
                                docs=utils.load_documentation(os.path.join(utils.DIR_PATH, "README.md")))
 
     """ Start of API """
-    @app.route('/api/health', methods=['GET'])
-    def health():
-        """calculate the monitoring system health by making sure the main program
-        loop is running properly"""
-        last_check = history.get_last_check()
-        status = {"text": "Online", "return_code": 0,
-                  'last_check_time': last_check.strftime(utils.TIME_FORMAT)}
 
-        # check if the main program loop is running
-        now = datetime.datetime.now()
-        if(now > last_check + datetime.timedelta(minutes=2)):
-            # program is offline if it hasn't run in 2 minutes (grace time for checks)
-            status['text'] = 'Offline'
-            status['return_code'] = 2  # Critical status
-
-        return jsonify(status)
-
-    @app.route('/api/list/hosts', methods=['GET'])
-    def list_hosts():
-        return jsonify(history.list_hosts())
-
-    @app.route('/api/list/tags', methods=['GET'])
-    def list_tags():
-        return jsonify(config_yaml['tags'])
-
-    @app.route('/api/status/hosts', methods=['GET'])
-    def status():
-        # get a list of hosts
-        hosts = history.get_hosts()
-
-        return jsonify(sorted(hosts, key=lambda o: o['name']))
-
-    @app.route('/api/status/summary', methods=['GET'])
-    def overall_status():
-        overall_status = 0  # 0 is the target, means all is good
-        error_count = 0
-
-        # pull in all the hosts and get their overall status
-        hosts = history.get_hosts()
-        services = []
-        for host in hosts:
-            # catch for rare cases where host status hasn't been calculated yet
-            if('overall_status' in host):
-                # set the higher of the two values
-                overall_status = host['overall_status'] if host['overall_status'] > overall_status else overall_status
-
-                if(host['overall_status'] > 0):
-                    error_count = error_count + 1
-
-        # get services in error
-        services = history.get_services([1, 2])
-
-        return jsonify({"total_hosts": len(hosts), "hosts_with_errors": error_count, "services_with_errors": len(services),
-                        "overall_status": overall_status, "overall_status_description": utils.SERVICE_STATUSES[overall_status],
-                        "services": services})
-
-    @app.route('/api/status/host/<host_id>', methods=['GET'])
-    def get_host(host_id):
-        host = history.get_host(host_id)
-
-        return jsonify(host)
-
-    @app.route('/api/status/services')
-    def get_services_by_query():
-        return_codes = [0, 1, 2, 3]  # by default return all codes
-        service_filter = ".*"  # by default list all services
-
-        if(request.args.get('return_codes') is not None):
-            return_codes = request.args.get('return_codes').split("|")
-
-        if(request.args.get('service_filter') is not None):
-            service_filter = request.args.get('service_filter')
-
-        services = history.get_services(return_codes, service_filter)
-
-        # sort by return code, then name
-        services = sorted(services, key=lambda o: (o['return_code'] * -1, o['host']['name']))
-
-        return jsonify({"return_codes": return_codes, "service_filter": service_filter, "services": services})
-
-    @app.route('/api/status/tag/<tag_id>', methods=['GET'])
-    def get_tag(tag_id):
-        tag = history.get_tag(tag_id)
-
-        # convert services to an array
-        tag['services'] = sorted(tag['services'], key=lambda o: o['host']['name'])
-
-        return jsonify(tag)
-
-    @app.route('/api/time/<id>', methods=['GET'], defaults={'start': None, 'end': None})
-    @app.route('/api/time/<id>/<int:start>/<int:end>', methods=['GET'])
-    def get_ts(id, start, end):
-        # if end is blank, set to now
-        if(end is None):
-            end = int(time.time())
-
-        # if start is blank, set to 1 hr
-        if(start is None):
-            start = end - 3600
-
-        tag = history.get_ts_data(id, start, end)
-
-        return jsonify(tag)
-
-    @app.route('/api/command/check_now/<id>', methods=['POST'])
+    @app.post('/command/check_now/{id}')
     def check_host_now(id):
         result = monitor.check_now(id)
 
@@ -219,7 +116,7 @@ def webapp_thread(config_file, config_yaml, history, notifier_configured, debugM
             aHost['next_check'] = result['next_check']
             history.save_host(id, aHost, update_perf_data=False)
 
-        return jsonify(result)
+        return result
 
     @app.route('/api/command/silence_host/<id>/<minutes>', methods=['POST'])
     def silence_host(id, minutes):
@@ -233,35 +130,6 @@ def webapp_thread(config_file, config_yaml, history, notifier_configured, debugM
             history.save_host(id, aHost, update_perf_data=False)
 
         return jsonify(result)
-
-    @app.route('/api/editor/browse_files/', methods=['GET'], defaults={'browse_path': utils.DIR_PATH})
-    @app.route('/api/editor/browse_files/<path:browse_path>', methods=['GET'])
-    def list_directory(browse_path):
-        if(not browse_path.startswith('/')):
-            browse_path = f"/{browse_path}"
-
-        # if path is a file, get directory
-        if(os.path.isfile(browse_path)):
-            browse_path = os.path.dirname(browse_path)
-
-        # get a list of all the directories
-        dirs = sorted([name for name in os.listdir(browse_path) if os.path.isdir(os.path.join(browse_path, name))])
-
-        # get a list of all the files, filter on valid yaml
-        files = natsorted(filter(lambda f: f.endswith(utils.ALLOWED_EDITOR_TYPES), os.listdir(browse_path)))
-
-        return jsonify({'success': True, 'dirs': dirs, 'files': files, 'path': browse_path})
-
-    @app.route('/api/editor/load_file', methods=['POST'])
-    def load_file():
-        file_path = request.form['file_path']
-
-        file_contents = ''
-        if(file_path.endswith(utils.ALLOWED_EDITOR_TYPES) and os.path.isfile(file_path)):
-            with open(file_path) as f:
-                file_contents = f.readlines()
-
-        return Response(file_contents, mimetype='text/plain')
 
     @app.route('/api/editor/save_file', methods=["POST"])
     def save_file():
