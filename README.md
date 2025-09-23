@@ -466,16 +466,6 @@ For integration with other systems the API can be used. To decode the status ret
 
 The status codes are determined by the settings for the device and the output of the various check utilities. Note that for service check related data Performance Data information (`perf_data`) is available if the check command returns it. This is parsed according to the [Nagios performance data](https://nagios-plugins.org/doc/guidelines.html#AEN200) standard. If there isn't any performance data the key will not exist for that service.
 
-
-__/api/command/check_now/<host_id>__ - updates a given host's next check time to the current time. This forces a service check instead of waiting for the normal update interval. The host id can be found via the `/api/status` endpoint for each host.
-
-```
-{
-  "success": true
-  "next_check": "09-14-2022 09:44AM"
-}
-```
-
 __/api/command/silence_host/<host_id>/<minutes>__ - sets the given hosts silenced property to True for the given amount of minutes. This will silence any notifications for this time.
 
 ```

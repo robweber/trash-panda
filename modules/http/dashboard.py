@@ -106,18 +106,6 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
 
     """ Start of API """
 
-    @app.post('/command/check_now/{id}')
-    def check_host_now(id):
-        result = monitor.check_now(id)
-
-        if(result['success']):
-            # update the next check time in the DB as well
-            aHost = history.get_host(id)
-            aHost['next_check'] = result['next_check']
-            history.save_host(id, aHost, update_perf_data=False)
-
-        return result
-
     @app.route('/api/command/silence_host/<id>/<minutes>', methods=['POST'])
     def silence_host(id, minutes):
         until = datetime.datetime.now() + datetime.timedelta(minutes=int(minutes))

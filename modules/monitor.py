@@ -320,6 +320,12 @@ class HostMonitor:
 
         with self.lock:
             for id, aHost in self.hosts.items():
+                saved_host = self.history.get_host(aHost.id)
+
+                if(aHost.next_check != saved_host['next_check']):
+                    logging.debug("next check has been changed")
+                    aHost.next_check = saved_host['next_check']
+
                 # check if we need to check this host,
                 next_check = datetime.datetime.strptime(aHost.next_check, utils.TIME_FORMAT)
                 if(next_check < now):
@@ -361,23 +367,6 @@ class HostMonitor:
 
     def get_host(self, id):
         return self.hosts[id] if id in self.hosts else None
-
-    def check_now(self, id):
-        """sets the next check time on the host to now, forcing a check"""
-        result = {"success": False}
-
-        aHost = self.get_host(id)
-
-        if(aHost is not None):
-            with self.lock:
-                # reset the next check time and update the host
-                aHost.next_check = datetime.datetime.now().strftime(utils.TIME_FORMAT)
-                self.hosts[id] = aHost
-
-                result['next_check'] = aHost.next_check
-                result['success'] = True
-
-        return result
 
     def silence_host(self, id, until):
         """sets the silenced property on a host which will expire when the current time

@@ -190,4 +190,10 @@ def api_app(config_file, config_yaml, history, notifier_configured, debugMode=Fa
 
         return result
 
+    @app.post('/command/check_now/{id}', tags=['Command'], description=Path('api_docs/post_command_check_now.md').read_text())
+    def check_host_now(id):
+        result = history.check_host_now(id)
+
+        return result
+
     return app

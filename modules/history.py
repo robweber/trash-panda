@@ -1,6 +1,7 @@
 import datetime
 import json
 import redis
+import modules.utils as utils
 from enum import Enum
 
 
@@ -156,6 +157,22 @@ class HostHistory:
 
                         # add the value
                         self.db.ts().add(p['id'], unix_time * 1000, p['value'])
+
+    def check_host_now(self, id):
+        """sets the next check time on the host to now, forcing a check"""
+        result = {"success": False}
+
+        aHost = self.get_host(id)
+
+        if(aHost is not None):
+            # reset the next check time and update the host
+            aHost['next_check'] = datetime.datetime.now().strftime(utils.TIME_FORMAT)
+            self.save_host(id, aHost, False)
+
+            result['next_check'] = aHost['next_check']
+            result['success'] = True
+
+        return result
 
     def __exists(self, key):
         return self.db.exists(key) > 0
