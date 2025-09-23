@@ -5,7 +5,13 @@ import time
 from fastapi import FastAPI
 from fastapi.responses import PlainTextResponse
 from natsort import natsorted
+from pydantic import BaseModel
 from .. import utils as utils
+
+class FilePath(BaseModel):
+    path: str
+    reset: bool = False
+
 
 def api_app(config_file, config_yaml, history, notifier_configured, debugMode=False, logHandlers=[]):
 
@@ -110,32 +116,34 @@ def api_app(config_file, config_yaml, history, notifier_configured, debugMode=Fa
 
         return tag
 
-    @app.get('/editor/browse_files/')
-    @app.get('/editor/browse_files/{browse_path}')
-    def list_directory(browse_path = utils.DIR_PATH):
-        if(not browse_path.startswith('/')):
-            browse_path = f"/{browse_path}"
+    @app.post('/editor/browse_files')
+    def list_directory(path: FilePath):
+        if(path.reset):
+            path.path = utils.DIR_PATH
+
+        if(not path.path.startswith('/')):
+            path.path = f"/{path.path}"
 
         # if path is a file, get directory
-        if(os.path.isfile(browse_path)):
-            browse_path = os.path.dirname(browse_path)
+        if(os.path.isfile(path.path)):
+            path.path = os.path.dirname(path.path)
 
         # get a list of all the directories
-        dirs = sorted([name for name in os.listdir(browse_path) if os.path.isdir(os.path.join(browse_path, name))])
+        dirs = sorted([name for name in os.listdir(path.path) if os.path.isdir(os.path.join(path.path, name))])
 
         # get a list of all the files, filter on valid yaml
-        files = natsorted(filter(lambda f: f.endswith(utils.ALLOWED_EDITOR_TYPES), os.listdir(browse_path)))
+        files = natsorted(filter(lambda f: f.endswith(utils.ALLOWED_EDITOR_TYPES), os.listdir(path.path)))
 
-        return {'success': True, 'dirs': dirs, 'files': files, 'path': browse_path}
+        return {'success': True, 'dirs': dirs, 'files': files, 'path': path.path}
 
-    @app.post('/editor/load_file')
-    def load_file(file_path):
+    @app.post('/editor/load_file', response_class=PlainTextResponse)
+    def load_file(file_path: FilePath):
 
         file_contents = ''
-        if(file_path.endswith(utils.ALLOWED_EDITOR_TYPES) and os.path.isfile(file_path)):
-            with open(file_path) as f:
+        if(file_path.path.endswith(utils.ALLOWED_EDITOR_TYPES) and os.path.isfile(file_path.path)):
+            with open(file_path.path) as f:
                 file_contents = f.readlines()
 
-        return PlainTextResponse(content=file_contents)
+        return ''.join(file_contents)
 
     return app

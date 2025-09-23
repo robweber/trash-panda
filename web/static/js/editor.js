@@ -41,10 +41,11 @@ function makePathLink(path, name, funcName = 'loadFiles'){
   return '<a href="#" onClick="return ' + funcName + '(\'' + path + '\')">' + name + '</a><br />';
 }
 
-function loadFiles(path){
+function loadFiles(path, reset=false){
 
   // send request to load file listings
-  $.ajax({type: 'GET', contentType: 'application/json', url: '/api/editor/browse_files/' + path, success: function(data, status, request){
+  $.ajax({type: 'POST', contentType: 'application/json', url: '/api/editor/browse_files/',
+          data: JSON.stringify({'path': path, 'reset': reset}), success: function(data, status, request){
 
     if(data.success)
     {
@@ -82,7 +83,8 @@ function loadFiles(path){
 }
 
 function loadEditor(){
-  $.ajax({type: 'POST', url: '/api/editor/load_file', data: {'file_path': $('#config_path').html()}, success: function(data, status, request){
+  $.ajax({type: 'POST', contentType: 'application/json',
+          url: '/api/editor/load_file', data: JSON.stringify({'path': $('#config_path').html()}), success: function(data, status, request){
     editor.setValue(data,1);
 
     fileInfo = pathInfo($('#config_path').html());
