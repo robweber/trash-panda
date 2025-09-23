@@ -7,6 +7,7 @@ from fastapi.responses import PlainTextResponse
 from natsort import natsorted
 from pydantic import BaseModel
 from .. import utils as utils
+from pathlib import Path
 
 class FilePath(BaseModel):
     path: str
@@ -18,12 +19,14 @@ class FileContents(BaseModel):
 
 def api_app(config_file, config_yaml, history, notifier_configured, debugMode=False, logHandlers=[]):
 
-    app = FastAPI()
+    app = FastAPI(
+        title="Trash Panda API",
+        summary="Backend API for interacting with the Trash Panda monitoring service"
+    )
 
-    @app.get('/health')
+    @app.get('/health', tags=['Health'], description=Path('api_docs/get_health.md').read_text())
     def health():
-        """calculate the monitoring system health by making sure the main program
-        loop is running properly"""
+
         last_check = history.get_last_check()
         status = {"text": "Online", "return_code": 0,
                   'last_check_time': last_check.strftime(utils.TIME_FORMAT)}
@@ -37,23 +40,19 @@ def api_app(config_file, config_yaml, history, notifier_configured, debugMode=Fa
 
         return status
 
-    @app.get('/list/hosts')
+    @app.get('/list/hosts', tags=['Informational'], description=Path('api_docs/get_list_hosts.md').read_text())
     def list_hosts():
+
         return history.list_hosts()
 
-    @app.get('/list/tags')
+    @app.get('/list/tags', tags=['Informational'], description=Path('api_docs/get_list_tags.md').read_text())
     def list_tags():
+
         return config_yaml['tags']
 
-    @app.get('/status/hosts')
-    def status():
-        # get a list of hosts
-        hosts = history.get_hosts()
-
-        return sorted(hosts, key=lambda o: o['name'])
-
-    @app.get('/status/summary')
+    @app.get('/status/summary', tags=['Status'], description=Path('api_docs/get_status_summary.md').read_text())
     def overall_status():
+
         overall_status = 0  # 0 is the target, means all is good
         error_count = 0
 
@@ -76,15 +75,23 @@ def api_app(config_file, config_yaml, history, notifier_configured, debugMode=Fa
                         "overall_status": overall_status, "overall_status_description": utils.SERVICE_STATUSES[overall_status],
                         "services": services}
 
-    @app.get('/status/host/{host_id}')
-    def get_host(host_id):
+    @app.get('/status/hosts', tags=['Status'], description=Path('api_docs/get_status_hosts.md').read_text())
+    def status():
+
+        # get a list of hosts
+        hosts = history.get_hosts()
+
+        return sorted(hosts, key=lambda o: o['name'])
+
+    @app.get('/status/host/{host_id}', tags=['Status'], description=Path('api_docs/get_status_hosts_id.md').read_text())
+    def get_host(host_id: str):
+
         host = history.get_host(host_id)
 
         return host
 
-    @app.get('/status/services')
-    def get_services_by_query(return_codes = "0|1|2|3", service_filter=".*"):
-        """ by default lookup all return codes and list all services """
+    @app.get('/status/services', tags=['Status'], description=Path('api_docs/get_status_services.md').read_text())
+    def get_services_by_query(return_codes: str = "0|1|2|3", service_filter: str =".*"):
 
         return_codes = return_codes.split("|")
 
@@ -95,8 +102,9 @@ def api_app(config_file, config_yaml, history, notifier_configured, debugMode=Fa
 
         return {"return_codes": return_codes, "service_filter": service_filter, "services": services}
 
-    @app.get('/status/tag/{tag_id}')
-    def get_tag(tag_id):
+    @app.get('/status/tag/{tag_id}', tags=['Status'], description=Path('api_docs/get_status_tag.md').read_text())
+    def get_tag(tag_id: str):
+
         tag = history.get_tag(tag_id)
 
         # convert services to an array
@@ -104,9 +112,8 @@ def api_app(config_file, config_yaml, history, notifier_configured, debugMode=Fa
 
         return tag
 
-    @app.get('/time/{id}')
-    @app.get('/time/{id}/{start}/{end}')
-    def get_ts(id, start: int = None, end: int = None):
+    @app.get('/time/{id}/{start}/{end}', tags=['Performance Data'], description=Path('api_docs/get_perf_data_time.md').read_text())
+    def get_ts(id: str, start: int = None, end: int = None):
         # if end is blank, set to now
         if(end is None):
             end = int(time.time())
@@ -119,8 +126,11 @@ def api_app(config_file, config_yaml, history, notifier_configured, debugMode=Fa
 
         return tag
 
-    @app.post('/editor/browse_files')
+    @app.post('/editor/browse_files', tags=['Editor'])
     def list_directory(path: FilePath):
+        """
+        Used by the UI file editor to browse the file system for available configuration files
+        """
         if(path.reset):
             path.path = utils.DIR_PATH
 
@@ -139,9 +149,12 @@ def api_app(config_file, config_yaml, history, notifier_configured, debugMode=Fa
 
         return {'success': True, 'dirs': dirs, 'files': files, 'path': path.path}
 
-    @app.post('/editor/load_file', response_class=PlainTextResponse)
+    @app.post('/editor/load_file', response_class=PlainTextResponse, tags=['Editor'])
     def load_file(file_path: FilePath):
-
+        """
+        Used by the UI file editor
+        Loads a file, in plaintext, given the path
+        """
         file_contents = ''
         if(file_path.path.endswith(utils.ALLOWED_EDITOR_TYPES) and os.path.isfile(file_path.path)):
             with open(file_path.path) as f:
@@ -149,16 +162,22 @@ def api_app(config_file, config_yaml, history, notifier_configured, debugMode=Fa
 
         return ''.join(file_contents)
 
-    @app.post('/editor/save_file')
+    @app.post('/editor/save_file', tags=['Editor'])
     def save_file(save_file: FileContents):
+        """
+        Used by the UI file editor to save a file with the given contents
+        """
 
         with open(save_file.path, 'w') as f:
             f.write(save_file.contents)
 
         return {'success': True, 'message': f"Saved {save_file.path}"}
 
-    @app.get('/check_config')
+    @app.get('/check_config', tags=['Health'], description=Path('api_docs/get_check_config.md').read_text())
     def check_config():
+        """
+
+        """
         result = {'success': True, 'message': 'Config is valid'}
 
         # check the config and see if it validates
