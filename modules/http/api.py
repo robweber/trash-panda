@@ -12,6 +12,9 @@ class FilePath(BaseModel):
     path: str
     reset: bool = False
 
+class FileContents(BaseModel):
+    path: str
+    contents: str
 
 def api_app(config_file, config_yaml, history, notifier_configured, debugMode=False, logHandlers=[]):
 
@@ -145,5 +148,27 @@ def api_app(config_file, config_yaml, history, notifier_configured, debugMode=Fa
                 file_contents = f.readlines()
 
         return ''.join(file_contents)
+
+    @app.post('/editor/save_file')
+    def save_file(save_file: FileContents):
+
+        with open(save_file.path, 'w') as f:
+            f.write(save_file.contents)
+
+        return {'success': True, 'message': f"Saved {save_file.path}"}
+
+    @app.get('/check_config')
+    def check_config():
+        result = {'success': True, 'message': 'Config is valid'}
+
+        # check the config and see if it validates
+        yaml_check = utils.load_config_file(config_file)
+
+        if(not yaml_check['valid']):
+            result['success'] = False
+            result['message'] = 'Configuration file is not valid'
+            result['errors'] = yaml_check['errors']
+
+        return result
 
     return app

@@ -44,7 +44,7 @@ function makePathLink(path, name, funcName = 'loadFiles'){
 function loadFiles(path, reset=false){
 
   // send request to load file listings
-  $.ajax({type: 'POST', contentType: 'application/json', url: '/api/editor/browse_files/',
+  $.ajax({type: 'POST', contentType: 'application/json', url: '/api/editor/browse_files',
           data: JSON.stringify({'path': path, 'reset': reset}), success: function(data, status, request){
 
     if(data.success)
@@ -111,15 +111,16 @@ function loadEditor(){
 }
 
 function saveFile(){
-    $.post('/api/editor/save_file', {'file_path': $('#config_path').html(), "file_contents":editor.getValue()}, function(data){
-        //show success
-        if(data.success)
-        {
-          //show message
-          $('#js-success-alert').html(data.message);
-          $('#js-success-alert').show().delay(3000).fadeOut();
-        }
-    });
+  $.ajax({type: 'POST', contentType: 'application/json', url: '/api/editor/save_file',
+          data: JSON.stringify({'path': $('#config_path').html(), "contents":editor.getValue()}), success: function(data, status, request){
+      //show success
+      if(data.success)
+      {
+        //show message
+        $('#js-success-alert').html(data.message);
+        $('#js-success-alert').show().delay(3000).fadeOut();
+      }
+  }});
 }
 
 function checkConfig(){

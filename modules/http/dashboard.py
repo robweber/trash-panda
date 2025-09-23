@@ -131,28 +131,6 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
 
         return jsonify(result)
 
-    @app.route('/api/editor/save_file', methods=["POST"])
-    def save_file():
-        file_path = request.form['file_path']
-
-        with open(file_path, 'w') as f:
-            f.write(request.form['file_contents'])
-
-        return jsonify({'success': True, 'message': f"Saved {file_path}"})
-
-    @app.route('/api/check_config', methods=['GET'])
-    def check_config():
-        result = {'success': True, 'message': 'Config is valid'}
-
-        # check the config and see if it validates
-        yaml_check = utils.load_config_file(config_file)
-
-        if(not yaml_check['valid']):
-            result['success'] = False
-            result['message'] = 'Configuration file is not valid'
-            result['errors'] = yaml_check['errors']
-
-        return jsonify(result)
 
     """ Start of custom processors """
     @app.context_processor
