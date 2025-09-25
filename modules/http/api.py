@@ -3,29 +3,31 @@ import logging
 import os
 import os.path
 import time
-from fastapi import FastAPI
+from fastapi import FastAPI, Body, Path, Query
 from fastapi.responses import PlainTextResponse
 from natsort import natsorted
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from .. import utils as utils
-from pathlib import Path
+from pathlib import Path as LoadPath
+from typing import Annotated
 
 class FilePath(BaseModel):
-    path: str
+    path: str = Field(description="a valid file system directory of file path")
     reset: bool = False
 
 class FileContents(BaseModel):
-    path: str
-    contents: str
+    path: str = Field(description="full system path to the file to write")
+    contents: str = Field(description="string contents of the file to write")
 
 def api_app(config_file, config_yaml, history, notifier_configured, debugMode=False, logHandlers=[]):
 
     app = FastAPI(
         title="Trash Panda API",
+        version="1.0.0",
         summary="Backend API for interacting with the Trash Panda monitoring service"
     )
 
-    @app.get('/health', tags=['Health'], description=Path('api_docs/get_health.md').read_text())
+    @app.get('/health', tags=['Health'], description=LoadPath('api_docs/get_health.md').read_text())
     def health():
 
         last_check = history.get_last_check()
@@ -41,17 +43,17 @@ def api_app(config_file, config_yaml, history, notifier_configured, debugMode=Fa
 
         return status
 
-    @app.get('/list/hosts', tags=['Informational'], description=Path('api_docs/get_list_hosts.md').read_text())
+    @app.get('/list/hosts', tags=['Informational'], description=LoadPath('api_docs/get_list_hosts.md').read_text())
     def list_hosts():
 
         return history.list_hosts()
 
-    @app.get('/list/tags', tags=['Informational'], description=Path('api_docs/get_list_tags.md').read_text())
+    @app.get('/list/tags', tags=['Informational'], description=LoadPath('api_docs/get_list_tags.md').read_text())
     def list_tags():
 
         return config_yaml['tags']
 
-    @app.get('/status/summary', tags=['Status'], description=Path('api_docs/get_status_summary.md').read_text())
+    @app.get('/status/summary', tags=['Status'], description=LoadPath('api_docs/get_status_summary.md').read_text())
     def overall_status():
 
         overall_status = 0  # 0 is the target, means all is good
@@ -76,23 +78,23 @@ def api_app(config_file, config_yaml, history, notifier_configured, debugMode=Fa
                         "overall_status": overall_status, "overall_status_description": utils.SERVICE_STATUSES[overall_status],
                         "services": services}
 
-    @app.get('/status/hosts', tags=['Status'], description=Path('api_docs/get_status_hosts.md').read_text())
+    @app.get('/status/hosts', tags=['Status'], description=LoadPath('api_docs/get_status_hosts.md').read_text())
     def status():
-
         # get a list of hosts
         hosts = history.get_hosts()
 
         return sorted(hosts, key=lambda o: o['name'])
 
-    @app.get('/status/host/{host_id}', tags=['Status'], description=Path('api_docs/get_status_hosts_id.md').read_text())
-    def get_host(host_id: str):
+    @app.get('/status/host/{host_id}', tags=['Status'], description=LoadPath('api_docs/get_status_hosts_id.md').read_text())
+    def get_host(host_id: str = Path(description="A valid host id")):
 
         host = history.get_host(host_id)
 
         return host
 
-    @app.get('/status/services', tags=['Status'], description=Path('api_docs/get_status_services.md').read_text())
-    def get_services_by_query(return_codes: str = "0|1|2|3", service_filter: str =".*"):
+    @app.get('/status/services', tags=['Status'], description=LoadPath('api_docs/get_status_services.md').read_text())
+    def get_services_by_query(return_codes: Annotated[str, Query(description="Return codes (0-3) to filter on, separate multiple with pipe (|)")] ="0|1|2|3",
+                              service_filter: Annotated[str, Query(description="Service filter, regex that filters on service id")] = ".*"):
 
         return_codes = return_codes.split("|")
 
@@ -103,8 +105,8 @@ def api_app(config_file, config_yaml, history, notifier_configured, debugMode=Fa
 
         return {"return_codes": return_codes, "service_filter": service_filter, "services": services}
 
-    @app.get('/status/tag/{tag_id}', tags=['Status'], description=Path('api_docs/get_status_tag.md').read_text())
-    def get_tag(tag_id: str):
+    @app.get('/status/tag/{tag_id}', tags=['Status'], description=LoadPath('api_docs/get_status_tag.md').read_text())
+    def get_tag(tag_id: str = Path(description="a valid tag id")):
 
         tag = history.get_tag(tag_id)
 
@@ -113,8 +115,10 @@ def api_app(config_file, config_yaml, history, notifier_configured, debugMode=Fa
 
         return tag
 
-    @app.get('/time/{id}/{start}/{end}', tags=['Performance Data'], description=Path('api_docs/get_perf_data_time.md').read_text())
-    def get_ts(id: str, start: int = None, end: int = None):
+    @app.get('/time/{id}/{start}/{end}', tags=['Performance Data'], description=LoadPath('api_docs/get_perf_data_time.md').read_text())
+    def get_ts(id: Annotated[str, Path(description="a valid performance id (host-service ids)")],
+               start: Annotated[int, Path(description="UNIX timestamp representing the start interval")],
+               end: Annotated[int, Path(description="UNIX timestamp representing the end interval, must be greater than start")]):
         # if end is blank, set to now
         if(end is None):
             end = int(time.time())
@@ -128,7 +132,7 @@ def api_app(config_file, config_yaml, history, notifier_configured, debugMode=Fa
         return tag
 
     @app.post('/editor/browse_files', tags=['Editor'])
-    def list_directory(path: FilePath):
+    def list_directory(path: Annotated[FilePath, Body(embed=True)]):
         """
         Used by the UI file editor to browse the file system for available configuration files
         """
@@ -151,7 +155,7 @@ def api_app(config_file, config_yaml, history, notifier_configured, debugMode=Fa
         return {'success': True, 'dirs': dirs, 'files': files, 'path': path.path}
 
     @app.post('/editor/load_file', response_class=PlainTextResponse, tags=['Editor'])
-    def load_file(file_path: FilePath):
+    def load_file(file_path: Annotated[FilePath, Body(embed=True)]):
         """
         Used by the UI file editor
         Loads a file, in plaintext, given the path
@@ -164,7 +168,7 @@ def api_app(config_file, config_yaml, history, notifier_configured, debugMode=Fa
         return ''.join(file_contents)
 
     @app.post('/editor/save_file', tags=['Editor'])
-    def save_file(save_file: FileContents):
+    def save_file(save_file: Annotated[FileContents, Body(embed=True)]):
         """
         Used by the UI file editor to save a file with the given contents
         """
@@ -174,7 +178,7 @@ def api_app(config_file, config_yaml, history, notifier_configured, debugMode=Fa
 
         return {'success': True, 'message': f"Saved {save_file.path}"}
 
-    @app.get('/check_config', tags=['Health'], description=Path('api_docs/get_check_config.md').read_text())
+    @app.get('/check_config', tags=['Health'], description=LoadPath('api_docs/get_check_config.md').read_text())
     def check_config():
         """
 
@@ -191,14 +195,15 @@ def api_app(config_file, config_yaml, history, notifier_configured, debugMode=Fa
 
         return result
 
-    @app.post('/command/check_now/{id}', tags=['Command'], description=Path('api_docs/post_command_check_now.md').read_text())
-    def check_host_now(id):
+    @app.post('/command/check_now/{id}', tags=['Command'], description=LoadPath('api_docs/post_command_check_now.md').read_text())
+    def check_host_now(id: str = Path(description="A valid host id")):
         result = history.check_host_now(id)
 
         return result
 
-    @app.post('/command/silence_host/{id}/{minutes}', tags=['Command'], description=Path('api_docs/post_command_silence_host.md').read_text())
-    def silence_host(id, minutes):
+    @app.post('/command/silence_host/{id}/{minutes}', tags=['Command'], description=LoadPath('api_docs/post_command_silence_host.md').read_text())
+    def silence_host(id:str = Path(description="a valid host id"),
+                     minutes:int = Path(description="the number of minutes to silence this host")):
         result = history.silence_host(id, minutes)
 
         logging.debug(f"Silencing {id} until {result['until']}")

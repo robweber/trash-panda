@@ -1,5 +1,7 @@
 __/api/time/<perf_id>/start>/<end>__ - lookup Performance Data information for a specified time period. The __start__ and __end__ times should be unix timestamps. If these are omitted the last 60 minutes are returned by default.
 
+The performance ID is created by combining the host and service ids. For a host __switch-1__ with a service __alive__ the performance id would be __switch-1-alive__.
+
 ```
 {
   "times": [
