@@ -135,9 +135,9 @@ monitor = HostMonitor(history, yaml_file)
 # start the web app
 logging.info('Starting Trash Panda Web Service')
 web_app = flask_app(args.file, yaml_file, history, notify is not None, True, logHandlers)
-api = api_app(args.file, yaml_file, history, notify is not None, True, logHandlers)
+api = api_app(args.file, yaml_file, history)
 starlette_app = Starlette(
-    debug=True,
+    debug=args.debug,
     routes=[
         Route('/', homepage_redirect),
         Mount('/static', StaticFiles(directory=os.path.join(utils.DIR_PATH, 'web', 'static'))),
@@ -147,7 +147,7 @@ starlette_app = Starlette(
 )
 
 # load uvicorn server, start in new thread
-web_config = uvicorn.Config(app=starlette_app, host="0.0.0.0", port=args.port, log_level=logLevel.lower())
+web_config = uvicorn.Config(app=starlette_app, host="0.0.0.0", port=args.port, log_level=logLevel.lower(), log_config=None)
 web_server = Server(config=web_config)
 
 with web_server.run_in_thread():

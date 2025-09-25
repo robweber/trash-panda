@@ -22,7 +22,7 @@ class FileContents(BaseModel):
     contents: str = Field(description="string contents of the file to write")
 
 
-def api_app(config_file, config_yaml, history, notifier_configured, debugMode=False, logHandlers=[]):
+def api_app(config_file, config_yaml, history):
 
     app = FastAPI(
         title="Trash Panda API",

@@ -27,11 +27,6 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
     for tag in config_yaml['tags'].keys():
         config_yaml['tags'][tag]['color'] = utils.COLOR_MAPPING[config_yaml['tags'][tag]['color']]
 
-    # turn of web server logging if not in debug mode
-    if(not debugMode):
-        werkzeug = logging.getLogger('werkzeug')
-        werkzeug.disabled = True
-
     @app.route('/', methods=["GET"])
     def index():
         return render_template("index.html", message=config_yaml['config']['web']['landing_page_text'])
