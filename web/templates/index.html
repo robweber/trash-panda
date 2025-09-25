@@ -20,7 +20,7 @@ function load_status(){
 
       // link for the details
       details = $('<a>').html('<i class="mdi mdi-' + h.icon + ' icon-inline mr-2"></i><span>' + h.name + "</span>").addClass('host_title ml-2');
-      details.attr('href', '/web/status/host/' + h.id);
+      details.attr('href', '/dashboard/status/host/' + h.id);
 
       row.append(td.clone().append(details));
 

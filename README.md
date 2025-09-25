@@ -144,7 +144,7 @@ config:
         color: gray
       links:
         - name: Test Link
-          url: /web/docs/test-link
+          url: /dashboard/docs/test-link
           new_tab: False
 ```
 
@@ -283,7 +283,7 @@ web:
   top_nav:
     links:
       - name: Test Link
-        url: /web/docs/test-link
+        url: /dashboard/docs/test-link
         new_tab: False  # this is an optional attribute
 ```
 
@@ -428,7 +428,7 @@ To work properly the documentation file should have the same ID as the host and 
 
 ### Direct Documentation Links
 
-An endpoint `/web/docs/<filename>` exists to load and render any Markdown file from the docs directory. These can be linked together to create a rudimentary wiki page or other type of custom documentation for display via Markdown parsing. Coupled with [custom nav links](#website-options) this can be linked on any page. The link for a file `information.md` within the docs directory would be `/web/docs/information`. As with host documentation filenames are assumed to be in a slugified format.
+An endpoint `/dashboard/docs/<filename>` exists to load and render any Markdown file from the docs directory. These can be linked together to create a rudimentary wiki page or other type of custom documentation for display via Markdown parsing. Coupled with [custom nav links](#website-options) this can be linked on any page. The link for a file `information.md` within the docs directory would be `/dashboard/docs/information`. As with host documentation filenames are assumed to be in a slugified format.
 
 ## Templating
 

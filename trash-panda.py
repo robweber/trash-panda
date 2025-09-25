@@ -30,6 +30,7 @@ from modules.history import HostHistory
 from modules.notifications import NotificationGroup
 from modules.http.dashboard import flask_app
 from modules.http.api import api_app
+from modules.http.web import dashboard_app
 from starlette.applications import Starlette
 from starlette.middleware.wsgi import WSGIMiddleware
 from starlette.staticfiles import StaticFiles
@@ -57,7 +58,7 @@ def signal_handler(signum, frame):
     sys.exit(0)
 
 async def homepage_redirect(request):
-    return RedirectResponse(url="/web/", status_code=301) # 301 Permanent Redirect
+    return RedirectResponse(url="/dashboard/", status_code=307) # 307 Temp Redirect
 
 async def check_notifications(notify, old_host, new_host):
     """check if any service statuses have changed and send notifications
@@ -139,7 +140,7 @@ starlette_app = Starlette(
     routes = [
         Route('/', homepage_redirect),
         Mount('/static', StaticFiles(directory=os.path.join(utils.DIR_PATH, 'web', 'static'))),
-        Mount('/web', app=WSGIMiddleware(web_app)),
+        Mount('/dashboard', app=WSGIMiddleware(web_app)),
         Mount('/api', app=api)
     ]
 )
