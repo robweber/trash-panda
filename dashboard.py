@@ -33,7 +33,8 @@ from modules.http.api import api_app
 from starlette.applications import Starlette
 from starlette.middleware.wsgi import WSGIMiddleware
 from starlette.staticfiles import StaticFiles
-from starlette.routing import Mount
+from starlette.responses import RedirectResponse
+from starlette.routing import Mount, Route
 from slugify import slugify
 from typing import Generator
 
@@ -55,6 +56,8 @@ def signal_handler(signum, frame):
     logging.debug('Exiting Program')
     sys.exit(0)
 
+async def homepage_redirect(request):
+    return RedirectResponse(url="/web/", status_code=301) # 301 Permanent Redirect
 
 async def check_notifications(notify, old_host, new_host):
     """check if any service statuses have changed and send notifications
@@ -134,6 +137,7 @@ api = api_app(args.file, yaml_file, history, notify is not None, True, logHandle
 starlette_app = Starlette(
     debug=True,
     routes = [
+        Route('/', homepage_redirect),
         Mount('/static', StaticFiles(directory=os.path.join(utils.DIR_PATH, 'web', 'static'))),
         Mount('/web', app=WSGIMiddleware(web_app)),
         Mount('/api', app=api)

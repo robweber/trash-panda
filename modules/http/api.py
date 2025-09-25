@@ -197,7 +197,7 @@ def api_app(config_file, config_yaml, history, notifier_configured, debugMode=Fa
 
         return result
 
-    @app.post('/command/silence_host/{id}/{minutes}', tags=['Command'], escription=Path('api_docs/post_command_silence_host.md').read_text())
+    @app.post('/command/silence_host/{id}/{minutes}', tags=['Command'], description=Path('api_docs/post_command_silence_host.md').read_text())
     def silence_host(id, minutes):
         result = history.silence_host(id, minutes)
 
