@@ -3,11 +3,11 @@ Main class to start the program. Will kick off Flask based web application
 for the web interfaceand start the timer for the host checks. Must run as root.
 To run use:
 
-sudo python3 dashboard.py
+sudo python3 trash-panda.py
 
 For a list of arguments use:
 
-sudo python3 dashboard.py -h
+sudo python3 trash-panda.py -h
 """
 
 
