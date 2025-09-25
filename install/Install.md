@@ -46,7 +46,7 @@ pip3 install -r install/requirements.txt
 
 ### Running the program
 
-A configuration file is needed. This will copy the example config to the default directory for editing and copy an example custom page to the docs directory. Edit the config file according to the instructions in the README document and run the `dashboard.py` file.
+A configuration file is needed. This will copy the example config to the default directory for editing and copy an example custom page to the docs directory. Edit the config file according to the instructions in the README document and run the `trash-panda.py` file.
 
 ```
 

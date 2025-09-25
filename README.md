@@ -43,21 +43,21 @@ Install the repository according to the instructions in the [Install](install/In
 Before the program can be used services, device types, and hosts need to be configured in the `monitor.yaml` file created during the install. Detailed instructions for how to do this are below. Running the program must be done with `sudo` as root privileges are needed to bind to a socket. Once running the dashboard page will be available at `http://server_ip:5000/`. _Note the port may be different if you change it using the arguments below._
 
 ```
-sudo .venv/bin/python3 dashboard.py
+sudo .venv/bin/python3 trash-panda.py
 ```
 
 You can also specify the `-c` flag to read in a config file instead of passing in arguments from the command line.
 
 ```
-sudo .venv/bin/python3 dashboard.py -c /path/to/config.conf
+sudo .venv/bin/python3 trash-panda.py -c /path/to/config.conf
 ```
 
 A full list of arguments can be found by using the `-h` flag.
 
 ```
-.venv/bin/python3 dashboard.py -h
+.venv/bin/python3 trash-panda.py -h
 
-usage: dashboard.py [-h] [-c CONFIG] [-f FILE] [-p PORT] [-d DATABASE] [-D]
+usage: trash-panda.py [-h] [-c CONFIG] [-f FILE] [-p PORT] [-d DATABASE] [-D]
 
 Trash Panda
 
