@@ -158,19 +158,47 @@ class HostHistory:
                         # add the value
                         self.db.ts().add(p['id'], unix_time * 1000, p['value'])
 
-    def check_host_now(self, id):
-        """sets the next check time on the host to now, forcing a check"""
+    def check_host_now(self, host_id):
+        """sets the next check time on the host to now, forcing a check
+
+        :param host_id: a valid host id
+        """
         result = {"success": False}
 
-        aHost = self.get_host(id)
+        aHost = self.get_host(host_id)
 
         if(aHost is not None):
             # reset the next check time and update the host
             aHost['next_check'] = datetime.datetime.now().strftime(utils.TIME_FORMAT)
-            self.save_host(id, aHost, False)
+            self.save_host(host_id, aHost, False)
 
             result['next_check'] = aHost['next_check']
             result['success'] = True
+
+        return result
+
+    def silence_host(self, host_id, minutes):
+        """sets the silenced property on a host which will expire from the current time
+        plus the number of minutes indicated
+
+        :param host_id: a valid host id
+        :param minutes: the number of minutes the host will be silenced
+        """
+        result = {"success": False}
+
+        until = datetime.datetime.now() + datetime.timedelta(minutes=int(minutes))
+        aHost = self.get_host(host_id)
+
+        if(aHost is not None):
+            #set the silenced property
+            aHost['silenced'] = True
+            aHost['silenced_until'] = until.strftime(utils.TIME_FORMAT)
+
+            result['success'] = True
+            result['is_silenced'] = True
+            result['until'] = aHost['silenced_until']
+
+            self.save_host(host_id, aHost, False)
 
         return result
 

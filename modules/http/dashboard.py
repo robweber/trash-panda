@@ -104,22 +104,6 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
         return render_template('docs.html', page_title='Guide', file='README',
                                docs=utils.load_documentation(os.path.join(utils.DIR_PATH, "README.md")))
 
-    """ Start of API """
-
-    @app.route('/api/command/silence_host/<id>/<minutes>', methods=['POST'])
-    def silence_host(id, minutes):
-        until = datetime.datetime.now() + datetime.timedelta(minutes=int(minutes))
-        result = monitor.silence_host(id, until)
-
-        if(result['success']):
-            # update the host in the history DB as well
-            aHost = history.get_host(id)
-            aHost['silenced'] = result['is_silenced']
-            history.save_host(id, aHost, update_perf_data=False)
-
-        return jsonify(result)
-
-
     """ Start of custom processors """
     @app.context_processor
     def nav_links():

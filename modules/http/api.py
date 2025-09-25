@@ -1,4 +1,5 @@
 import datetime
+import logging
 import os
 import os.path
 import time
@@ -193,6 +194,14 @@ def api_app(config_file, config_yaml, history, notifier_configured, debugMode=Fa
     @app.post('/command/check_now/{id}', tags=['Command'], description=Path('api_docs/post_command_check_now.md').read_text())
     def check_host_now(id):
         result = history.check_host_now(id)
+
+        return result
+
+    @app.post('/command/silence_host/{id}/{minutes}', tags=['Command'], escription=Path('api_docs/post_command_silence_host.md').read_text())
+    def silence_host(id, minutes):
+        result = history.silence_host(id, minutes)
+
+        logging.debug(f"Silencing {id} until {result['until']}")
 
         return result
 

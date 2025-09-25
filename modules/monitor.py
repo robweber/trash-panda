@@ -322,6 +322,9 @@ class HostMonitor:
             for id, aHost in self.hosts.items():
                 saved_host = self.history.get_host(aHost.id)
 
+                if(saved_host['silenced']):
+                    aHost.silenced = saved_host['silenced_until']
+
                 if(aHost.next_check != saved_host['next_check']):
                     logging.debug("next check has been changed")
                     aHost.next_check = saved_host['next_check']
@@ -367,24 +370,3 @@ class HostMonitor:
 
     def get_host(self, id):
         return self.hosts[id] if id in self.hosts else None
-
-    def silence_host(self, id, until):
-        """sets the silenced property on a host which will expire when the current time
-        exceeds the given datetime object
-        """
-        result = {"success": False}
-
-        aHost = self.get_host(id)
-
-        if(aHost is not None):
-            with self.lock:
-                # set the host as silenced until this datetime
-                aHost.silenced = until.strftime(utils.TIME_FORMAT)
-                self.hosts[id] = aHost
-
-                logging.debug(f"Silencing {id} until {aHost.silenced}")
-                result['is_silenced'] = aHost.is_silenced()
-                result['until'] = aHost.silenced
-                result['success'] = True
-
-        return result

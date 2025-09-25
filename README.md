@@ -466,16 +466,6 @@ For integration with other systems the API can be used. To decode the status ret
 
 The status codes are determined by the settings for the device and the output of the various check utilities. Note that for service check related data Performance Data information (`perf_data`) is available if the check command returns it. This is parsed according to the [Nagios performance data](https://nagios-plugins.org/doc/guidelines.html#AEN200) standard. If there isn't any performance data the key will not exist for that service.
 
-__/api/command/silence_host/<host_id>/<minutes>__ - sets the given hosts silenced property to True for the given amount of minutes. This will silence any notifications for this time.
-
-```
-{
-  "is_silenced": true,
-  "success": true,
-  "until": "05-02-2023 01:31PM"
-}
-```
-
 ## Watchdog
 
 Trash Panda will check if defined hosts and services are running, but what keeps track of Trash Panda? The `watchdog.py` script can be used to externally check the Trash Panda web service via the [health api](#api) endpoint. This script should be setup to run via a cron job and can read in the same YAML config file to trigger monitoring notifications. If the health service is either not running, or it reports that the monitoring system checker is not running, a notification will be sent using the configured notifier from the YAML file. When the service returns to normal operation a recovery notification is also sent.
