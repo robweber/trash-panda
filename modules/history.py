@@ -190,7 +190,7 @@ class HostHistory:
         aHost = self.get_host(host_id)
 
         if(aHost is not None):
-            #set the silenced property
+            # set the silenced property
             aHost['silenced'] = True
             aHost['silenced_until'] = until.strftime(utils.TIME_FORMAT)
 

@@ -1,10 +1,10 @@
-import datetime
 import logging
 import os
 import os.path
 from .. import utils as utils
-from flask import Flask, flash, render_template, jsonify, redirect, request, Response
+from flask import Flask, flash, render_template, redirect, request
 from slugify import slugify
+
 
 def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=False, logHandlers=[]):
     app = Flask(import_name="trash-panda", static_folder=os.path.join(utils.DIR_PATH, 'web', 'static'),

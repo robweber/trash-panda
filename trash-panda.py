@@ -24,20 +24,18 @@ import os
 import os.path
 import modules.utils as utils
 import uvicorn
-from natsort import natsorted
 from modules.monitor import HostMonitor
 from modules.history import HostHistory
 from modules.notifications import NotificationGroup
 from modules.http.dashboard import flask_app
 from modules.http.api import api_app
-from modules.http.web import dashboard_app
 from starlette.applications import Starlette
 from starlette.middleware.wsgi import WSGIMiddleware
 from starlette.staticfiles import StaticFiles
 from starlette.responses import RedirectResponse
 from starlette.routing import Mount, Route
-from slugify import slugify
 from typing import Generator
+
 
 class Server(uvicorn.Server):
     @contextlib.contextmanager
@@ -52,13 +50,16 @@ class Server(uvicorn.Server):
             self.should_exit = True
             thread.join()
 
+
 # function to handle when the is killed and exit gracefully
 def signal_handler(signum, frame):
     logging.debug('Exiting Program')
     sys.exit(0)
 
+
 async def homepage_redirect(request):
-    return RedirectResponse(url="/dashboard/", status_code=307) # 307 Temp Redirect
+    return RedirectResponse(url="/dashboard/", status_code=307)  # 307 Temp Redirect
+
 
 async def check_notifications(notify, old_host, new_host):
     """check if any service statuses have changed and send notifications
@@ -137,7 +138,7 @@ web_app = flask_app(args.file, yaml_file, history, notify is not None, True, log
 api = api_app(args.file, yaml_file, history, notify is not None, True, logHandlers)
 starlette_app = Starlette(
     debug=True,
-    routes = [
+    routes=[
         Route('/', homepage_redirect),
         Mount('/static', StaticFiles(directory=os.path.join(utils.DIR_PATH, 'web', 'static'))),
         Mount('/dashboard', app=WSGIMiddleware(web_app)),

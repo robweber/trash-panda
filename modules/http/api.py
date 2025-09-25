@@ -3,21 +3,24 @@ import logging
 import os
 import os.path
 import time
+from .. import utils as utils
 from fastapi import FastAPI, Body, Path, Query
 from fastapi.responses import PlainTextResponse
 from natsort import natsorted
 from pydantic import BaseModel, Field
-from .. import utils as utils
 from pathlib import Path as LoadPath
 from typing import Annotated
+
 
 class FilePath(BaseModel):
     path: str = Field(description="a valid file system directory of file path")
     reset: bool = False
 
+
 class FileContents(BaseModel):
     path: str = Field(description="full system path to the file to write")
     contents: str = Field(description="string contents of the file to write")
+
 
 def api_app(config_file, config_yaml, history, notifier_configured, debugMode=False, logHandlers=[]):
 
@@ -75,8 +78,9 @@ def api_app(config_file, config_yaml, history, notifier_configured, debugMode=Fa
         services = history.get_services([1, 2])
 
         return {"total_hosts": len(hosts), "hosts_with_errors": error_count, "services_with_errors": len(services),
-                        "overall_status": overall_status, "overall_status_description": utils.SERVICE_STATUSES[overall_status],
-                        "services": services}
+                "overall_status": overall_status,
+                "overall_status_description": utils.SERVICE_STATUSES[overall_status],
+                "services": services}
 
     @app.get('/status/hosts', tags=['Status'], description=LoadPath('api_docs/get_status_hosts.md').read_text())
     def status():
@@ -93,7 +97,7 @@ def api_app(config_file, config_yaml, history, notifier_configured, debugMode=Fa
         return host
 
     @app.get('/status/services', tags=['Status'], description=LoadPath('api_docs/get_status_services.md').read_text())
-    def get_services_by_query(return_codes: Annotated[str, Query(description="Return codes (0-3) to filter on, separate multiple with pipe (|)")] ="0|1|2|3",
+    def get_services_by_query(return_codes: Annotated[str, Query(description="Return codes to filter on, separate multiple with pipe")] = "0|1|2|3",
                               service_filter: Annotated[str, Query(description="Service filter, regex that filters on service id")] = ".*"):
 
         return_codes = return_codes.split("|")
@@ -202,8 +206,8 @@ def api_app(config_file, config_yaml, history, notifier_configured, debugMode=Fa
         return result
 
     @app.post('/command/silence_host/{id}/{minutes}', tags=['Command'], description=LoadPath('api_docs/post_command_silence_host.md').read_text())
-    def silence_host(id:str = Path(description="a valid host id"),
-                     minutes:int = Path(description="the number of minutes to silence this host")):
+    def silence_host(id: str = Path(description="a valid host id"),
+                     minutes: int = Path(description="the number of minutes to silence this host")):
         result = history.silence_host(id, minutes)
 
         logging.debug(f"Silencing {id} until {result['until']}")
