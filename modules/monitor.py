@@ -319,15 +319,19 @@ class HostMonitor:
         now = datetime.datetime.now()
 
         with self.lock:
+            # get any queued actions waiting
+            action_queue = self.history.consume_queued_actions()
+
             for id, aHost in self.hosts.items():
-                saved_host = self.history.get_host(aHost.id)
+                logging.debug(json.dumps(action_queue))
+                # check if any actions should be applied
+                if(id in action_queue):
+                    for action_obj in action_queue[id]:
+                        if(action_obj['action'] == 'silence'):
+                            aHost.silenced = action_obj['until']
 
-                if(saved_host['silenced']):
-                    aHost.silenced = saved_host['silenced_until']
-
-                if(aHost.next_check != saved_host['next_check']):
-                    logging.debug("next check has been changed")
-                    aHost.next_check = saved_host['next_check']
+                        elif(action_obj['action'] == 'check_now'):
+                            aHost.next_check = action_obj['next_check']
 
                 # check if we need to check this host,
                 next_check = datetime.datetime.strptime(aHost.next_check, utils.TIME_FORMAT)
@@ -360,8 +364,10 @@ class HostMonitor:
                     aHost.next_check = next_check.strftime(utils.TIME_FORMAT)
                     host_check['next_check'] = aHost.next_check
 
-                    self.hosts[id] = aHost
                     result.append(host_check)
+
+                # save any changed host data
+                self.hosts[id] = aHost
 
         return sorted(result, key=lambda o: o['name'])
 

@@ -158,24 +158,34 @@ class HostHistory:
                         # add the value
                         self.db.ts().add(p['id'], unix_time * 1000, p['value'])
 
+    def consume_queued_actions(self):
+        """ load any actions queued in the database and reset the queue to 0 """
+        result = self.__read_db(DBKeys.QUEUED_ACTIONS.value)
+
+        self.__write_db(DBKeys.QUEUED_ACTIONS.value, {})
+
+        return result
+
     def check_host_now(self, host_id):
         """sets the next check time on the host to now, forcing a check
 
         :param host_id: a valid host id
         """
-        result = {"success": False}
+        action_obj = {'next_check': datetime.datetime.now().strftime(utils.TIME_FORMAT),
+                      "action": "check_now"}
 
-        aHost = self.get_host(host_id)
+        # load queued actions
+        queue = self.__read_db(DBKeys.QUEUED_ACTIONS.value)
 
-        if(aHost is not None):
-            # reset the next check time and update the host
-            aHost['next_check'] = datetime.datetime.now().strftime(utils.TIME_FORMAT)
-            self.save_host(host_id, aHost, False)
+        # update queue or add new list
+        if(host_id in queue):
+            queue[host_id].append(action_obj)
+        else:
+            queue[host_id] = [action_obj]
 
-            result['next_check'] = aHost['next_check']
-            result['success'] = True
+        self.__write_db(DBKeys.QUEUED_ACTIONS.value, queue)
 
-        return result
+        return {"success": True, "next_check": action_obj['next_check']}
 
     def silence_host(self, host_id, minutes):
         """sets the silenced property on a host which will expire from the current time
@@ -184,23 +194,22 @@ class HostHistory:
         :param host_id: a valid host id
         :param minutes: the number of minutes the host will be silenced
         """
-        result = {"success": False}
-
         until = datetime.datetime.now() + datetime.timedelta(minutes=int(minutes))
-        aHost = self.get_host(host_id)
+        action_obj = {'action': 'silence',
+                      'until': until.strftime(utils.TIME_FORMAT)}
 
-        if(aHost is not None):
-            # set the silenced property
-            aHost['silenced'] = True
-            aHost['silenced_until'] = until.strftime(utils.TIME_FORMAT)
+        # load queued actions
+        queue = self.__read_db(DBKeys.QUEUED_ACTIONS.value)
 
-            result['success'] = True
-            result['is_silenced'] = True
-            result['until'] = aHost['silenced_until']
+        # update queue or add new list
+        if(host_id in queue):
+            queue[host_id].append(action_obj)
+        else:
+            queue[host_id] = [action_obj]
 
-            self.save_host(host_id, aHost, False)
+        self.__write_db(DBKeys.QUEUED_ACTIONS.value, queue)
 
-        return result
+        return {"success": True, 'is_silenced': True, 'until': action_obj['until']}
 
     def __exists(self, key):
         return self.db.exists(key) > 0
@@ -229,7 +238,7 @@ class HostHistory:
         return result
 
     def __write_db(self, db_key, db_value):
-        """ write a value to the Redis DB as  JSON String"""
+        """ write a value to the Redis DB as a JSON String"""
         self.db.set(db_key, json.dumps(db_value))
 
 
@@ -237,6 +246,7 @@ class DBKeys(Enum):
     """Enum that holds the keys for Redis data lookups"""
     HOST_KEY = 'hosts'
     LAST_CHECK = "last_check_timestamp"
+    QUEUED_ACTIONS = "queued_actions"
 
 
 class DBQueries(Enum):
