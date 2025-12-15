@@ -323,10 +323,10 @@ class HostMonitor:
             action_queue = self.history.consume_queued_actions()
 
             for id, aHost in self.hosts.items():
-                logging.debug(json.dumps(action_queue))
                 # check if any actions should be applied
                 if(id in action_queue):
                     for action_obj in action_queue[id]:
+                        logging.debug(f"{id} {action_obj['action']}")
                         if(action_obj['action'] == 'silence'):
                             aHost.silenced = action_obj['until']
 
