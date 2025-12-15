@@ -45,7 +45,7 @@ function loadFiles(path, reset=false){
 
   // send request to load file listings
   $.ajax({type: 'POST', contentType: 'application/json', url: '/api/editor/browse_files',
-          data: JSON.stringify({'path': path, 'reset': reset}), success: function(data, status, request){
+          data: JSON.stringify({'path': {'path': path, 'reset': reset}}), success: function(data, status, request){
 
     if(data.success)
     {
@@ -84,7 +84,7 @@ function loadFiles(path, reset=false){
 
 function loadEditor(){
   $.ajax({type: 'POST', contentType: 'application/json',
-          url: '/api/editor/load_file', data: JSON.stringify({'path': $('#config_path').html()}), success: function(data, status, request){
+          url: '/api/editor/load_file', data: JSON.stringify({'file_path': {'path': $('#config_path').html()}}), success: function(data, status, request){
     editor.setValue(data,1);
 
     fileInfo = pathInfo($('#config_path').html());
@@ -112,7 +112,7 @@ function loadEditor(){
 
 function saveFile(){
   $.ajax({type: 'POST', contentType: 'application/json', url: '/api/editor/save_file',
-          data: JSON.stringify({'path': $('#config_path').html(), "contents":editor.getValue()}), success: function(data, status, request){
+          data: JSON.stringify({'save_file': {'path': $('#config_path').html(), "contents":editor.getValue()}}), success: function(data, status, request){
       //show success
       if(data.success)
       {
