@@ -200,8 +200,15 @@ class HostMonitor:
         if(host.ping_command is None):
             is_alive = self._ping(host.address)
         else:
+            # run a custom command if defined
             output = self.__run_process(self.__create_service_call(host.ping_command, host.config), [])
-            is_alive = {"success": True if output.returncode == 0 else False, "performance_data": ""}
+
+            # check if there is performance data
+            perf_string = output.stdout.strip().split("|")
+            perf_data = perf_string[1] if len(perf_string) > 1 else ""
+
+            is_alive = {"success": True if output.returncode == 0 else False,
+                        "performance_data": perf_data}
 
         if(is_alive['success']):
             logging.debug(f"{host.name}: Is Alive")

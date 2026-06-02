@@ -14,6 +14,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 - swapped the host type and host status areas of the Host Status page to make the overall status more visible
 
+### Fixed
+
+- custom defined "alive" checks can will now ingest performance data if available
+
 ## 6.3
 
 ### Added
