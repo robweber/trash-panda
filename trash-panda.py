@@ -134,7 +134,7 @@ monitor = HostMonitor(history, yaml_file)
 
 # start the web app
 logging.info('Starting Trash Panda Web Service')
-web_app = flask_app(args.file, yaml_file, history, notify is not None, True, logHandlers)
+web_app = flask_app(args.file, yaml_file, history, notify is not None, args.debug, logHandlers)
 api = api_app(args.file, yaml_file, history)
 starlette_app = Starlette(
     debug=args.debug,
