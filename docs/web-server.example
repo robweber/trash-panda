@@ -1,0 +1,5 @@
+A documentation page that would have more information about the web server defined in the `install/monitor_example.yaml` file.
+
+## HTTP
+
+This service header will link directly to the service definition in the Services status page with a bookmark icon. You can create these using `## Header` markdown as long as the header text matches the service name.
