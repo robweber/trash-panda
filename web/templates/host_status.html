@@ -99,22 +99,51 @@ function load_status(){
       col1 = $('<div>').append(serviceLink).append(check_attempts);
 
       //create a column for the links (if any)
-      link1 = '';
-      if(s.hasOwnProperty('service_url'))
-      {
-        link1 = $('<a>');
-        link1.attr('href', s.service_url);
-        link1.attr('target', "_blank");
-        link1.attr('class', 'mdi mdi-launch icon-sm icon-inline');
-        col_size = 6;
+      link1 = "";
+
+      // check if anchor for documentation exists
+      anchor_text = "#" + slugify(s.name);
+      if($(anchor_text).length){
+        // create documentation anchor link
+        link1 = $('<a>')
+        link1.attr('class', 'mdi mdi-book-outline icon-sm icon-inline')
+        link1.attr('href', anchor_text);
+        link1.on('click', function(event) {
+            // Prevent default instant page jump
+            event.preventDefault();
+
+            // Get the target ID from the href attribute
+            target = this.hash;
+
+            // Ensure the target element exists on the page
+            if ($(target).length) {
+
+                // activate documentation tab
+                $('#host-content-nav a[href="#documentation"]').tab('show');
+
+                $('html, body').animate({
+                    scrollTop: $(target).offset().top
+                }, 800); // 800ms animation speed
+            }
+        });
       }
 
       link2 = '';
-      if(s.hasOwnProperty('perf_data'))
+      if(s.hasOwnProperty('service_url'))
       {
         link2 = $('<a>');
-        link2.attr('href', '/dashboard/perf_data/' + s.id);
-        link2.attr('class', 'mdi mdi-chart-areaspline-variant icon-sm icon-inline');
+        link2.attr('href', s.service_url);
+        link2.attr('target', "_blank");
+        link2.attr('class', 'mdi mdi-launch icon-sm icon-inline');
+        col_size = 6;
+      }
+
+      link3 = '';
+      if(s.hasOwnProperty('perf_data'))
+      {
+        link3 = $('<a>');
+        link3.attr('href', '/dashboard/perf_data/' + s.id);
+        link3.attr('class', 'mdi mdi-chart-areaspline-variant icon-sm icon-inline');
         col_size = 6;
       }
 
@@ -126,7 +155,7 @@ function load_status(){
       //if links exist add those as well
       if(col_size != 12)
       {
-        col2 = $('<div>').append(link1).append(link2);
+        col2 = $('<div>').append(link1).append(link2).append(link3);
         col2.attr('class', 'pl-0 col-6 text-right');
         row1.append(col2);
       }
@@ -157,6 +186,7 @@ function load_status(){
     $('#host-next-check').html(data.next_check);
 
     countdown.reset_countdown();
+
   }});
 
 }
@@ -257,4 +287,5 @@ load_status();
 setInterval(load_status, 15000);
 countdown.start_countdown();
 copier.prepare();
+
 {% endblock %}
