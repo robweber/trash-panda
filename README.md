@@ -458,7 +458,7 @@ The following custom functions are available in addition to any standard [Jinja 
 
 ## API
 
-For integration with other systems the API can be used. To decode the status return codes use the following:
+For integration with other systems the API can be used. Documentation for the API can be accessed at `http://SERVER_IP:PORT/api/docs`. To decode the status return codes use the following:
 
 * 0 - OK, everything normal
 * 1 - Warning, potential problem
