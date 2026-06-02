@@ -97,7 +97,7 @@ types:
     ping_command:
       type: dummy_check
       args:
-        message: "Alive"
+        message: "Alive|percent_packet_loss=0% average_return_time=1ms"
         return_code: 0
   server:
     name: Server
@@ -125,7 +125,7 @@ types:
     ping_command:
       type: dummy_check
       args:
-        message: "Alive"
+        message: "Alive|percent_packet_loss=0% average_return_time=1ms"
         return_code: 0
     config:
       community:
@@ -153,12 +153,12 @@ hosts:
     ping_command:
       type: dummy_check
       args:
-        message: "Alive"
+        message: "Alive|percent_packet_loss=0% average_return_time=1ms"
         return_code: 0
     # will inherit services plus add these
     services:
       - type: dummy_check
         name: HTTP
         args:
-          message: "HTTP OK: HTTP/1.1 200 OK - 732014 bytes in 0.156 second response time"
+          message: "HTTP OK: HTTP/1.1 200 OK - 732014 bytes in 0.156 second response time|time=0.156s;;;0.000000;10.000000 size=732014B;;;0"
           return_code: 0
