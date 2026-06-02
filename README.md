@@ -426,6 +426,10 @@ On every host status page there is a tab for the configured services, and host d
 
 To work properly the documentation file should have the same ID as the host and end in `.md`. For a host named __My Web Server__ the file would be the slugified version of the host __my-web-server.md__. This is the same as the host id returned by the [API](#api) or found in the browser path when viewing the host status.
 
+### Service Hyperlinks
+
+Within a host's documentation file you can use markdown headers to automatically link service status information with it's corresponding documentation. For example, if a Service exists with the name __Web Service__, creating a documentation header `## Web Service` will automatically generate a bookmark link on the Host Status page to quick link directly to that spot in the documentation. The example documentation file in the `docs/` directory illustrates this. 
+
 ### Direct Documentation Links
 
 An endpoint `/dashboard/docs/<filename>` exists to load and render any Markdown file from the docs directory. These can be linked together to create a rudimentary wiki page or other type of custom documentation for display via Markdown parsing. Coupled with [custom nav links](#website-options) this can be linked on any page. The link for a file `information.md` within the docs directory would be `/dashboard/docs/information`. As with host documentation filenames are assumed to be in a slugified format.

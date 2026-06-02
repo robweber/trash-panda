@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## Unreleased
+
+### Added
+
+- on the Host Status page links to Service documentation are automatically generated if a matching documentation header exists
+
+### Changed
+
+- swapped the host type and host status areas of the Host Status page to make the overall status more visible
+
 ## 6.3
 
 ### Added

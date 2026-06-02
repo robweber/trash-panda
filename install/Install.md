@@ -46,13 +46,14 @@ pip3 install -r install/requirements.txt
 
 ### Running the program
 
-A configuration file is needed. This will copy the example config to the default directory for editing and copy an example custom page to the docs directory. Edit the config file according to the instructions in the README document and run the `trash-panda.py` file.
+A configuration file is needed. This will copy the example config to the default directory for editing and copy some example custom documentation files to the docs directory. Edit the config file according to the instructions in the README document and run the `trash-panda.py` file.
 
 ```
 
 mkdir conf
 cp install/monitor_example.yaml conf/monitor.yaml
 mv docs/wiki.example docs/wiki.md
+mv docs/web-server.example docs/web-server.md
 
 ```
 
