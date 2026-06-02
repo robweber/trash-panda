@@ -104,9 +104,10 @@ function load_status(){
       // check if anchor for documentation exists
       anchor_text = "#" + slugify(s.name);
       if($(anchor_text).length){
+
         // create documentation anchor link
-        link1 = $('<a>')
-        link1.attr('class', 'mdi mdi-book-outline icon-sm icon-inline')
+        link1 = $('<a>');
+        link1.attr('class', 'mdi mdi-book-outline icon-sm icon-inline');
         link1.attr('href', anchor_text);
         link1.on('click', function(event) {
             // Prevent default instant page jump
@@ -126,6 +127,7 @@ function load_status(){
                 }, 800); // 800ms animation speed
             }
         });
+        col_size = 6;
       }
 
       link2 = '';
@@ -204,9 +206,9 @@ function load_status(){
     <div class="col-lg-4 host-status-card">
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title">Type: <span class="text-info">{{ host['type'] | replace('_',' ') | title }}</span></h5>
+          <h5 class="card-title">Status: <span id="host-overall-status">{{ overall_status[host['overall_status']] }}</span></h5>
           <p class="card-text">
-            Overall Status: <span id="host-overall-status">{{ overall_status[host['overall_status']] }}</span> <br />
+            Type: <span class="text-info">{{ host['type'] | replace('_',' ') | title }}</span> <br />
             Last Check: <span id="host-last-check">{{ host['last_check'] }}</span> <br />
             Next Check: <span id="host-next-check">{{ host['next_check'] }}</span> <br />
             IP Address: {{ host['address'] }}
