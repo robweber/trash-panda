@@ -119,6 +119,9 @@ function load_status(){
             // Ensure the target element exists on the page
             if ($(target).length) {
 
+                // add to history so we can revert later
+                history.pushState({target: 'documentation'}, "", "#documentation")
+
                 // activate documentation tab
                 $('#host-content-nav a[href="#documentation"]').tab('show');
 
@@ -247,7 +250,7 @@ function load_status(){
       <a class="nav-link active" id="services-tab" data-toggle="tab" href="#services" role="tab">Services</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" id="services-tab" data-toggle="tab" href="#documentation" role="tab">Documentation</a>
+      <a class="nav-link" id="documentation-tab" data-toggle="tab" href="#documentation" role="tab">Documentation</a>
     </li>
   </ul>
   <div class="tab-content" id="host-content">
@@ -289,5 +292,16 @@ load_status();
 setInterval(load_status, 15000);
 countdown.start_countdown();
 copier.prepare();
+
+window.addEventListener("popstate", () => {
+  // check if returning from a hashed anchor
+  if (!window.location.hash) {
+    $('#host-content-nav a[href="#services"]').tab('show');
+
+    $('html, body').animate({
+        scrollTop: $("#documentation-tab").offset().top
+    }, 200);
+  }
+});
 
 {% endblock %}
