@@ -276,11 +276,14 @@ web:
 
 __Top Nav Links__
 
-You can add additional links to the top navigation menu by using `links` key. Each link must include a name and URL. By default links will open in a new browser tab but this can be changed by setting `new_tab: False`. A common use case is linking directly to a custom page created with the [markdown documentation](#direct-documentation-links) feature.
+You can add additional links to the top navigation menu by using `links` key. All custom links will be grouped together in a dropdown tab title "Links". This title can be changed via the `links_title` option.
+
+Each link must include a name and URL. By default links will open in a new browser tab but this can be changed by setting `new_tab: False`. A common use case is linking directly to a custom page created with the [markdown documentation](#direct-documentation-links) feature.
 
 ```
 web:
   top_nav:
+    links_title: My Links  # optional, "Links" by default
     links:
       - name: Test Link
         url: /dashboard/docs/test-link
@@ -317,6 +320,7 @@ Device types can also define configuration variables that must be included in ho
 web_server:
   name: Web Server
   icon: server
+  group: Webservers
   interval: 10
   notifier: log
   service_check_attempts: 2
@@ -335,6 +339,7 @@ The above defines a device type of __web_server__ that can be implemented by a h
 Also of note are some optional variables.
 
 * __interval__: By default the global interval will be used, but individual device types, or individual hosts, can set their own.
+* __group__: Optional way to group similar devices logically, will be passed down to host
 * __notifier__: Again, by default the global notification type will be used but hosts types can set their own. This will apply to the host and all services under it.
 * __service_check_attempts__: Override the global service check value with a custom value for this host
 * __ping_command__: Override the built in ICMP Ping check with a custom check defined in the [services](#services) list.
@@ -347,8 +352,7 @@ Finally, the Service and Device Type definitions are put together into an actual
 ```
 type: web_server
 name: "My Web Server"
-# the info tag is optional
-info: "A local webserver hosting a few sites"
+info: "A local webserver hosting a few sites"  # the info tag is optional
 address: 192.168.0.2
 management_page: "http://myserver:5000/admin"
 config:
@@ -369,6 +373,7 @@ The above host will inherit the services from the __web_server__ type above but 
 The following attributes are useful, but not necessary, for any host definition:
 * id - defaults to a slugified version of the name (`my-web-server` in example), but can be set specifically using the id value
 * icon - a custom icon from [Material Design Icons](https://materialdesignicons.com/)
+* group - a way go group similiar devices, these are different than types. _Example:_ firewall and switch types could be part of an Infrastructure group. All devices are Ungrouped by default.
 * info - any additional information on this device you want displayed on the Dashboard page.
 * management_page - the full URL to web management for this device, if it exists
 * interval - the check interval, if different than the global value
@@ -428,7 +433,7 @@ To work properly the documentation file should have the same ID as the host and 
 
 ### Service Hyperlinks
 
-Within a host's documentation file you can use markdown headers to automatically link service status information with it's corresponding documentation. For example, if a Service exists with the name __Web Service__, creating a documentation header `## Web Service` will automatically generate a bookmark link on the Host Status page to quick link directly to that spot in the documentation. The example documentation file in the `docs/` directory illustrates this. 
+Within a host's documentation file you can use markdown headers to automatically link service status information with it's corresponding documentation. For example, if a Service exists with the name __Web Service__, creating a documentation header `## Web Service` will automatically generate a bookmark link on the Host Status page to quick link directly to that spot in the documentation. The example documentation file in the `docs/` directory illustrates this.
 
 ### Direct Documentation Links
 
