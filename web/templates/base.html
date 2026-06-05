@@ -44,9 +44,12 @@
                   <div class="dropdown-menu">
                     {% for group in list_hostgroups() %}
                       {% for host in group.members %}
-                      <a class="dropdown-item" href="/dashboard/status/host/{{ host.id }}"><i class="mdi mdi-{{ host.icon }}"></i> {{ host.name }}</a>
+                      <a class="dropdown-item" href="/dashboard/status/host/{{ host.id }}"><i class="mdi mdi-{{ host.icon }} icon-sm"></i> {{ host.name }}</a>
                       {% endfor %}
+                      {% if not loop.last %}
+                      <!-- don't put this at the end -->
                       <div class="dropdown-divider"></div>
+                      {% endif %}
                     {% endfor %}
                   </div>
                 </li>

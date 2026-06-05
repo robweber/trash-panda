@@ -131,15 +131,16 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
             # group them by type
             grouped = defaultdict(list)
             for h in hosts:
-                grouped[h['type']].append({"name": h['name'], "id": h['id'], "icon": h['icon'], "type": h['type']})
+                grouped[h['group']].append({"name": h['name'], "id": h['id'], "icon": h['icon']})
 
             # return list of groups, each containing the members
             result = [
-                {"type": type, "members": sorted(members, key=lambda o: o['name'])}
-                for type, members in grouped.items()
+                {"group": group, "members": sorted(members, key=lambda o: o['name'])}
+                for group, members in grouped.items()
             ]
 
-            return result
+            # sort by group name
+            return sorted(result, key=lambda o: o['group'])
 
         return dict(list_hostgroups=list_hosts)
 
