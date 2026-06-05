@@ -12,6 +12,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - on the Host Status page links to Service documentation are automatically generated if a matching documentation header exists
 - top navigation now includes a drop list of hosts for quick access from page
 - custom top nav links can include a custom title - _Links_ is the default title
+- optional `group` attribute for Host and HostType definitions
+- API calls `/list/groups` to get group names and `/status/group/<name>` to get group host information
 
 ### Changed
 

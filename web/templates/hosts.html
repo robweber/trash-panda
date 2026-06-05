@@ -5,7 +5,7 @@
 var countdown = new UpdateCountdown("last_updated");
 
 function load_status(){
-  $.ajax({type: 'GET', url: '/api/status/hosts', success: function(data, status, request){
+  $.ajax({type: 'GET', url: '{{ url }}', success: function(data, status, request){
     var table = $('#host_info > tbody');
 
     // setup row objects

@@ -31,7 +31,7 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
 
     @app.route('/', methods=["GET"])
     def index():
-        return render_template("index.html", message=config_yaml['config']['web']['landing_page_text'])
+        return render_template("hosts.html", url="/api/status/hosts", message=config_yaml['config']['web']['landing_page_text'])
 
     @app.route('/status/host/<id>')
     def host_status(id):
@@ -45,6 +45,12 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
         else:
             flash('Host page not found', 'warning')
             return redirect('/')
+
+    @app.route('/status/group')
+    def group():
+        # get the group name from the query args
+        group_name = request.args.get('group')
+        return render_template("hosts.html", url=f"/api/status/group/{group_name}", message="", page_title=group_name)
 
     @app.route('/status/issues')
     def list_issues():
@@ -82,6 +88,12 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
 
         return render_template("editor.html", config_file=file_path, editor_config=config_yaml['config']['web']['editor'],
                                page_title='Config Editor')
+
+    @app.route('/groups', methods=['GET'])
+    def view_groups():
+        groups = sorted(history.list_groups())
+
+        return render_template("view_groups.html", groups=groups, page_title="Groups")
 
     @app.route('/tags', methods=['GET'])
     def view_tags():

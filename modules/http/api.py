@@ -100,7 +100,7 @@ def api_app(config_file, config_yaml, history):
         group = history.get_group(group_name)
 
         # sort by host name
-        result = {"group": group_name, "members": sorted(group, key=lambda o: o['name'])}
+        result = sorted(group, key=lambda o: o['name'])
 
         return result
 
