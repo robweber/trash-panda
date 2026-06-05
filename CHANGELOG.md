@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - custom top nav links can include a custom title - _Links_ is the default title
 - optional `group` attribute for Host and HostType definitions
 - API calls `/list/groups` to get group names and `/status/group/<name>` to get group host information
+- new Dashboard views to see groups and group members
 
 ### Changed
 
