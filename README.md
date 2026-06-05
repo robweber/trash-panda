@@ -310,6 +310,16 @@ Breaking this down the __command__ statement points to the path of the Nagios `c
 
 Within the arguments several custom variable placeholders and methods used. These are available for all service definitions and are listed in the [Templating section](#templating). You can see that the host address is used; which is expanded at runtime. A default of port 80 is given but can be changed if the user sets the `service.port` variable on the host. Similarly the web path of `/` is given as a default but could be changed to something liked `/login` if the `services.path` variable is set.
 
+### Modifying Service Output
+
+By default service output text is filtered based on [Nagios performance data syntax](https://nagios-plugins.org/doc/guidelines.html#AEN200) so that performance data is not shown in the web interface. When using the [API](#api) the original output is stored in the `raw_text` attribute.
+
+It is possible to define a custom `output_filter` for a service that parses the output text in a different way. This is useful if service check output has odd characters, or returns JSON responses. It is worth noting that modifying the output text does not affect the return code status in any way, it's just a way to produce more readable output. Templates can be used but only the following variables are available:
+
+* `value` - The original service output. If Trash Panda detects that a string is JSON it will be automatically parsed prior to rendering the template.
+* `return_code` - The service `return_code` as an integer 0-3.  
+* Global variables set via `jinja_constants` in the [global config](#global-configuration).
+
 ## Host Types
 
 Host types are a way to define specific types of device, such as a server or network switch. Each type can include service checks that you'd expect every device of this type to have. An example may be a Web Server device type that includes a status check on port 80 by default.
@@ -379,16 +389,6 @@ The following attributes are useful, but not necessary, for any host definition:
 * interval - the check interval, if different than the global value
 * service_check_attempts - how many service checks to confirm warning/critical states. Only needed if different than the global value.
 * ping_command - by default an ICMP ping command is sent to all hosts to verify they are online. This can be changed via a custom ping_command service to detect if the host is alive utilizing a different method.
-
-### Modifying Service Output
-
-By default service output text is filtered based on [Nagios performance data syntax](https://nagios-plugins.org/doc/guidelines.html#AEN200) so that performance data is not shown in the web interface. When using the [API](#api) the original output is stored in the `raw_text` attribute.
-
-It is possible to define a custom `output_filter` for a service that parses the output text in a different way. This is useful if service check output has odd characters, or returns JSON responses. It is worth noting that modifying the output text does not affect the return code status in any way, it's just a way to produce more readable output. Templates can be used but only the following variables are available:
-
-* `value` - The original service output. If Trash Panda detects that a string is JSON it will be automatically parsed prior to rendering the template.
-* `return_code` - The service `return_code` as an integer 0-3.  
-* Global variables set via `jinja_constants` in the [global config](#global-configuration).
 
 ## Service Tags
 
