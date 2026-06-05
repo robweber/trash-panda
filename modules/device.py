@@ -15,6 +15,7 @@ class Device:
     management_page = None
     config = {}
     info = ""
+    group = None
     icon = "devices"
     interval = 5
     check_attempts = 3
@@ -28,6 +29,7 @@ class Device:
         self.address = host_def['address']
         self.management_page = None if 'management_page' not in host_def else host_def['management_page']
         self.info = host_def['info']
+        self.group = host_def['group']
         self.icon = host_def['icon']
         self.interval = host_def['interval']
         self.notifier = host_def['notifier']
@@ -46,8 +48,9 @@ class Device:
         """takes the current host configuration and returns it as a dictionary object, which
         can be serialized for JSON output"""
         result = {'type': self.type, 'id': self.id, 'name': self.name, 'address': self.address,
-                  'icon': self.icon, 'info': self.info, 'interval': self.interval, 'service_check_attempts': self.check_attempts,
-                  'last_check': self.last_check, 'config': self.config, 'silenced': self.is_silenced()}
+                  'icon': self.icon, 'info': self.info, 'interval': self.interval, 'group': self.group,
+                  'service_check_attempts': self.check_attempts, 'last_check': self.last_check, 'config': self.config,
+                  'silenced': self.is_silenced()}
 
         # set these values if they exist
         if(self.management_page is not None):
@@ -82,6 +85,7 @@ class HostType:
     type = None
     name = None
     info = ""
+    group = "Ungrouped"
     icon = 'devices'
     interval = 5
     notifier = None
@@ -102,6 +106,9 @@ class HostType:
 
         if('icon' in type_def):
             self.icon = type_def['icon']
+
+        if('group' in type_def):
+            self.group = type_def['group']
 
         if('config' in type_def):
             self.config = type_def['config']
@@ -133,6 +140,9 @@ class HostType:
 
         if('icon' not in device_def):
             device_def['icon'] = self.icon
+
+        if('group' not in device_def):
+            device_def['group'] = self.group
 
         if('interval' not in device_def):
             device_def['interval'] = self.interval

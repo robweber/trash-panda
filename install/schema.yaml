@@ -233,6 +233,9 @@ types:
       icon:
         required: False
         type: string
+      group:
+        required: False
+        type: string
       info:
         required: False
         type: string
@@ -291,6 +294,9 @@ hosts:
       service_check_attempts:
         required: False
         type: integer
+      group:
+        required: False
+        type: string
       icon:
         required: False
         type: string
