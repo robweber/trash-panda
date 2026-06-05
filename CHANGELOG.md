@@ -10,6 +10,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 - added interactive API documentation using [FastAPI](https://fastapi.tiangolo.com/), accessible at `/api/docs`
 - on the Host Status page links to Service documentation are automatically generated if a matching documentation header exists
+- top navigation now includes a drop list of hosts for quick access from page
+- custom top nav links can include a custom title - _Links_ is the default title
 
 ### Changed
 
@@ -19,6 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - main script renamed `trash-panda.py` from `dashboard.py` to reflect it launches the full service
 - commands, such as silence or check now, go into a queue system rather than interacting with the host object directly
 - swapped the host type and host status areas of the Host Status page to make the overall status more visible
+- top nav layout changed, custom links now grouped in drop down menu
 
 ### Fixed
 
