@@ -182,6 +182,10 @@ config:
                   type: string
                   default: gray
                   allowed: *allowed_colors
+            links_title:
+              required: False
+              type: string
+              default: Links
             links:
               required: False
               type: list

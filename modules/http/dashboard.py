@@ -2,6 +2,7 @@ import logging
 import os
 import os.path
 from .. import utils as utils
+from collections import defaultdict
 from flask import Flask, flash, render_template, redirect, request
 from slugify import slugify
 
@@ -22,6 +23,7 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
     # set log level
     logLevel = 'INFO' if not debugMode else 'DEBUG'
     app.logger.setLevel(getattr(logging, logLevel))
+    app.debug = debugMode
 
     # re-map the tag colors
     for tag in config_yaml['tags'].keys():
@@ -118,5 +120,34 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
                 return 'link'
 
         return dict(get_nav_style=get_style)
+
+    @app.context_processor
+    def list_hostgroups():
+        def list_hosts():
+
+            # get a list of hosts
+            hosts = history.get_hosts()
+
+            # group them by type
+            grouped = defaultdict(list)
+            for h in hosts:
+                grouped[h['type']].append({"name": h['name'], "id": h['id'], "icon": h['icon'], "type": h['type']})
+
+            # return list of groups, each containing the members
+            result = [
+                {"type": type, "members": sorted(members, key=lambda o: o['name'])}
+                for type, members in grouped.items()
+            ]
+
+            return result
+
+        return dict(list_hostgroups=list_hosts)
+
+    @app.context_processor
+    def link_title():
+        def get_title():
+            # get the dropdown title for any custom links - if set
+            return config_yaml['config']['web']['top_nav']['links_title']
+        return dict(custom_link_title=get_title)
 
     return app
