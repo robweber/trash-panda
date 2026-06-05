@@ -82,7 +82,11 @@ Clicking on a host name will show you more information about that device. Indivi
 
 ### Issues
 
-On the Dashboards menu you can find a link to the Issues dashboard. This page shows all services that currently are in either a warning or critical state.
+In the Dashboards menu you can find a link to the Issues dashboard. This page shows all services that currently are in either a warning or critical state.
+
+### Groups
+
+Clicking the Groups menu option will show a list of all host groups currently active. By default all hosts are in the _Ungrouped_ group. Defining groups allows grouping similar hosts so they can be displayed together. Entering the group view is the same view as the Overview dashboard but filtered for the specific group.
 
 ### Tags
 
@@ -383,12 +387,18 @@ The above host will inherit the services from the __web_server__ type above but 
 The following attributes are useful, but not necessary, for any host definition:
 * id - defaults to a slugified version of the name (`my-web-server` in example), but can be set specifically using the id value
 * icon - a custom icon from [Material Design Icons](https://materialdesignicons.com/)
-* group - a way go group similiar devices, these are different than types. _Example:_ firewall and switch types could be part of an Infrastructure group. All devices are Ungrouped by default.
+* group - a way go group similar devices, these are different than types. _Example:_ firewall and switch types could be part of an Infrastructure group. All devices are Ungrouped by default.
 * info - any additional information on this device you want displayed on the Dashboard page.
 * management_page - the full URL to web management for this device, if it exists
 * interval - the check interval, if different than the global value
 * service_check_attempts - how many service checks to confirm warning/critical states. Only needed if different than the global value.
 * ping_command - by default an ICMP ping command is sent to all hosts to verify they are online. This can be changed via a custom ping_command service to detect if the host is alive utilizing a different method.
+
+## Host Groups
+
+At first glance there are two ways to organize hosts, types and groups. These may sound interchangeable but there are subtle differences to each. A __Host Type__ is an inheritance mechanism for quickly templating and creating Host definitions. A type is best thought of as a parent template that pushes configuration options down to similar child devices. These options are things like icons, groups, and services. A __Host Group__ is a logical grouping of hosts for any purpose. They could share similar host types, or just be a part of a physical area or like purpose. Host groups are viewable in dashboards or via the API.
+
+As an example imagine host types such as a Firewall, Switch, NVR, and Cameras. Each has distinct attributes and service checks that don't necessarily overlap. From a grouping structure you could group all of these by location (Data Rack vs Remote) or by purpose (Infrastructure vs Surveillance). The type defines how the services are managed, the group defines how you want the hosts categorized or linked.
 
 ## Service Tags
 
