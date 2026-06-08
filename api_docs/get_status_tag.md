@@ -1,10 +1,10 @@
-__/api/status/tag/<tag_id>__ - information on the status of each service with this tag id
+__/api/status/tag/<type>/<tag_id>__ - return the status information for all hosts or services attached to this tag. Must specify either __host__ or __service_- as the type. Returned response will have __members__ as the resulting key.
 
 ```
 {
   "id": "http",
   "name": "HTTP",
-  "services": [
+  "members": [
     {
       "check_attempt": 1,
       "id": "web-server-http",

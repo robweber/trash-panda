@@ -239,6 +239,12 @@ types:
       group:
         required: False
         type: string
+      tags:
+        required: False
+        type: list
+        default: []
+        schema:
+          type: string
       info:
         required: False
         type: string
@@ -300,6 +306,12 @@ hosts:
       group:
         required: False
         type: string
+      tags:
+        required: False
+        type: list
+        default: []
+        schema:
+          type: string
       icon:
         required: False
         type: string

@@ -124,13 +124,19 @@ def api_app(config_file, config_yaml, history):
 
         return {"return_codes": return_codes, "service_filter": service_filter, "services": services}
 
-    @app.get('/status/tag/{tag_id}', tags=['Status'], description=LoadPath('api_docs/get_status_tag.md').read_text())
-    def get_tag(tag_id: str = Path(description="a valid tag id")):
+    @app.get('/status/tag/{type}/{tag_id}', tags=['Status'], description=LoadPath('api_docs/get_status_tag.md').read_text())
+    def get_tag(type: str = Path(description="tag type, either host or service"), tag_id: str = Path(description="a valid tag id")):
 
-        tag = history.get_tag(tag_id)
+        if(type == 'host'):
+            tag = history.get_host_tag(tag_id)
 
-        # convert services to an array
-        tag['services'] = sorted(tag['services'], key=lambda o: o['host']['name'])
+            # sort the members
+            tag['members'] = sorted(tag['members'], key=lambda o: o['name'])
+        else:
+            tag = history.get_service_tag(tag_id)
+
+            # sort the members
+            tag['members'] = sorted(tag['members'], key=lambda o: o['host']['name'])
 
         return tag
 

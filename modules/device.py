@@ -30,6 +30,7 @@ class Device:
         self.management_page = None if 'management_page' not in host_def else host_def['management_page']
         self.info = host_def['info']
         self.group = host_def['group']
+        self.tags = host_def['tags']
         self.icon = host_def['icon']
         self.interval = host_def['interval']
         self.notifier = host_def['notifier']
@@ -48,7 +49,7 @@ class Device:
         """takes the current host configuration and returns it as a dictionary object, which
         can be serialized for JSON output"""
         result = {'type': self.type, 'id': self.id, 'name': self.name, 'address': self.address,
-                  'icon': self.icon, 'info': self.info, 'interval': self.interval, 'group': self.group,
+                  'icon': self.icon, 'info': self.info, 'interval': self.interval, 'group': self.group, 'tags': self.tags,
                   'service_check_attempts': self.check_attempts, 'last_check': self.last_check, 'config': self.config,
                   'silenced': self.is_silenced()}
 
@@ -86,6 +87,7 @@ class HostType:
     name = None
     info = ""
     group = "Ungrouped"
+    tags = []
     icon = 'devices'
     interval = 5
     notifier = None
@@ -109,6 +111,9 @@ class HostType:
 
         if('group' in type_def):
             self.group = type_def['group']
+
+        if('tags' in type_def):
+            self.tags = type_def['tags']
 
         if('config' in type_def):
             self.config = type_def['config']
@@ -143,6 +148,13 @@ class HostType:
 
         if('group' not in device_def):
             device_def['group'] = self.group
+
+        # set tags if they don't exist
+        if('tags' not in device_def):
+            device_def['tags'] = self.tags
+        else:
+            # merge them if they do
+            device_def['tags'] = device_def['tags'] + self.tags
 
         if('interval' not in device_def):
             device_def['interval'] = self.interval

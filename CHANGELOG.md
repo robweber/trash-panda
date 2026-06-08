@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - optional `group` attribute for Host and HostType definitions
 - API calls `/list/groups` to get group names and `/status/group/<name>` to get group host information
 - new Dashboard views to see groups and group members
+- Added orange, pink, and purple as valid color options
 
 ### Changed
 
@@ -25,6 +26,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - commands, such as silence or check now, go into a queue system rather than interacting with the host object directly
 - swapped the host type and host status areas of the Host Status page to make the overall status more visible
 - top nav layout changed, custom links now grouped in drop down menu
+- tag and menu colors no longer tied to Bootstrap defaults
 
 ### Fixed
 

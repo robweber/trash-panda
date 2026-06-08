@@ -77,7 +77,25 @@ class HostHistory:
 
         return host[0]
 
-    def get_tag(self, tag_id):
+    def get_host_tag(self, tag_id):
+        """ finds hosts matching the given tag id
+
+        :param tag_id: the id of the tag to lookup
+
+        :returns: list of hosts that include this tag
+        """
+
+        # get list of services matching this tag id
+        result = {"id": tag_id}
+        result['members'] = self.__read_db_json(DBQueries.GET_HOST_TAG.value.format(tag_id=tag_id))
+
+        # remove service info
+        for i in range(0, len(result['hosts'])):
+            result['members'][i].pop("services")
+
+        return result
+
+    def get_service_tag(self, tag_id):
         """ finds services matching the given tag id
 
         :param tag_id: the id of the tag to lookup
@@ -87,7 +105,7 @@ class HostHistory:
 
         # get list of services matching this tag id
         result = {"id": tag_id}
-        result['services'] = self.__read_db_json(DBQueries.GET_TAG.value.format(tag_id=tag_id))
+        result['members'] = self.__read_db_json(DBQueries.GET_SERVICE_TAG.value.format(tag_id=tag_id))
 
         return result
 
@@ -278,7 +296,8 @@ class DBQueries(Enum):
     GET_TAG_IDS = '$[*].services[*].tags'
     GET_GROUP_NAMES = '$[*].group'
     GET_HOST = '$[?(@.id=="{host_id}")]'
+    GET_HOST_TAG = '$[?(@.tags[*]=="{tag_id}")]'
     GET_GROUP = '$[?(@.group=="{group_name}")]'
     GET_SERVICE = '$[*].services[?(@.id=="{service_id}")]'
-    GET_TAG = '$[*].services[?(@.tags[*]=="{tag_id}")]'
+    GET_SERVICE_TAG = '$[*].services[?(@.tags[*]=="{tag_id}")]'
     GET_SERVICES_BY_QUERY = '$[*].services[?(({return_codes}) && @.id=~"{service_regex}")]'

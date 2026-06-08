@@ -16,7 +16,16 @@ function load_status(){
     //clear existing data
     table.empty();
 
-    data.services.forEach(function(s){
+    // check which key to iterate over
+    if('members' in data)
+    {
+      iter = data.members;
+    }
+    else {
+      iter = data.services;
+    }
+
+    iter.forEach(function(s){
       row = tr.clone();
 
       text_highlight = 'text-secondary';

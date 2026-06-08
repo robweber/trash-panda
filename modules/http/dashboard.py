@@ -54,7 +54,7 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
 
     @app.route('/status/tag/<tag_id>')
     def tags(tag_id):
-        tag = history.get_tag(tag_id)
+        tag = history.get_service_tag(tag_id)
         tag['name'] = config_yaml['tags'][tag_id]['name']
 
         return render_template("services.html", url=f"/api/status/tag/{tag_id}", page_title=f"{tag['name']}")
@@ -136,10 +136,16 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
             # get a list of hosts
             hosts = history.get_hosts()
 
-            # group them by type
+            # group them by primary tag
             grouped = defaultdict(list)
             for h in hosts:
-                grouped[h['group']].append({"name": h['name'], "id": h['id'], "icon": h['icon']})
+                h_sub = {"name": h['name'], "id": h['id'], "icon": h['icon']}
+
+                if('tags' in h):
+                    # primary tag is the first one
+                    grouped[h['tags'][0]].append(h_sub)
+                else:
+                    grouped['ungrouped'].append(h_sub)
 
             # return list of groups, each containing the members
             result = [
