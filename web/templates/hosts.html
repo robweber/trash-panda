@@ -15,7 +15,14 @@ function load_status(){
     //clear existing data
     table.empty();
 
-    data.forEach(function(h){
+    if('members' in data){
+      iter = data.members
+    }
+    else {
+      iter = data
+    }
+
+    iter.forEach(function(h){
       row = tr.clone();
 
       // link for the details

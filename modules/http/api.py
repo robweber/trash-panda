@@ -57,9 +57,16 @@ def api_app(config_file, config_yaml, history):
         return sorted(history.list_groups())
 
     @app.get('/list/tags', tags=['Informational'], description=LoadPath('api_docs/get_list_tags.md').read_text())
-    def list_tags():
+    def list_tags(type: Annotated[str, Query(description="type of tags to return (host or service)")] = None):
+        result = config_yaml['tags']
 
-        return config_yaml['tags']
+        if(type is not None):
+            # filter tags on those used by this type
+            filter_list = history.get_tags(type)
+
+            result = {k: v for k, v in result.items() if k in filter_list}
+
+        return result
 
     @app.get('/status/summary', tags=['Status'], description=LoadPath('api_docs/get_status_summary.md').read_text())
     def overall_status():

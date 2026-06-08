@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container">
-  <p>Click on a tag name to view services assigned to that tag. </p>
+  <p>Click on a tag name to view {{tag_type}}s assigned to that tag. </p>
   <ul>
     {% for t in tags: %}
     <li>
-      <a href="/dashboard/status/tag/{{ t }} ">{{ tags[t]['name'] }}</a>
+      <a href="/dashboard/status/tag/{{ tag_type }}/{{ t }} ">{{ tags[t]['name'] }}</a>
     </li>
     {% endfor %}
   </ul>

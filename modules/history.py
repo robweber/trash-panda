@@ -63,6 +63,20 @@ class HostHistory:
 
         return group
 
+    def get_tags(self, type):
+        result = []
+
+        if(type == 'host'):
+            tags = self.__read_db_json(DBQueries.GET_HOST_TAG_IDS.value)
+        else:
+            tags = self.__read_db_json(DBQueries.GET_SERVICE_TAG_IDS.value)
+
+        # flatten the array
+        result = [t for h_tags in tags for t in h_tags]
+
+        # return unique set
+        return list(set(result))
+
     def get_host(self, host_id):
         """ get host information from the database based on the ID
 
@@ -90,7 +104,7 @@ class HostHistory:
         result['members'] = self.__read_db_json(DBQueries.GET_HOST_TAG.value.format(tag_id=tag_id))
 
         # remove service info
-        for i in range(0, len(result['hosts'])):
+        for i in range(0, len(result['members'])):
             result['members'][i].pop("services")
 
         return result
@@ -293,7 +307,8 @@ class DBKeys(Enum):
 class DBQueries(Enum):
     """Enum that holds keys for JSON Queries"""
     GET_HOST_IDS = '$[*].id'
-    GET_TAG_IDS = '$[*].services[*].tags'
+    GET_HOST_TAG_IDS = '$[*].tags'
+    GET_SERVICE_TAG_IDS = '$[*].services[*].tags'
     GET_GROUP_NAMES = '$[*].group'
     GET_HOST = '$[?(@.id=="{host_id}")]'
     GET_HOST_TAG = '$[?(@.tags[*]=="{tag_id}")]'

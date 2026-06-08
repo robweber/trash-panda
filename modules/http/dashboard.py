@@ -52,12 +52,16 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
     def list_issues():
         return render_template("services.html", url="/api/status/services?return_codes=1|2", page_title="Issues")
 
-    @app.route('/status/tag/<tag_id>')
-    def tags(tag_id):
-        tag = history.get_service_tag(tag_id)
+    @app.route('/status/tag/<type>/<tag_id>')
+    def tags(type, tag_id):
+        if(type == 'host'):
+            tag = history.get_host_tag(tag_id)
+        else:
+            tag = history.get_service_tag(tag_id)
+
         tag['name'] = config_yaml['tags'][tag_id]['name']
 
-        return render_template("services.html", url=f"/api/status/tag/{tag_id}", page_title=f"{tag['name']}")
+        return render_template(f"{type}s.html", url=f"/api/status/tag/{type}/{tag_id}", page_title=f"{tag['name']}")
 
     @app.route('/status/services/<service_filter>')
     def list_services(service_filter):
@@ -91,11 +95,17 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
 
         return render_template("view_groups.html", groups=groups, page_title="Groups")
 
-    @app.route('/tags', methods=['GET'])
-    def view_tags():
-        tags = dict(sorted(config_yaml['tags'].items()))  # sort by id
+    @app.route('/tags/<type>', methods=['GET'])
+    def view_tags(type):
+        # filter tags on those used by this type
+        filter_list = history.get_tags(type)
 
-        return render_template("view_tags.html", tags=tags, page_title="Tags")
+        tags = {k: v for k, v in config_yaml['tags'].items() if k in filter_list}
+
+        # sort
+        tags = dict(sorted(tags.items()))
+
+        return render_template("view_tags.html", tags=tags, tag_type=type, page_title=f"{type.capitalize()} Tags")
 
     @app.route('/docs/<file>', methods=['GET'])
     def load_doc(file):
