@@ -25,10 +25,6 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
     app.logger.setLevel(getattr(logging, logLevel))
     app.debug = debugMode
 
-    # re-map the tag colors
-    for tag in config_yaml['tags'].keys():
-        config_yaml['tags'][tag]['color'] = utils.COLOR_MAPPING[config_yaml['tags'][tag]['color']]
-
     @app.route('/', methods=["GET"])
     def index():
         return render_template("hosts.html", url="/api/status/hosts", message=config_yaml['config']['web']['landing_page_text'])
@@ -127,7 +123,7 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
             style = config_yaml['config']['web']['top_nav']['style']['type']
 
             if(style == 'button'):
-                return utils.COLOR_MAPPING[config_yaml['config']['web']['top_nav']['style']['color']]
+                return config_yaml['config']['web']['top_nav']['style']['color']
             else:
                 return 'link'
 

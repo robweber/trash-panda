@@ -8,6 +8,9 @@ allowed_colors:
     - gray
     - green
     - light_blue
+    - orange
+    - pink
+    - purple
     - red
     - yellow
 

@@ -260,13 +260,16 @@ The top navigation style can be modified using the `style` key. Two style types 
 * __button__ - the default style, a rounded button.
 * __link__ - just a plain text link
 
-Additionally the __button__ style can also include a __color__ option. Accepted options are based on default Bootstrap colors:
+Additionally the __button__ style can also include a __color__ option. Accepted values are:
 
 * black
 * blue
 * gray
 * green
 * light_blue
+* orange
+* pink
+* purple
 * red
 * yellow
 

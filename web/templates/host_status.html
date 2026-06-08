@@ -167,7 +167,7 @@ function load_status(){
 
       tag_div = $('<div>').addClass('col-sm-12').addClass('text-left');
       s.tags.forEach(function(aTag){
-        tagPill = $('<span>').text(TAGS[aTag]['name']).addClass('badge').addClass('rounded-pill').addClass('bg-' + TAGS[aTag]['color']);
+        tagPill = $('<span>').text(TAGS[aTag]['name']).addClass('badge').addClass('rounded-pill').addClass('tp-bg-' + TAGS[aTag]['color']);
         tagLink = $('<a>').append(tagPill).addClass('text-light');
         tagLink.attr('href', '/dashboard/status/tag/' + aTag);
         tag_div.append(tagLink);
