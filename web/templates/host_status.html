@@ -167,8 +167,8 @@ function load_status(){
 
       tag_div = $('<div>').addClass('col-sm-12').addClass('text-left');
       s.tags.forEach(function(aTag){
-        tagPill = $('<span>').text(TAGS[aTag]['name']).addClass('badge').addClass('rounded-pill').addClass('tp-bg-' + TAGS[aTag]['color']);
-        tagLink = $('<a>').append(tagPill).addClass('text-light');
+        //tagPill = $('<span>').text(TAGS[aTag]['name']).addClass('badge').addClass('rounded-pill').addClass('tp-bg-' + TAGS[aTag]['color']);
+        tagLink = $('<a>').addClass('tag-pill').addClass('badge').addClass('rounded-pill').addClass('tp-bg-' + TAGS[aTag]['color']).text(TAGS[aTag]['name']);
         tagLink.attr('href', '/dashboard/status/tag/' + aTag);
         tag_div.append(tagLink);
       });
@@ -203,7 +203,12 @@ function load_status(){
 <div class="container">
   <div class="row">
     <div class="col-lg-8">
-      <h2 class="mb-3 host-title"><i class="mdi mdi-{{ host['icon'] }} icon-2x"></i> {{ host['name'] }}</h2>
+      <h2 class="mb-0 host-title"><i class="mdi mdi-{{ host['icon'] }} icon-2x"></i> {{ host['name'] }}</h2>
+      <div class="mt-0 mb-4">
+        {% for t in host['tags']: %}
+        <a href="/dashboard/status/tag/host/{{ t }}" class="mt-0 p-1 badge rounded-pill tp-bg-{{ tags[t].color }}">{{ tags[t].name }}</a>
+        {% endfor %}
+      </div>
       <p>{{ host['info'] }}</p>
     </div>
     <div class="col-lg-4 host-status-card">
@@ -212,7 +217,6 @@ function load_status(){
           <h5 class="card-title">Status: <span id="host-overall-status">{{ overall_status[host['overall_status']] }}</span></h5>
           <p class="card-text">
             Type: <span class="text-info">{{ host['type'] | replace('_',' ') | title }}</span> <br />
-            Group: <a href="/dashboard/status/group?group={{ host['group'] }}">{{ host ['group'] }}</a><br />
             Last Check: <span id="host-last-check">{{ host['last_check'] }}</span> <br />
             Next Check: <span id="host-next-check">{{ host['next_check'] }}</span> <br />
             IP Address: {{ host['address'] }}

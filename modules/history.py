@@ -31,13 +31,6 @@ class HostHistory:
     def list_hosts(self):
         return self.__read_db_json(DBQueries.GET_HOST_IDS.value)
 
-    def list_groups(self):
-        # get all the group names
-        groups = self.__read_db_json(DBQueries.GET_GROUP_NAMES.value)
-
-        # only return unique set
-        return list(set(groups))
-
     def get_hosts(self):
         """ returns all host information from the database """
         all_hosts = self.__read_db_json("$[*]")
@@ -46,22 +39,6 @@ class HostHistory:
             all_hosts[i].pop("services")
 
         return all_hosts
-
-    def get_group(self, group_name):
-        """ get all hosts assigned to a given group
-
-        :param group_name: a valid group name
-
-        :returns: a list containing each host as a dictionary object
-        """
-
-        group = self.__read_db_json(DBQueries.GET_GROUP.value.format(group_name=group_name))
-
-        # remove service info
-        for i in range(0, len(group)):
-            group[i].pop("services")
-
-        return group
 
     def get_tags(self, type):
         result = []
@@ -309,10 +286,8 @@ class DBQueries(Enum):
     GET_HOST_IDS = '$[*].id'
     GET_HOST_TAG_IDS = '$[*].tags'
     GET_SERVICE_TAG_IDS = '$[*].services[*].tags'
-    GET_GROUP_NAMES = '$[*].group'
     GET_HOST = '$[?(@.id=="{host_id}")]'
-    GET_HOST_TAG = '$[?(@.tags[*]=="{tag_id}")]'
-    GET_GROUP = '$[?(@.group=="{group_name}")]'
+    GET_HOST_TAG = '$[?(@.tags[?(@=="{tag_id}")])]'
     GET_SERVICE = '$[*].services[?(@.id=="{service_id}")]'
     GET_SERVICE_TAG = '$[*].services[?(@.tags[*]=="{tag_id}")]'
     GET_SERVICES_BY_QUERY = '$[*].services[?(({return_codes}) && @.id=~"{service_regex}")]'

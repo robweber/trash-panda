@@ -51,11 +51,6 @@ def api_app(config_file, config_yaml, history):
 
         return history.list_hosts()
 
-    @app.get('/list/groups', tags=['Informational'], description=LoadPath('api_docs/get_list_groups.md').read_text())
-    def list_groups():
-
-        return sorted(history.list_groups())
-
     @app.get('/list/tags', tags=['Informational'], description=LoadPath('api_docs/get_list_tags.md').read_text())
     def list_tags(type: Annotated[str, Query(description="type of tags to return (host or service)")] = None):
         result = config_yaml['tags']
@@ -100,16 +95,6 @@ def api_app(config_file, config_yaml, history):
         hosts = history.get_hosts()
 
         return sorted(hosts, key=lambda o: o['name'])
-
-    @app.get('/status/group/{group_name}', tags=['Status'], description=LoadPath('api_docs/get_status_group.md').read_text())
-    def get_group(group_name: str = Path(description="a valid group name")):
-
-        group = history.get_group(group_name)
-
-        # sort by host name
-        result = sorted(group, key=lambda o: o['name'])
-
-        return result
 
     @app.get('/status/host/{host_id}', tags=['Status'], description=LoadPath('api_docs/get_status_hosts_id.md').read_text())
     def get_host(host_id: str = Path(description="A valid host id")):

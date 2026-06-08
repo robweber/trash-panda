@@ -236,9 +236,6 @@ types:
       icon:
         required: False
         type: string
-      group:
-        required: False
-        type: string
       tags:
         required: False
         type: list
@@ -303,9 +300,6 @@ hosts:
       service_check_attempts:
         required: False
         type: integer
-      group:
-        required: False
-        type: string
       tags:
         required: False
         type: list
