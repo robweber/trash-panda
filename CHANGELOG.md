@@ -12,9 +12,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - on the Host Status page links to Service documentation are automatically generated if a matching documentation header exists
 - top navigation now includes a drop list of hosts for quick access from page
 - custom top nav links can include a custom title - _Links_ is the default title
-- optional `group` attribute for Host and HostType definitions
-- API calls `/list/groups` to get group names and `/status/group/<name>` to get group host information
-- new Dashboard views to see groups and group members
+- tags can now be used on Host and HostType definitions
+- new Dashboard views to see host tags
 - Added orange, pink, and purple as valid color options
 
 ### Changed
@@ -25,6 +24,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - main script renamed `trash-panda.py` from `dashboard.py` to reflect it launches the full service
 - commands, such as silence or check now, go into a queue system rather than interacting with the host object directly
 - swapped the host type and host status areas of the Host Status page to make the overall status more visible
+- API call to `/list/tag` can be given the optional type parameter `/list/tags?type=<host|service>` to filter on tag type
+- API call to `/status/tag/<id>` changed to `/status/tag/<type>/<id>` as hosts and services can use tags
 - top nav layout changed, custom links now grouped in drop down menu
 - tag and menu colors no longer tied to Bootstrap defaults
 

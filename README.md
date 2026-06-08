@@ -84,13 +84,9 @@ Clicking on a host name will show you more information about that device. Indivi
 
 In the Dashboards menu you can find a link to the Issues dashboard. This page shows all services that currently are in either a warning or critical state.
 
-### Groups
-
-Clicking the Groups menu option will show a list of all host groups currently active. By default all hosts are in the _Ungrouped_ group. Defining groups allows grouping similar hosts so they can be displayed together. Entering the group view is the same view as the Overview dashboard but filtered for the specific group.
-
 ### Tags
 
-Also on the Dashboards menu is the Tags dashboard. Here you can find a list of all configured tags. Clicking one will show all services configured with that [Service Tag](#service-tags). Tags will also been shown on the Host Status page next to each service.
+Tags can be configured for both hosts and services to group related devices. Host Tags will show all tags assigned to hosts while services tags show all tags assigned to services. Tags will also be shown on the Host Status page for each device. [Tags](#tags) must be defined prior to being used. 
 
 ### Performance Data
 
@@ -337,10 +333,12 @@ Device types can also define configuration variables that must be included in ho
 web_server:
   name: Web Server
   icon: server
-  group: Webservers
   interval: 10
   notifier: log
   service_check_attempts: 2
+  tags:
+    - server
+    - hardware
   ping_command:
     type: custom_ping
   config:
@@ -356,11 +354,10 @@ The above defines a device type of __web_server__ that can be implemented by a h
 Also of note are some optional variables.
 
 * __interval__: By default the global interval will be used, but individual device types, or individual hosts, can set their own.
-* __group__: Optional way to group similar devices logically, will be passed down to host
 * __notifier__: Again, by default the global notification type will be used but hosts types can set their own. This will apply to the host and all services under it.
 * __service_check_attempts__: Override the global service check value with a custom value for this host
 * __ping_command__: Override the built in ICMP Ping check with a custom check defined in the [services](#services) list.
-* __tags__: a list of tags that apply to this service. See the (tags documentation)[#service-tags]
+* __tags__: a list of tags that apply to this service. See the (tags documentation)[#tags]
 
 ## Host Definitions
 
@@ -390,7 +387,6 @@ The above host will inherit the services from the __web_server__ type above but 
 The following attributes are useful, but not necessary, for any host definition:
 * id - defaults to a slugified version of the name (`my-web-server` in example), but can be set specifically using the id value
 * icon - a custom icon from [Material Design Icons](https://materialdesignicons.com/)
-* group - a way go group similar devices, these are different than types. _Example:_ firewall and switch types could be part of an Infrastructure group. All devices are Ungrouped by default.
 * info - any additional information on this device you want displayed on the Dashboard page.
 * management_page - the full URL to web management for this device, if it exists
 * interval - the check interval, if different than the global value
@@ -399,44 +395,31 @@ The following attributes are useful, but not necessary, for any host definition:
 
 ## Host Groups
 
-At first glance there are two ways to organize hosts, types and groups. These may sound interchangeable but there are subtle differences to each. A __Host Type__ is an inheritance mechanism for quickly templating and creating Host definitions. A type is best thought of as a parent template that pushes configuration options down to similar child devices. These options are things like icons, groups, and services. A __Host Group__ is a logical grouping of hosts for any purpose. They could share similar host types, or just be a part of a physical area or like purpose. Host groups are viewable in dashboards or via the API.
+At first glance there are two ways to organize hosts, types and groups. These may sound interchangeable but there are subtle differences to each.
 
 As an example imagine host types such as a Firewall, Switch, NVR, and Cameras. Each has distinct attributes and service checks that don't necessarily overlap. From a grouping structure you could group all of these by location (Data Rack vs Remote) or by purpose (Infrastructure vs Surveillance). The type defines how the services are managed, the group defines how you want the hosts categorized or linked.
 
-## Service Tags
+## Tags
 
-Tags are a grouping feature that can be applied to services. This allows you to easily create separate dashboards for all services that match the tag. A common use case for this is a Disk Space service that may be applied to multiple hosts. By applying a tag to this service you can see that status of all the Disk Space services for each host in one place instead of looking at them individually. Another use could be tagging services that all interact with each other in some way across hosts (like a web server and database server).
+Tags are a grouping feature that can be applied to hosts or services. This allows you to easily create separate dashboards for grouped devices or services that match the tag. A common use case for this is a Disk Space service that may be applied to multiple hosts. By applying a tag to this service you can see the status of all the Disk Space services for each host in one place instead of looking at them individually. Another use for this could be tagging all host devices that key Infrastructure so you can quickly see them all in one Dashboard. Both services and hosts can have multiple tags.
+
+At first glance it may seem that there are two ways to organize hosts, types and tags. There are subtle differences to each. A [Host Type](#host-types) is an inheritance mechanism for quickly templating and creating Host definitions. A type is best thought of as a parent template that pushes configuration options down to similar child devices. These options are things like icons, groups, and services. A [Host Tag](#tags) is a logical grouping of hosts or services for any purpose. They could share similar host types, or just be a part of a physical area. Host groups are viewable in dashboards or via the API.
 
 Before applying tags must be setup within the main configuration with the `tags` key. By default all tags are black. Valid colors are the same as the [Top Nav Style colors][#website-options].
 
 ```
 tags:
+  hardware:
+    name: Physical Hardware
+  server:
+    name: Server
+    color: yellow
   website:
     name: Website
     tag: light_blue
 ```
 
-Adding a tag to a service can be done when creating either the [Host Type](#host-types) or [Host definition](#host-definitions).
-
-```
-type: web_server
-name: "My Web Server"
-address: 192.168.0.2
-management_page: "http://myserver:5000/admin"
-config:
-  virtual_host: "myserver"
-services:
-  - type: http
-    name: "Admin Page"
-    output_filter: "{{ value.trim() }}"
-    tags:
-      - website
-    args:
-      port: 5000
-      path: "/admin"
-```
-
-The tag will automatically show on the services it's applied to. Clicking the tag name will bring up the status page for that tag, listing all the services. This page is similar to the dashboard in that it will refresh every 15 seconds. For quick access to a tag you can set it up as a [link on the dashboard](#website-options).
+Adding a tag can be done when creating either the [Host Type](#host-types) or [Host definition](#host-definitions). Host tags are inherited and additive. Tags added at the Host Type level are added to any found in the specific host. The first host tag is the _primary tag_ for the host.
 
 ## Host Documentation
 
