@@ -169,7 +169,7 @@ function load_status(){
       s.tags.forEach(function(aTag){
         //tagPill = $('<span>').text(TAGS[aTag]['name']).addClass('badge').addClass('rounded-pill').addClass('tp-bg-' + TAGS[aTag]['color']);
         tagLink = $('<a>').addClass('tag-pill').addClass('badge').addClass('rounded-pill').addClass('tp-bg-' + TAGS[aTag]['color']).text(TAGS[aTag]['name']);
-        tagLink.attr('href', '/dashboard/status/tag/' + aTag);
+        tagLink.attr('href', '/dashboard/status/tag/service/' + aTag);
         tag_div.append(tagLink);
       });
 
