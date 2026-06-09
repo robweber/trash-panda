@@ -4,8 +4,40 @@
 <script type="text/javascript">
 var countdown = new UpdateCountdown("last_updated");
 
+function silence_all(tag, minutes){
+  $.post('/api/command/silence_tag/' + tag + '/' + minutes, function(data, status, request){
+    if(data.success){
+      if(data.is_silenced)
+      {
+        $('#js-success-alert').html("Hosts silenced until " + data.until);
+
+        $('#silence-btn').html('Silenced');
+        $('#silence-btn').addClass('btn-danger');
+        $('#silence-btn').removeClass('btn-warning');
+        $('#cancel-btn').show();
+      }
+      else
+      {
+        $('#js-success-alert').html("Silent mode canceled");
+
+        $('#silence-btn').html('Silence');
+        $('#silence-btn').addClass('btn-warning');
+        $('#silence-btn').removeClass('btn-danger');
+        $('#cancel-btn').hide();
+      }
+
+      $('#js-success-alert').show().delay(3000).fadeOut();
+    }
+    else {
+      $('#js-error-alert').html("Error silencing host");
+      $('#js-error-alert').show().delay(3000).fadeOut();
+    }
+  });
+}
+
 function load_status(){
   $.ajax({type: 'GET', url: '{{ url }}', success: function(data, status, request){
+    var silent_total = 0;
     var table = $('#host_info > tbody');
 
     // setup row objects
@@ -50,6 +82,7 @@ function load_status(){
       var silent_mode = '';
       if(h.silenced)
       {
+        silent_total ++;
         silent_mode = $('<i>');
         silent_mode.attr('class','mdi mdi-volume-off icon-sm icon-inline ml-1');
       }
@@ -68,6 +101,23 @@ function load_status(){
 
     });
 
+    // check if hosts are silenced, or silence removed
+    if(silent_total == iter.length && $('#cancel-btn').css('display') == 'none')
+    {
+      $('#silence-btn').html('Silenced');
+      $('#silence-btn').addClass('btn-danger');
+      $('#silence-btn').removeClass('btn-warning');
+      $('#cancel-btn').show();
+    }
+    else if(silent_total != iter.length && $('#cancel-btn').css('display') == 'block')
+    {
+      // revert to normal look
+      $('#silence-btn').html('Silence All');
+      $('#silence-btn').addClass('btn-warning');
+      $('#silence-btn').removeClass('btn-danger');
+      $('#cancel-btn').hide();
+    }
+
     // reset countdown
     countdown.reset_countdown();
   }});
@@ -80,6 +130,19 @@ function load_status(){
   <p>The overall status of each host is listed below. Click the name to see additional details. If a management page is configured it can be launched with the <i class="mdi mdi-launch icon-sm icon-inline"></i> icon.</p>
   {% else: %}
   <p>{{ message }}</p>
+  {% endif %}
+  {% if tag_id %}
+  <div class="mt-2 mb-2 pt-1" align="right">
+    <div class="dropdown div-inline silence_btn">
+      <button id="silence-btn" class="btn btn-warning dropdown-toggle silence_btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Silence All</button>
+      <div class="dropdown-menu dropdown-mobile" aria-labelledby="dropdownMenuButton">
+        <button class="dropdown-item" type="button" id="cancel-btn" style="display:none" onClick="silence_all('{{ tag_id }}', -1)">Cancel</button>
+        <button class="dropdown-item" type="button" onClick="silence_all('{{ tag_id }}', 30)">30 Min</button>
+        <button class="dropdown-item" type="button" onClick="silence_all('{{ tag_id }}', 60)">1 Hour</button>
+        <button class="dropdown-item" type="button" onClick="silence_all('{{ tag_id }}', 120)">2 Hours</button>
+      </div>
+    </div>
+  </div>
   {% endif %}
   <table class="table table-striped" id="host_info">
     <thead class="thead-dark">

@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - tags can now be used on Host and HostType definitions
 - new Dashboard views to see host tags
 - Added orange, pink, and purple as valid color options
+- New API command `/api/silence_tag/<tag_id>/<minutes>` to silence all hosts with a given tag
 
 ### Changed
 

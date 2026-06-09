@@ -55,7 +55,7 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
 
         tag['name'] = config_yaml['tags'][tag_id]['name']
 
-        return render_template(f"{type}s.html", url=f"/api/status/tag/{type}/{tag_id}", page_title=f"{tag['name']}")
+        return render_template(f"{type}s.html", url=f"/api/status/tag/{type}/{tag_id}", tag_id=tag_id, page_title=f"{tag['name']}")
 
     @app.route('/status/services/<service_filter>')
     def list_services(service_filter):

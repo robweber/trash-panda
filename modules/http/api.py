@@ -227,4 +227,16 @@ def api_app(config_file, config_yaml, history):
 
         return result
 
+    @app.post('/command/silence_tag/{tag_id}/{minutes}', tags=['Command'], description=LoadPath('api_docs/post_command_silence_tag.md').read_text())
+    def silence_host_tag(tag_id: str = Path(description="a valid tag name"),
+                         minutes: int = Path(description="the number of minutes to silence this tag group")):
+        # get all the hosts in this tag group
+        hosts = history.get_host_tag(tag_id)
+
+        for m in hosts['members']:
+            result = history.silence_host(m['id'], minutes)
+            logging.debug(f"Silencing {m['id']} until {result['until']}")
+
+        return result
+
     return app
