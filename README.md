@@ -92,7 +92,7 @@ Tags can be configured for both hosts and services to group related entities. Ho
 
 Any [service](#services) that returns performance data will have it logged with a timestamp for each data point. Performance data is parsed according to the [Nagios specification](https://nagios-plugins.org/doc/guidelines.html#AEN200) for performance data. Services that have data available will show a chart icon beneath the service. Clicking the chart will load the performance data graphs.
 
-On the Performance Data page line charts are rendered for any performance metrics available for that service. These can be shown in different time increments, by default the last 60 minutes are shown. When available, warning and critical values are also drawn on the chart.
+On the Performance Data page line charts are rendered for any performance metrics available for that service. These can be shown in different time increments, by default the last 60 minutes are shown. Areas of the chart can be selected to zoom in on specific time periods. When available, warning and critical values are also drawn on the chart.
 
 ## Config File
 

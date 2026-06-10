@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - new Dashboard views to see host tags
 - Added orange, pink, and purple as valid color options
 - New API command `/api/silence_tag/<tag_id>/<minutes>` to silence all hosts with a given tag
+- Performance data charts can now be panned/zoomed utilizing the [Chart.js Zoom](https://www.chartjs.org/chartjs-plugin-zoom/latest/) plugin
 
 ### Changed
 
@@ -29,6 +30,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 - API call to `/status/tag/<id>` changed to `/status/tag/<type>/<id>` as hosts and services can use tags
 - top nav layout changed, custom links now grouped in drop down menu
 - tag and menu colors no longer tied to Bootstrap defaults
+- performance data scaling handled better by using [date-fns](https://github.com/chartjs/chartjs-adapter-date-fns) adapter to treat x axis as a time series
 
 ### Fixed
 
