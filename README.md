@@ -84,9 +84,9 @@ Clicking on a host name will show you more information about that device. Indivi
 
 In the Dashboards menu you can find a link to the Issues dashboard. This page shows all services that currently are in either a warning or critical state.
 
-### Tags
+### Host and Service Tags
 
-Tags can be configured for both hosts and services to group related devices. Host Tags will show all tags assigned to hosts while services tags show all tags assigned to services. Tags will also be shown on the Host Status page for each device. [Tags](#tags) must be defined prior to being used. 
+Tags can be configured for both hosts and services to group related entities. Host Tags will show all tags assigned to hosts while service tags show all tags assigned to services. Tags will also be shown on the Host Status page for each device. [Tags](#tags) must be defined prior to being used.
 
 ### Performance Data
 
@@ -111,14 +111,6 @@ services: !include conf/services.yaml
 types: !include conf/types.yaml
 hosts: !include conf/hosts.yaml
 ```
-
-The following additional options are available for every configured device:
-
-* management_page - a link to the local management page of the host, if there is one. This will be displayed in the dashboard
-* icon - the icon to use for the device, overrides the default type. Should be found on [Material Design Icons](https://materialdesignicons.com/)
-* interval - how often this host should be checked, in minutes. If not given this is the system default. At runtime this value is randomly adjusted +/- 60 seconds to help spread load.
-* service_check_attempts - how many times a service should be checked before confirming a warning or critical state. Default is 3, set this to 1 to automatically confirm state changes.
-* config - an additional mapping of config options specific to this host type
 
 ### Global Configuration
 
@@ -311,7 +303,7 @@ http:
 
 Breaking this down the __command__ statement points to the path of the Nagios `check_http` command. The __args__ section defines arguments to be passed to this executable.
 
-Within the arguments several custom variable placeholders and methods used. These are available for all service definitions and are listed in the [Templating section](#templating). You can see that the host address is used; which is expanded at runtime. A default of port 80 is given but can be changed if the user sets the `service.port` variable on the host. Similarly the web path of `/` is given as a default but could be changed to something liked `/login` if the `services.path` variable is set.
+Within the arguments several custom variable placeholders and methods are used. These are available for all service definitions and are listed in the [Templating section](#templating). You can see that the host address is used; which is expanded at runtime. A default of port 80 is given but can be changed if the user sets the `service.port` variable on the host. Similarly the web path of `/` is given as a default but could be changed to something liked `/login` if the `services.path` variable is set.
 
 ### Modifying Service Output
 
@@ -325,9 +317,9 @@ It is possible to define a custom `output_filter` for a service that parses the 
 
 ## Host Types
 
-Host types are a way to define specific types of device, such as a server or network switch. Each type can include service checks that you'd expect every device of this type to have. An example may be a Web Server device type that includes a status check on port 80 by default.
+Host types are a way to setup specific types of devices, such as a server or network switch. Each type can include service checks that you'd expect every device of this type to have. An example may be a Web Server device type that includes a status check on port 80 by default.
 
-Device types can also define configuration variables that must be included in host configs so that service checks execute properly. Using the above example of an http command from above an example host type definition could be:
+Device types can also define configuration variables that must be included in host configs so that service checks execute properly. Using the above example of an http command an example host type definition could be:
 
 ```
 web_server:
@@ -353,11 +345,12 @@ The above defines a device type of __web_server__ that can be implemented by a h
 
 Also of note are some optional variables.
 
-* __interval__: By default the global interval will be used, but individual device types, or individual hosts, can set their own.
-* __notifier__: Again, by default the global notification type will be used but hosts types can set their own. This will apply to the host and all services under it.
-* __service_check_attempts__: Override the global service check value with a custom value for this host
-* __ping_command__: Override the built in ICMP Ping check with a custom check defined in the [services](#services) list.
-* __tags__: a list of tags that apply to this service. See the (tags documentation)[#tags]
+* __interval__ - By default the global interval will be used, but individual device types, or individual hosts, can set their own.
+* __config__ - a list of configuration options the Host must set
+* __notifier__ - Again, by default the global notification type will be used but hosts types can set their own. This will apply to the host and all services under it.
+* __service_check_attempts__ -  Override the global service check value with a custom value for this host
+* __ping_command__ - Override the built in ICMP Ping check with a custom check defined in the [services](#services) list.
+* __tags__ - a list of tags that apply to this host type. See the (tags documentation)[#tags]
 
 ## Host Definitions
 
@@ -385,27 +378,20 @@ The above host will inherit the services from the __web_server__ type above but 
 ### Optional Host Attributes
 
 The following attributes are useful, but not necessary, for any host definition:
-* id - defaults to a slugified version of the name (`my-web-server` in example), but can be set specifically using the id value
-* icon - a custom icon from [Material Design Icons](https://materialdesignicons.com/)
-* info - any additional information on this device you want displayed on the Dashboard page.
-* management_page - the full URL to web management for this device, if it exists
-* interval - the check interval, if different than the global value
-* service_check_attempts - how many service checks to confirm warning/critical states. Only needed if different than the global value.
-* ping_command - by default an ICMP ping command is sent to all hosts to verify they are online. This can be changed via a custom ping_command service to detect if the host is alive utilizing a different method.
-
-## Host Groups
-
-At first glance there are two ways to organize hosts, types and groups. These may sound interchangeable but there are subtle differences to each.
-
-As an example imagine host types such as a Firewall, Switch, NVR, and Cameras. Each has distinct attributes and service checks that don't necessarily overlap. From a grouping structure you could group all of these by location (Data Rack vs Remote) or by purpose (Infrastructure vs Surveillance). The type defines how the services are managed, the group defines how you want the hosts categorized or linked.
+* __id__ - defaults to a slugified version of the name (`my-web-server` in example), but can be set specifically using the id value
+* __icon__ - a custom icon from [Material Design Icons](https://materialdesignicons.com/)
+* __info__ - any additional information on this device you want displayed on the Dashboard page.
+* __management_page__ - the full URL to web management for this device, if it exists
+* __config__ - additional configuration values for this host that can be used as part of service checks
+* __interval__ - the check interval, if different than the global value
+* __service_check_attempts__ - how many service checks to confirm warning/critical states. Only needed if different than the global value.
+* __ping_command__ - by default an ICMP ping command is sent to all hosts to verify they are online. This can be changed via a custom `ping_command` service to detect if the host is alive utilizing a different method.
 
 ## Tags
 
-Tags are a grouping feature that can be applied to hosts or services. This allows you to easily create separate dashboards for grouped devices or services that match the tag. A common use case for this is a Disk Space service that may be applied to multiple hosts. By applying a tag to this service you can see the status of all the Disk Space services for each host in one place instead of looking at them individually. Another use for this could be tagging all host devices that key Infrastructure so you can quickly see them all in one Dashboard. Both services and hosts can have multiple tags.
+Tags are a grouping feature that can be applied to hosts or services. They allow you to easily create separate dashboards for grouped devices or services that match the tag. A example use case for this is a Disk Space service that may be applied to multiple hosts. By applying a tag to each service you can see the status of all the Disk Space services for each host in one place instead of looking at them individually. Another use for this could be tagging all host devices that are key Infrastructure so you can quickly see them all in one Dashboard. Both services and hosts can have multiple tags.
 
-At first glance it may seem that there are two ways to organize hosts, types and tags. There are subtle differences to each. A [Host Type](#host-types) is an inheritance mechanism for quickly templating and creating Host definitions. A type is best thought of as a parent template that pushes configuration options down to similar child devices. These options are things like icons, groups, and services. A [Host Tag](#tags) is a logical grouping of hosts or services for any purpose. They could share similar host types, or just be a part of a physical area. Host groups are viewable in dashboards or via the API.
-
-Before applying tags must be setup within the main configuration with the `tags` key. By default all tags are black. Valid colors are the same as the [Top Nav Style colors][#website-options].
+Before applying tags they must be setup within the main configuration with the `tags` key. By default all tags are black. Valid colors are the same as the [Top Nav Style colors](#website-options).
 
 ```
 tags:
@@ -419,7 +405,9 @@ tags:
     tag: light_blue
 ```
 
-Adding a tag can be done when creating either the [Host Type](#host-types) or [Host definition](#host-definitions). Host tags are inherited and additive. Tags added at the Host Type level are added to any found in the specific host. The first host tag is the _primary tag_ for the host.
+Adding a tag can be done when creating either the [Host Type](#host-types) or [Host definition](#host-definitions). Host level tags are inherited and additive. Tags added at the Host Type level are added to any found in the specific host. The first host tag is the _primary tag_ for the host.
+
+At first glance it may seem that there are two ways to organize hosts, types and tags. There are subtle differences to each. A [Host Type](#host-types) is an inheritance mechanism for quickly templating and creating Host definitions. A type is best thought of as a parent template that pushes configuration options down to similar child devices. These options are things like icons, groups, and services. A [Host Tag](#tags) is a logical grouping of hosts or services for any purpose. They could share similar host types, be a part of the same physical area, or separate physical vs virtual devices. Host groups are also viewable in dashboards or via the API.
 
 ## Host Documentation
 
@@ -433,7 +421,7 @@ Within a host's documentation file you can use markdown headers to automatically
 
 ### Direct Documentation Links
 
-An endpoint `/dashboard/docs/<filename>` exists to load and render any Markdown file from the docs directory. These can be linked together to create a rudimentary wiki page or other type of custom documentation for display via Markdown parsing. Coupled with [custom nav links](#website-options) this can be linked on any page. The link for a file `information.md` within the docs directory would be `/dashboard/docs/information`. As with host documentation filenames are assumed to be in a slugified format.
+An endpoint `/dashboard/docs/<filename>` exists to load and render any Markdown file from the docs directory. These can be linked together to create a rudimentary wiki page or other type of custom documentation for display via Markdown parsing. Coupled with [custom nav links](#website-options) these can be accessed on any page. The link for a file `information.md` within the docs directory would be `/dashboard/docs/information`. As with host documentation filenames are assumed to be in a slugified format.
 
 ## Templating
 
@@ -445,11 +433,11 @@ The `host` variable is a dictionary containing any configuration listed for the 
 
 ### Service
 
-The `service` variable is a dictionary containing any configuration listed for the service specifically as defined in the host config.
+The `service` variable is a dictionary containing any configuration listed for the service specifically as defined in the host definition.
 
 ### Script Paths
 
-The OS path to both the Nagios default scripts and the `check_scripts` directory of the trash-panda repo are available as shortcuts to defined command paths. A default is set but you can override these by using the same name as `jinja_constants` values in the [global config](#global-configuration).
+The OS path to both the Nagios default scripts and the `check_scripts` directory of the trash-panda repo are available as shortcuts for command paths. A default is set but you can override these by using the same name as `jinja_constants` values in the [global config](#global-configuration).
 
 * NAGIOS_PATH - default is `/usr/lib/nagios/plugins/`
 * SCRIPTS_PATH - path to [trash-panda-scripts](https://github.com/robweber/trash-panda-scripts) directory, default is `../trash-panda-scripts`
@@ -468,12 +456,13 @@ For integration with other systems the API can be used. Documentation for the AP
 * 0 - OK, everything normal
 * 1 - Warning, potential problem
 * 2 - Critical, definitely a problem
+* 3 - Unknown, issue running host or service check
 
 The status codes are determined by the settings for the device and the output of the various check utilities. Note that for service check related data Performance Data information (`perf_data`) is available if the check command returns it. This is parsed according to the [Nagios performance data](https://nagios-plugins.org/doc/guidelines.html#AEN200) standard. If there isn't any performance data the key will not exist for that service.
 
 ## Watchdog
 
-Trash Panda will check if defined hosts and services are running, but what keeps track of Trash Panda? The `watchdog.py` script can be used to externally check the Trash Panda web service via the [health api](#api) endpoint. This script should be setup to run via a cron job and can read in the same YAML config file to trigger monitoring notifications. If the health service is either not running, or it reports that the monitoring system checker is not running, a notification will be sent using the configured notifier from the YAML file. When the service returns to normal operation a recovery notification is also sent.
+Trash Panda will check if defined hosts and services are running, but what keeps track of Trash Panda? The `watchdog.py` script can be used to externally check the Trash Panda web service via the [health api](#api) endpoint. This script should be setup to run via a cron job and can read in the main YAML config file to trigger monitoring notifications. If the health service is either not running, or it reports that the monitoring system checker is not running, a notification will be sent using the configured notifier from the YAML file. When the service returns to normal operation a recovery notification is also sent.
 
 ```
 .venv/bin/python3 watchdog.py -c conf/monitor.yaml
@@ -483,12 +472,14 @@ Once a notification is sent a flag file is created in the Trash Panda repo direc
 
 ## Credits
 
-The following projects are used within this project and contributed most of the heavy lifting in getting it completed.
+The following projects used within this project and contributed most of the heavy lifting in getting it completed.
 
+* [Bootstrap](https://getbootstrap.com/) - web frontend toolkit
+* [Cerebrus](https://docs.python-cerberus.org/en/stable/) - used for YAML data validation
+* [Chart.js](https://www.chartjs.org/) - Performance data charts
+* [FastAPI](https://fastapi.tiangolo.com/) - API backend and documentation
 * [Flask](https://flask.palletsprojects.com/en/2.1.x/#) - a micro web framework for Python
 * [Jinja](https://palletsprojects.com/p/jinja/) - templating engine
-* [Cerebrus](https://docs.python-cerberus.org/en/stable/) - used for YAML data validation
-* [Bootstrap](https://getbootstrap.com/) - web frontend toolkit
 * [JQuery](https://jquery.com/) - Javascript library
 * [Material Design Icons](https://materialdesignicons.com/) - open source web icons
 * [Twemoji](https://github.com/twitter/twemoji) - Twitter Open Source Emojis (Trash Panda Logo)

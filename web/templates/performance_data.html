@@ -2,6 +2,7 @@
 {% block header %}
 <script src="/static/js/chart.min.js"></script>
 <script src="/static/js/chartjs-plugin-annotation.min.js"></script>
+<script src="/static/js/chartjs-adapter-date-fns.min.js"></script>
 <script src="/static/js/countdown.js"></script>
 
 <script type="text/javascript">
@@ -17,9 +18,22 @@ function load_graph(){
   $.ajax({type: 'GET', url: '/api/time/{{ p["id"] }}/' + start_time + '/' + end_time, success: function(data, status, request){
     const ctx = document.getElementById('graph-{{ p["id"] }}');
 
+    // put the data in the format {x: time, y: value}
+    full_data = []
+    for(i = 0; i < data.values.length; i ++){
+      // timestamp should be in milliseconds
+      full_data.push({x: data.unix_times[i] * 1000, y: data.values[i]})
+    }
+
+    // figure out the step size
+    steps = Math.max(1, Math.floor(full_data.length /100));
+
+    // trim the full dataset for better viewing
+    display_data = full_data.filter((_, i) => i % steps === 0);
+
     data_array = [{
       label: '{{ p["id"] }}',
-      data: data.values,
+      data: display_data,
       borderWidth: 3,
       color: "#1181F1",
       fill: 'start'
@@ -66,19 +80,28 @@ function load_graph(){
     canvases.set(ctx, new Chart(ctx, {
       type: 'line',
       data: {
-        labels: data.times,
         datasets: data_array
       },
       options: {
         animation: shouldAnimate,
-        {% if 'critical' in p or 'warning' in p %}
-        plugins:{
+        parsing: false,
+        plugins: {
+          {% if 'critical' in p or 'warning' in p %}
           annotation:{
             annotations: annotations
           }
+          {% endif %}
         },
-        {% endif %}
         scales: {
+          x : {
+            type: 'time',
+            time: {
+              displayFormats: {
+                minute: "h:mma",
+                hour: "MM/dd ha"
+              }
+            }
+          },
           y: {
             beginAtZero: true,
             title: {
