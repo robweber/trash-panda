@@ -105,6 +105,10 @@ function load_graph(){
       },
       options: {
         animation: shouldAnimate,
+        onResize: function(chart, size) {
+          // if screen is less than 600, remove y axis title
+          chart.options.scales.y.title.display = size.width >= 600;
+        },
         parsing: false,
         plugins: {
           {% if 'critical' in p or 'warning' in p %}
@@ -112,6 +116,9 @@ function load_graph(){
             annotations: annotations
           },
           {% endif %}
+          legend: {
+            display: false
+          },
           zoom: {
             pan: {
               enabled: true,
@@ -121,6 +128,9 @@ function load_graph(){
             zoom: {
               wheel: {
                 enabled: false
+              },
+              pinch: {
+                enabled: true
               },
               drag: {
                 enabled: true,
