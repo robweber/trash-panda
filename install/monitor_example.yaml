@@ -9,6 +9,16 @@ config:
       links:
         - name: Wiki
           url: /docs/wiki
+# tags are optional but here are some examples
+tags:
+  hardware:
+    name: Physical Hardware
+    color: blue
+  linux:
+    name: Linux OS
+    color: green
+  updates:
+    name: Updates
 # dummy checks are used in this config but the real checks can be swapped out as the command type
 services:
   dummy_check:
@@ -111,6 +121,8 @@ types:
           return_code: 2
       - type: dummy_check
         name: "Linux Updates"
+        tags:
+          - updates
         # utilize the output filter to parse the returned json
         output_filter: "There are {{ value.security }} security and {{ value.non_security }} non-security updates pending"
         args:
@@ -121,6 +133,9 @@ types:
     name: Switch
     icon: router-network
     info: "This config is currently using fake check values, to use properly convert the service checks to proper SNMP checks."
+    # tags can be part of type or host
+    tags:
+      - hardware
     # remove this to use ICMP checks
     ping_command:
       type: dummy_check
@@ -150,6 +165,8 @@ hosts:
     name: "Web Server"
     address: 192.168.0.10
     management_page: "http://192.168.0.10/"
+    tags:
+      - linux
     ping_command:
       type: dummy_check
       args:
