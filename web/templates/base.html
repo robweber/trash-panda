@@ -62,7 +62,7 @@
                   </a>
                   <div class="dropdown-menu">
                     {% for button in create_nav_links() %}
-                    <a class="dropdown-item" href="/dashboard/status/host/{{ button.url }}" target="{{ '_blank' if button.new_tab else '_self'}}">{{ button.name }}</a>
+                    <a class="dropdown-item" href="{{ button.url }}" target="{{ '_blank' if button.new_tab else '_self'}}">{{ button.name }}</a>
                     {% endfor %}
                   </div>
                 </li>
