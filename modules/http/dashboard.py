@@ -139,7 +139,7 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
             for h in hosts:
                 h_sub = {"name": h['name'], "id": h['id'], "icon": h['icon']}
 
-                if('tags' in h):
+                if('tags' in h and len(h['tags']) != 0):
                     # primary tag is the first one
                     grouped[h['tags'][0]].append(h_sub)
                 else:
