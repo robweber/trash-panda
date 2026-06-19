@@ -52,8 +52,13 @@ A configuration file is needed. This will copy the example config to the default
 
 mkdir conf
 cp install/monitor_example.yaml conf/monitor.yaml
+cp install/secrets_example.yaml conf/secrets.yaml
 mv docs/wiki.example docs/wiki.md
 mv docs/web-server.example docs/web-server.md
+
+# set permissions on secrets file
+chown root:root conf/secrets.yaml
+chmod 4000 conf/secrets.yaml
 
 ```
 

@@ -9,6 +9,7 @@ config:
       links:
         - name: Wiki
           url: /docs/wiki
+secrets: !include secrets.yaml
 # tags are optional but here are some examples
 tags:
   hardware:
@@ -160,7 +161,7 @@ hosts:
     name: "Switch 1"
     address: 192.168.0.2
     config:
-      community: "public"
+      community: "{{ secrets.switch_snmp }}"
   - type: server
     name: "Web Server"
     address: 192.168.0.10
