@@ -15,6 +15,7 @@ This is a _very_ basic monitoring solution meant for simple home use. It will mo
   - [Performance Data](#performance-data)
 - [Config File](#config-file)
   - [Global Configuration](#global-configuration)
+  - [Secrets File](#secrets-file)
   - [Notifications](#notifications)
   - [Website Options](#website-options)
 - [Services](#services)
@@ -107,6 +108,7 @@ The monitor file is where the configuration is set for services, device type, an
 Example file where these are imported from separate files:
 ```
 config: !include conf/config.yaml
+secrets: !include conf/secrets.yaml
 services: !include conf/services.yaml
 types: !include conf/types.yaml
 hosts: !include conf/hosts.yaml
@@ -154,7 +156,7 @@ By default the system will not send any notifications, but there is support for 
 
 Notifications are triggered on host status (up/down) changes or service status changes each time a check is run. Services must be in a CONFIRMED state before a notification is sent. Services are in an UNCONFIRMED state when either a warning or critical state has not reached the `service_check_attempts` threshold described above. It is possible to temporarily silence notifications using the web interface or [API](#api).
 
-Additional notification types can be defined by extending the `MonitorNotification` class. Built-in notification types are listed below.
+Additional notification types can be defined by extending the `MonitorNotification` class. Built-in notification types are listed below. Authentication information can be stored within the [secrets file][#secrets-file].
 
 __Email Notifier__ - sends notifications to an email address. Requires a valid SMTP server to route the mail through. Can be something like Gmail if valid permissions are given to send mail through the account.
 ```
@@ -168,7 +170,7 @@ config:
           port: 25  # could be different, check your outgoing mail server settings
           secure: True  # if False, make sure your server allows non-authenticated connections
           username: user  # if secure=True
-          password: password  # if secure=True
+          password: "{{ secrets.password }}"  # if secure=True
           sender: sender@email.server.com
           recipient: recipient@address.com
 ```
@@ -193,8 +195,8 @@ config:
     types:
       - type: pushover
         args:
-          api_key: pushover_api_key
-          user_key: pushover_user_key
+          api_key: "{{ secrets.pushover_api_key }}"
+          user_key: "{{ secrets.pushover_user_key }}"
 ```
 
 __Webhook Notifier__ - sends a POST request to a given URL containing data from either the host or service affected.
@@ -219,6 +221,29 @@ When the webhook is trigered a POST request containing a JSON payload will be se
   }
 }
 ```
+
+### Secrets File
+
+There may be portions of the configuration for hosts or services that require the use of passwords, API keys, or other sensitive information. Segmenting this information into a separate `secrets.yaml` file can lock down these items in a more secure way. As shown in the example above the secrets file can be loaded using the same syntax as another other additional YAML file:
+
+```
+secrets: !include conf/secrets.yaml
+```
+
+The format of the secrets file is a simple key/value pair that specifies a name and then the password or other information you wish to reference. This file should have permissions set so that it read/written exclusively by the `root` user using:
+
+```
+chown root:root secrets.yaml
+chmod 400 secrets.yaml
+```
+
+Referencing items in the secrets file is done via Jinja templates. You can reference secrets in the following areas:
+
+* Notification parameters
+* [Host][#host-definitions] `config` tag
+* Host Service arguments
+
+Examples of referencing a secret are available in the example files. In general they are used by adding `{{ secrets.key_value }}`.
 
 ### Website Options
 
