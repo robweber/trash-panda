@@ -58,6 +58,7 @@ service_definition: &service_definition
       args:
         required: False
         type: dict
+        default: {}
         valueschema:
           type:
             - string
@@ -206,6 +207,13 @@ config:
                     required: False
                     type: boolean
                     default: True
+secrets:
+  required: False
+  type: dict
+  default: {}
+  minlength: 1
+  valueschema:
+    type: string
 services:
   required: True
   type: dict
