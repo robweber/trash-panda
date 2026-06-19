@@ -127,7 +127,8 @@ else:
 notify = None
 if('notifications' in yaml_file['config']):
     notify = NotificationGroup(yaml_file['config']['notifications']['primary'],
-                               yaml_file['config']['notifications']['types'])
+                               yaml_file['config']['notifications']['types'],
+                               yaml_file['secrets'])
 
 logging.info('Starting monitoring check daemon')
 monitor = HostMonitor(history, yaml_file)
