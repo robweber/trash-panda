@@ -27,6 +27,7 @@ class HostMonitor:
     services = None
     hosts = None
     history = None
+    secrets = {}
     custom_jinja_constants = {}
     _jinja = None
     lock = Lock()  # lock for host updating functions
@@ -68,6 +69,11 @@ class HostMonitor:
             self.hosts[device.id] = device
             logging.info(f"Loading device {device.name} with check interval every {device.interval} min")
 
+        # set any loaded secret variables
+        if(yaml_file['secrets']):
+            logging.debug("SECRETS FILE LOADED")
+            self.secrets = yaml_file['secrets']
+
         # save a list of all valid hosts
         self.history.set_hosts(self.get_hosts())
 
@@ -108,9 +114,19 @@ class HostMonitor:
 
         if(service['type'] in self.services):
             serviceObj = self.services[service['type']]
-            service_args = service['args'] if 'args' in service else {}
+
+            # render any service secrets
+            service_args = {}
+            for k, v in service['args'].items():
+                if(isinstance(v, str)):
+                    v = self.__render_template(v, {"secrets": self.secrets})
+                service_args[k] = v
+
+            # render any secrets referenced in host config
+            host_args = {k: self.__render_template(v, {"secrets": self.secrets}) for k, v in host_config.items()}
+
             jinja_vars = {"NAGIOS_PATH": utils.NAGIOS_PATH, "SCRIPTS_PATH": os.path.join(os.path.dirname(utils.DIR_PATH), 'trash-panda-scripts'),
-                          'service': service_args, 'host': host_config}
+                          'service': service_args, 'host': host_args}
 
             jinja_vars.update(self.custom_jinja_constants)  # add any custom constants
 
