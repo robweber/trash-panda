@@ -15,6 +15,8 @@ import os.path
 import yaml
 from cerberus import Validator
 from json.decoder import JSONDecodeError
+from pykeepass import PyKeePass
+from pykeepass.exceptions import CredentialsError
 
 # full path to the running directory of the program
 DIR_PATH = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
@@ -76,6 +78,27 @@ def load_documentation(host_file):
 
     return markdown.markdown(result, extensions=['fenced_code', 'tables', 'toc'])
 
+# unlock and return vault file, returns errors if missing or password wrong
+def unlock_vault_file(vault_file, password):
+    result = {"success": True, "message": "", "keepass": None}
+
+    if(os.path.exists(vault_file)):
+
+        try:
+            # load the keepass database
+            kp = PyKeePass(vault_file, password=password)
+
+            # if we get this far everything worked
+            result['keepass'] = kp
+
+        except CredentialsError as ce:
+            result['success'] = False
+            result['message'] = 'Invalid vault credentials'
+    else:
+        result['success'] = False
+        result['message'] = f"Vault {vault_file} does not exist"
+
+    return result
 
 # Checks if a string can be decoded into a JSON object
 def is_json(str):

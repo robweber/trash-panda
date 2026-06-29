@@ -205,14 +205,15 @@ def api_app(config_file, config_yaml, history):
     @app.post("/vault/load_file", tags=['Vault'])
     def load_vault_file(vault_file: Annotated[VaultFileLoad, Body(embed=True)]):
         result = {"success": True}
-        try:
-            # load the keepass database
-            kp = PyKeePass(vault_file.path, password=vault_file.password)
 
+        unlocked = utils.unlock_vault_file('/home/rob/Git/trash-panda/passwords.kdbx', vault_pass)
+
+        if(unlocked['success']):
+            # try to find the entries
             kp_entries = []
             if(vault_file.group_name is not None):
                 # find by group if given
-                group = kp.find_groups(name=vault_file.group_name, first=True)
+                group = unlocked['keepass'].find_groups(name=vault_file.group_name, first=True)
 
                 if(group is not None):
                     kp_entries = group.entries
@@ -226,9 +227,9 @@ def api_app(config_file, config_yaml, history):
                                "url": e.url, "notes": e.notes, "group": e.group.name})
 
             result['entries'] = entries
-        except CredentialsError as ce:
+        else:
             result['success'] = False
-            result['message'] = 'Invalid vault credentials'
+            result['message'] = unlocked['message']
 
         return result
 

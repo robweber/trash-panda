@@ -6,8 +6,6 @@ from collections import defaultdict
 from datetime import timedelta
 from flask import Flask, session, flash, render_template, redirect, request, url_for
 from flask_session import Session
-from pykeepass import PyKeePass
-from pykeepass.exceptions import CredentialsError
 from slugify import slugify
 
 
@@ -93,14 +91,15 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
     @app.route('/vault', methods=['GET'])
     def vault():
 
+        # check if vault key is currently set
         vault_unlocked = 'vault_key' in session
 
         entries = []
         if(vault_unlocked):
-            kp = PyKeePass('/home/rob/Git/trash-panda/passwords.kdbx', password=session['vault_key'])
+            kp = utils.unlock_vault_file('/home/rob/Git/trash-panda/passwords.kdbx', session['vault_key'])
 
-            entries = kp.entries
-            entries.sort(key=lambda e: e.group.name, e.title)  # sort by group and then name
+            entries = kp['keepass'].entries
+            entries.sort(key=lambda e: (e.group.name, e.title))  # sort by group and then name
 
         return render_template('vault.html', vault_unlocked = vault_unlocked, vault_entries = entries, page_title="Vault")
 
@@ -108,15 +107,15 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
     def unlock_vault():
         vault_pass = request.form.get('vault_password')
 
-        try:
-            # load the keepass database
-            kp = PyKeePass('/home/rob/Git/trash-panda/passwords.kdbx', password=vault_pass)
+        # try to unlock the vault file
+        unlocked = utils.unlock_vault_file('/home/rob/Git/trash-panda/passwords.kdbx', vault_pass)
 
-            # if we get here the password is OK
+        if(unlocked['success']):
+            # everything is OK
             session['vault_key'] = vault_pass
 
-        except CredentialsError as ce:
-            flash('Invalid vault credentials', 'danger')
+        else:
+            flash(unlocked['message'], 'danger')
 
         return redirect(url_for('vault'))
 
