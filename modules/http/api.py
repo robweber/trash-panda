@@ -7,6 +7,8 @@ from .. import utils as utils
 from fastapi import FastAPI, Body, Path, Query
 from fastapi.responses import PlainTextResponse
 from natsort import natsorted
+from pykeepass import PyKeePass
+from pykeepass.exceptions import CredentialsError
 from pydantic import BaseModel, Field
 from pathlib import Path as LoadPath
 from typing import Annotated
@@ -20,6 +22,11 @@ class FilePath(BaseModel):
 class FileContents(BaseModel):
     path: str = Field(description="full system path to the file to write")
     contents: str = Field(description="string contents of the file to write")
+
+class VaultFileLoad(BaseModel):
+    path: str = Field(description="path to the Vault file")
+    password: str = Field(description="password to unlock the KeePass file")
+    group_name: str = Field(description="Group to filter by", default=None)
 
 
 def api_app(config_file, config_yaml, history):
@@ -194,6 +201,36 @@ def api_app(config_file, config_yaml, history):
             f.write(save_file.contents)
 
         return {'success': True, 'message': f"Saved {save_file.path}"}
+
+    @app.post("/vault/load_file", tags=['Vault'])
+    def load_vault_file(vault_file: Annotated[VaultFileLoad, Body(embed=True)]):
+        result = {"success": True}
+        try:
+            # load the keepass database
+            kp = PyKeePass(vault_file.path, password=vault_file.password)
+
+            kp_entries = []
+            if(vault_file.group_name is not None):
+                # find by group if given
+                group = kp.find_groups(name=vault_file.group_name, first=True)
+
+                if(group is not None):
+                    kp_entries = group.entries
+            else:
+                kp_entries = kp.entries
+
+            # create json response of all found entries
+            entries = []
+            for e in kp_entries:
+                entries.append({"username": e.username, "password": e.password, "title": e.title,
+                               "url": e.url, "notes": e.notes, "group": e.group.name})
+
+            result['entries'] = entries
+        except CredentialsError as ce:
+            result['success'] = False
+            result['message'] = 'Invalid vault credentials'
+
+        return result
 
     @app.get('/check_config', tags=['Health'], description=LoadPath('api_docs/get_check_config.md').read_text())
     def check_config():
