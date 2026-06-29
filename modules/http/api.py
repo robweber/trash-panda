@@ -7,8 +7,6 @@ from .. import utils as utils
 from fastapi import FastAPI, Body, Path, Query
 from fastapi.responses import PlainTextResponse
 from natsort import natsorted
-from pykeepass import PyKeePass
-from pykeepass.exceptions import CredentialsError
 from pydantic import BaseModel, Field
 from pathlib import Path as LoadPath
 from typing import Annotated
@@ -22,6 +20,7 @@ class FilePath(BaseModel):
 class FileContents(BaseModel):
     path: str = Field(description="full system path to the file to write")
     contents: str = Field(description="string contents of the file to write")
+
 
 class VaultFileLoad(BaseModel):
     path: str = Field(description="path to the Vault file")
@@ -206,7 +205,7 @@ def api_app(config_file, config_yaml, history):
     def load_vault_file(vault_file: Annotated[VaultFileLoad, Body(embed=True)]):
         result = {"success": True}
 
-        unlocked = utils.unlock_vault_file('/home/rob/Git/trash-panda/passwords.kdbx', vault_pass)
+        unlocked = utils.unlock_vault_file('/home/rob/Git/trash-panda/passwords.kdbx', vault_file.password)
 
         if(unlocked['success']):
             # try to find the entries
@@ -218,7 +217,7 @@ def api_app(config_file, config_yaml, history):
                 if(group is not None):
                     kp_entries = group.entries
             else:
-                kp_entries = kp.entries
+                kp_entries = unlocked['keepass'].entries
 
             # create json response of all found entries
             entries = []

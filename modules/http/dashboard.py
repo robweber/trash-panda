@@ -101,7 +101,7 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
             entries = kp['keepass'].entries
             entries.sort(key=lambda e: (e.group.name, e.title))  # sort by group and then name
 
-        return render_template('vault.html', vault_unlocked = vault_unlocked, vault_entries = entries, page_title="Vault")
+        return render_template('vault.html', vault_unlocked=vault_unlocked, vault_entries=entries, page_title="Vault")
 
     @app.route('/vault', methods=['POST'])
     def unlock_vault():
@@ -199,4 +199,5 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
             return config_yaml['config']['web']['top_nav']['links_title']
         return dict(custom_link_title=get_title)
 
+    Session(app)
     return app

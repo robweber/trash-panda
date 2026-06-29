@@ -78,6 +78,7 @@ def load_documentation(host_file):
 
     return markdown.markdown(result, extensions=['fenced_code', 'tables', 'toc'])
 
+
 # unlock and return vault file, returns errors if missing or password wrong
 def unlock_vault_file(vault_file, password):
     result = {"success": True, "message": "", "keepass": None}
@@ -91,7 +92,7 @@ def unlock_vault_file(vault_file, password):
             # if we get this far everything worked
             result['keepass'] = kp
 
-        except CredentialsError as ce:
+        except CredentialsError:
             result['success'] = False
             result['message'] = 'Invalid vault credentials'
     else:
@@ -99,6 +100,7 @@ def unlock_vault_file(vault_file, password):
         result['message'] = f"Vault {vault_file} does not exist"
 
     return result
+
 
 # Checks if a string can be decoded into a JSON object
 def is_json(str):
