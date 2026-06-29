@@ -31,12 +31,12 @@
   right: 5px
 }
 
-#documentation a.code {
+#vault-table a.code, #documentation a.code {
   color: #e83e8c;
   text-decoration: none;
 }
 
-#documentation a.code:hover {
+#vault-table a.code:hover, #documentation a.code:hover {
   color: #e83e8c;
   text-decoration: none;
   cursor: copy;

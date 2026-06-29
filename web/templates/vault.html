@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 {% block header %}
+<link rel="stylesheet" href="/static/css/documentation.css" />
+<script src="/static/js/documentation.js"></script>
+<script type="text/javascript">
+var copier = new DocumentationCopy();
+</script>
 {% endblock %}
 {% block content %}
 <div class="container">
@@ -27,10 +32,10 @@
     <tbody>
       {% for e in vault_entries %}
       <tr>
-        <td>{{ e.title }}</td>
-        <td>{{ e.group.name }}</td>
-        <td>{{ e.username }}</td>
-        <td>{{ e.password }}</td>
+        <td><p>{{ e.title }}</p></td>
+        <td><p>{{ e.group.name }}</p></td>
+        <td><p><code>{{ e.username }}</code></p></td>
+        <td><p><code>{{ e.password }}</code></p></td>
       </tr>
       {% endfor %}
     </tbody>
@@ -39,5 +44,6 @@
 </div>
 {% endblock %}
 {% block onload_scripts %}
+copier.prepare();
 $('#vault-password').focus();
 {% endblock %}
