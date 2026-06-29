@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block header %}
+{% endblock %}
+{% block content %}
+<div class="container">
+  {% if not vault_unlocked %}
+  <form method="POST" action="/dashboard/vault">
+    <div class="row align-items-center">
+        <div class="col-md-3 offset-lg-2">
+          <p>Enter vault password to unlock:</p>
+        </div>
+        <div class="col-md-6">
+          <input type="password" class="form-control" id="vault-password" name="vault_password"/>
+        </div>
+    </div>
+  </form>
+  {% else %}
+  <table class="table table-striped" id="vault-table">
+    <thead class="thead-dark">
+      <tr>
+        <th>Name</th>
+        <th class="hide-md">Group</th>
+        <th class="hide-sm">Username</th>
+        <th class="hide-sm">Password</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for e in vault_entries %}
+      <tr>
+        <td>{{ e.title }}</td>
+        <td>{{ e.group.name }}</td>
+        <td>{{ e.username }}</td>
+        <td>{{ e.password }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</div>
+{% endblock %}
+{% block onload_scripts %}
+$('#vault-password').focus();
+{% endblock %}

@@ -3,6 +3,7 @@ cerberus
 chump
 configargparse
 Flask
+Flask-Session
 markdown
 natsort
 pythonping

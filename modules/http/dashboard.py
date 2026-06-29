@@ -3,7 +3,11 @@ import os
 import os.path
 from .. import utils as utils
 from collections import defaultdict
-from flask import Flask, flash, render_template, redirect, request
+from datetime import timedelta
+from flask import Flask, session, flash, render_template, redirect, request, url_for
+from flask_session import Session
+from pykeepass import PyKeePass
+from pykeepass.exceptions import CredentialsError
 from slugify import slugify
 
 
@@ -15,6 +19,9 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
 
     # generate random number for session secret key
     app.secret_key = os.urandom(24)
+    app.config['SESSION_TYPE'] = 'filesystem'
+    app.config['SESSION_PERMANENT'] = True
+    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=1)
 
     # add handlers for this app
     for h in logHandlers:
@@ -82,6 +89,36 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
 
         return render_template("editor.html", config_file=file_path, editor_config=config_yaml['config']['web']['editor'],
                                page_title='Config Editor')
+
+    @app.route('/vault', methods=['GET'])
+    def vault():
+
+        vault_unlocked = 'vault_key' in session
+
+        entries = []
+        if(vault_unlocked):
+            kp = PyKeePass('/home/rob/Git/trash-panda/passwords.kdbx', password=session['vault_key'])
+
+            entries = kp.entries
+            entries.sort(key=lambda e: e.group.name, e.title)  # sort by group and then name
+
+        return render_template('vault.html', vault_unlocked = vault_unlocked, vault_entries = entries, page_title="Vault")
+
+    @app.route('/vault', methods=['POST'])
+    def unlock_vault():
+        vault_pass = request.form.get('vault_password')
+
+        try:
+            # load the keepass database
+            kp = PyKeePass('/home/rob/Git/trash-panda/passwords.kdbx', password=vault_pass)
+
+            # if we get here the password is OK
+            session['vault_key'] = vault_pass
+
+        except CredentialsError as ce:
+            flash('Invalid vault credentials', 'danger')
+
+        return redirect(url_for('vault'))
 
     @app.route('/tags/<type>', methods=['GET'])
     def view_tags(type):
