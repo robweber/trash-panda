@@ -23,7 +23,6 @@ class FileContents(BaseModel):
 
 
 class VaultFileLoad(BaseModel):
-    path: str = Field(description="path to the Vault file")
     password: str = Field(description="password to unlock the KeePass file")
     group_name: str = Field(description="Group to filter by", default=None)
 
@@ -205,7 +204,7 @@ def api_app(config_file, config_yaml, history):
     def load_vault_file(vault_file: Annotated[VaultFileLoad, Body(embed=True)]):
         result = {"success": True}
 
-        unlocked = utils.unlock_vault_file('/home/rob/Git/trash-panda/passwords.kdbx', vault_file.password)
+        unlocked = utils.unlock_vault_file(config_yaml['config']['vault']['keepass_file'], vault_file.password)
 
         if(unlocked['success']):
             # try to find the entries

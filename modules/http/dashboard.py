@@ -96,7 +96,7 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
 
         entries = []
         if(vault_unlocked):
-            kp = utils.unlock_vault_file('/home/rob/Git/trash-panda/passwords.kdbx', session['vault_key'])
+            kp = utils.unlock_vault_file(config_yaml['config']['vault']['keepass_file'], session['vault_key'])
 
             entries = kp['keepass'].entries
             entries.sort(key=lambda e: (e.group.name, e.title))  # sort by group and then name
@@ -108,7 +108,7 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
         vault_pass = request.form.get('vault_password')
 
         # try to unlock the vault file
-        unlocked = utils.unlock_vault_file('/home/rob/Git/trash-panda/passwords.kdbx', vault_pass)
+        unlocked = utils.unlock_vault_file(config_yaml['config']['vault']['keepass_file'], vault_pass)
 
         if(unlocked['success']):
             # everything is OK
@@ -144,6 +144,14 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
                                docs=utils.load_documentation(os.path.join(utils.DIR_PATH, "README.md")))
 
     """ Start of custom processors """
+
+    @app.context_processor
+    def vault_enabled():
+        def is_vault_enabled():
+            # return if vault integration is enabled
+            return config_yaml['config']['vault']['enabled']
+        return dict(is_vault_enabled=is_vault_enabled)
+
     @app.context_processor
     def nav_links():
         def create_links():
