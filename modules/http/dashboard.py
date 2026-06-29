@@ -38,7 +38,7 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
     def host_status(id):
         result = history.get_host(id)
 
-        if(result is not None):
+        if(result):
             # set if a notifier is configured to toggle silent mode controls
             doc_file = os.path.join(config_yaml['config']['docs_dir'], f"{id}.md")
             return render_template("host_status.html", host=result, page_title='Host Status', has_notifier=notifier_configured,
