@@ -16,7 +16,16 @@ function load_status(){
     //clear existing data
     table.empty();
 
-    data.services.forEach(function(s){
+    // check which key to iterate over
+    if('members' in data)
+    {
+      iter = data.members;
+    }
+    else {
+      iter = data.services;
+    }
+
+    iter.forEach(function(s){
       row = tr.clone();
 
       text_highlight = 'text-secondary';
@@ -49,7 +58,7 @@ function load_status(){
       if(s.hasOwnProperty('perf_data'))
       {
         link2 = $('<a>');
-        link2.attr('href', '/perf_data/' + s.id);
+        link2.attr('href', '/dashboard/perf_data/' + s.id);
         link2.attr('class', 'mdi mdi-chart-areaspline-variant icon-sm icon-inline');
         col_size = 6;
       }
@@ -71,7 +80,7 @@ function load_status(){
 
       // link the host name
       host = $('<a>').html(s.host.name);
-      host.attr('href', '/status/host/' + s.host.id);
+      host.attr('href', '/dashboard/status/host/' + s.host.id);
 
       row.append(td.clone().append(host));
 

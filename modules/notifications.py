@@ -1,3 +1,4 @@
+import jinja2
 import logging
 import requests
 import smtplib
@@ -12,30 +13,48 @@ class NotificationGroup:
     """Contains a group of notification objects that can be triggered all at once"""
     default = "all"
     notifiers = {}
+    jinja = None
 
-    def __init__(self, default_type, notify_types):
+    def __init__(self, default_type, notify_types, secrets):
         """notify_types should be a list of notification types from the config"""
 
         # the type to use if none is given
         self.default = default_type
         logging.info(f"Default notification type is: {self.default}")
 
+        self.jinja = jinja2.Environment()
+
         # go through the list and create each notifier
         for n in notify_types:
-            self.notifiers[n['type']] = self.__create_notifier(n)
+            self.notifiers[n['type']] = self.__create_notifier(n, secrets)
 
-    def __create_notifier(self, notifier):
+    def __render_template(self, t_string, jinja_vars):
+        """ renders a jinja template, if not a string return original """
+        result = t_string
+
+        # catch for non-string types
+        if(isinstance(t_string, str)):
+            template = self.jinja.from_string(t_string)
+
+            result = template.render(jinja_vars).strip()
+
+        return result
+
+    def __create_notifier(self, notifier, secrets):
         """Create a notifier class using the given config"""
         result = None
 
+        # render any secrets
+        args = {k: self.__render_template(v, {"secrets": secrets}) for k, v in notifier['args'].items()}
+
         if(notifier['type'] == 'log'):
-            result = LogNotification(notifier['args'])
+            result = LogNotification(args)
         elif(notifier['type'] == 'pushover'):
-            result = PushoverNotification(notifier['args'])
+            result = PushoverNotification(args)
         elif(notifier['type'] == 'email'):
-            result = EmailNotification(notifier['args'])
+            result = EmailNotification(args)
         elif(notifier['type'] == 'webhook'):
-            result = WebhookNotification(notifier['args'])
+            result = WebhookNotification(args)
 
         return result
 

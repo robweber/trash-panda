@@ -31,6 +31,15 @@ p {
   width: 60%;
 }
 
+.tag-pill {
+  margin-bottom: .3em;
+  margin-right: 1.2em;
+}
+
+.tag-pill:last-child {
+  margin-bottom: 0px;
+}
+
 @media screen and (max-width: 1199px) and (min-width: 991px) {
 	.hide-lg{
 		display:none;

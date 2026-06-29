@@ -1,12 +1,29 @@
 {% extends "base.html" %}
 {% block header %}
 <script src="/static/js/chart.min.js"></script>
+<script src="/static/js/hammer.js"></script>
 <script src="/static/js/chartjs-plugin-annotation.min.js"></script>
+<script src="/static/js/chartjs-plugin-zoom.min.js"></script>
+<script src="/static/js/chartjs-adapter-date-fns.min.js"></script>
 <script src="/static/js/countdown.js"></script>
 
 <script type="text/javascript">
 var countdown = new UpdateCountdown("last_updated", 60);
 var canvases = new Map();
+
+function onModify(chart){
+  // if the chart is modified at all, enable the reset button
+  $('#reset-'+ chart.chart.id).prop('disabled', false);
+}
+
+function resetChart(chart_id){
+  //reset the chart
+  chart = document.getElementById('graph-' + chart_id);
+  canvases.get(chart).resetZoom();
+
+  //disable the button
+  $('#reset-'+ chart_id).prop('disabled', true);
+}
 
 function load_graph(){
   end_time = Math.floor(Date.now()/1000);
@@ -14,12 +31,30 @@ function load_graph(){
 
   {% if 'perf_data' in service %}
   {% for p in service['perf_data']: %}
+  chart = document.getElementById('graph-{{ p["id"] }}');
+
+  // if chart is first loading or hasn't been modified - pull data
+  if(!canvases.has(chart) || !canvases.get(chart).isZoomedOrPanned())
+  {
   $.ajax({type: 'GET', url: '/api/time/{{ p["id"] }}/' + start_time + '/' + end_time, success: function(data, status, request){
     const ctx = document.getElementById('graph-{{ p["id"] }}');
 
+    // put the data in the format {x: time, y: value}
+    full_data = []
+    for(i = 0; i < data.values.length; i ++){
+      // timestamp should be in milliseconds
+      full_data.push({x: data.unix_times[i] * 1000, y: data.values[i]})
+    }
+
+    // figure out the step size
+    steps = Math.max(1, Math.floor(full_data.length /100));
+
+    // trim the full dataset for better viewing
+    display_data = full_data.filter((_, i) => i % steps === 0);
+
     data_array = [{
       label: '{{ p["id"] }}',
-      data: data.values,
+      data: display_data,
       borderWidth: 3,
       color: "#1181F1",
       fill: 'start'
@@ -63,22 +98,60 @@ function load_graph(){
       canvases.get(ctx).destroy();
     }
 
-    canvases.set(ctx, new Chart(ctx, {
+    new_chart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: data.times,
         datasets: data_array
       },
       options: {
         animation: shouldAnimate,
-        {% if 'critical' in p or 'warning' in p %}
-        plugins:{
+        onResize: function(chart, size) {
+          // if screen is less than 600, remove y axis title
+          chart.options.scales.y.title.display = size.width >= 600;
+        },
+        parsing: false,
+        plugins: {
+          {% if 'critical' in p or 'warning' in p %}
           annotation:{
             annotations: annotations
+          },
+          {% endif %}
+          legend: {
+            display: false
+          },
+          zoom: {
+            pan: {
+              enabled: true,
+              mode: 'x',
+              modifierKey: 'ctrl'
+            },
+            zoom: {
+              wheel: {
+                enabled: false
+              },
+              pinch: {
+                enabled: true
+              },
+              drag: {
+                enabled: true,
+                backgroundColor: 'rgba(225,225,225,0.5)'
+              },
+              scaleMode: 'x',
+              mode: 'x',
+              onZoom: onModify
+            }
           }
         },
-        {% endif %}
         scales: {
+          x : {
+            type: 'time',
+            time: {
+              displayFormats: {
+                minute: "h:mma",
+                hour: "MM/dd ha"
+              }
+            }
+          },
           y: {
             beginAtZero: true,
             title: {
@@ -92,10 +165,16 @@ function load_graph(){
           }
         }
       }
-    }));
+    });
 
-  countdown.reset_countdown();
+    // set the id and add the chart to the map
+    new_chart.id = '{{ p["id"] }}';
+    canvases.set(ctx, new_chart);
+
+    // reset the countdown
+    countdown.reset_countdown();
   }});
+  }
   {% endfor %}
   {% endif %}
 }
@@ -104,6 +183,7 @@ function load_graph(){
 {% endblock %}
 {% block content %}
 <div class="container">
+  <p>Chart data is updated every 60 seconds. Select an area of a chart to zoom in, or use CTL-click to pan left/right. If a chart has been zoomed or panned it will not update until the view has been reset. </p>
   <div class="row mt-2 pt-1">
     <div class="col-lg-6 align-self-end" id="performance_refresh_counter">
       Last Refresh <span id="last_updated">0</span> seconds ago
@@ -124,7 +204,7 @@ function load_graph(){
           <a href="?minutes=1440" class="btn dropdown-item">24 hours</a>
         </div>
       </div>
-      <a href="/status/host/{{ service['host']['id'] }}" class="btn btn-primary host_back_btn"> Host Status</a>
+      <a href="/dashboard/status/host/{{ service['host']['id'] }}" class="btn btn-primary host_back_btn"> Host Status</a>
     </div>
   </div>
 </div>
@@ -134,9 +214,10 @@ function load_graph(){
     {% for p in service['perf_data']: %}
     <div class="card mt-2">
       <div class="card-header" id="heading_{{p['id']}}">
-        <h5 class="mb-0">
+        <h5 class="mb-0 float-left">
             Data Point: {{ p['label'] }}
         </h5>
+        <button id="reset-{{ p['id'] }}" class="btn btn-sm btn-secondary float-right" onClick="resetChart('{{ p['id'] }}')" disabled>Reset View</button>
       </div>
       <div class="card-body">
         <canvas id="graph-{{ p['id'] }}" class="mb-4"></canvas>

@@ -4,6 +4,40 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
+## 7.0
+
+### Added
+
+- added interactive API documentation using [FastAPI](https://fastapi.tiangolo.com/), accessible at `/api/docs`
+- on the Host Status page links to Service documentation are automatically generated if a matching documentation header exists
+- top navigation now includes a drop list of hosts for quick access from page
+- custom top nav links can include a custom title - _Links_ is the default title
+- tags can now be used on Host and HostType definitions
+- new Dashboard views to see host tags
+- Added orange, pink, and purple as valid color options
+- New API command `/api/silence_tag/<tag_id>/<minutes>` to silence all hosts with a given tag
+- Performance data charts can now be panned/zoomed utilizing the [Chart.js Zoom](https://www.chartjs.org/chartjs-plugin-zoom/latest/) plugin
+- minor mobile view fixes for performance data charts
+- `secrets` config option for storing credentials, best practice is in separate permission set file
+
+### Changed
+
+- install instructions now recommend using a Python virtual environment, service files updated to reflect this
+- API powered by FastAPI, Dashboard powered by conventional Flask app
+- Dashboard now accessible at `/dashboard` instead of the web root
+- main script renamed `trash-panda.py` from `dashboard.py` to reflect it launches the full service
+- commands, such as silence or check now, go into a queue system rather than interacting with the host object directly
+- swapped the host type and host status areas of the Host Status page to make the overall status more visible
+- API call to `/list/tag` can be given the optional type parameter `/list/tags?type=<host|service>` to filter on tag type
+- API call to `/status/tag/<id>` changed to `/status/tag/<type>/<id>` as hosts and services can use tags
+- top nav layout changed, custom links now grouped in drop down menu
+- tag and menu colors no longer tied to Bootstrap defaults
+- performance data scaling handled better by using [date-fns](https://github.com/chartjs/chartjs-adapter-date-fns) adapter to treat x axis as a time series
+
+### Fixed
+
+- custom defined "alive" checks can will now ingest performance data if available
+
 ## 6.3
 
 ### Added

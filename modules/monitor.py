@@ -27,6 +27,7 @@ class HostMonitor:
     services = None
     hosts = None
     history = None
+    secrets = {}
     custom_jinja_constants = {}
     _jinja = None
     lock = Lock()  # lock for host updating functions
@@ -68,6 +69,11 @@ class HostMonitor:
             self.hosts[device.id] = device
             logging.info(f"Loading device {device.name} with check interval every {device.interval} min")
 
+        # set any loaded secret variables
+        if(yaml_file['secrets']):
+            logging.debug("SECRETS FILE LOADED")
+            self.secrets = yaml_file['secrets']
+
         # save a list of all valid hosts
         self.history.set_hosts(self.get_hosts())
 
@@ -108,9 +114,19 @@ class HostMonitor:
 
         if(service['type'] in self.services):
             serviceObj = self.services[service['type']]
-            service_args = service['args'] if 'args' in service else {}
+
+            # render any service secrets
+            service_args = {}
+            for k, v in service['args'].items():
+                if(isinstance(v, str)):
+                    v = self.__render_template(v, {"secrets": self.secrets})
+                service_args[k] = v
+
+            # render any secrets referenced in host config
+            host_args = {k: self.__render_template(v, {"secrets": self.secrets}) for k, v in host_config.items()}
+
             jinja_vars = {"NAGIOS_PATH": utils.NAGIOS_PATH, "SCRIPTS_PATH": os.path.join(os.path.dirname(utils.DIR_PATH), 'trash-panda-scripts'),
-                          'service': service_args, 'host': host_config}
+                          'service': service_args, 'host': host_args}
 
             jinja_vars.update(self.custom_jinja_constants)  # add any custom constants
 
@@ -200,8 +216,15 @@ class HostMonitor:
         if(host.ping_command is None):
             is_alive = self._ping(host.address)
         else:
+            # run a custom command if defined
             output = self.__run_process(self.__create_service_call(host.ping_command, host.config), [])
-            is_alive = {"success": True if output.returncode == 0 else False, "performance_data": ""}
+
+            # check if there is performance data
+            perf_string = output.stdout.strip().split("|")
+            perf_data = perf_string[1] if len(perf_string) > 1 else ""
+
+            is_alive = {"success": True if output.returncode == 0 else False,
+                        "performance_data": perf_data}
 
         if(is_alive['success']):
             logging.debug(f"{host.name}: Is Alive")
@@ -319,7 +342,20 @@ class HostMonitor:
         now = datetime.datetime.now()
 
         with self.lock:
+            # get any queued actions waiting
+            action_queue = self.history.consume_queued_actions()
+
             for id, aHost in self.hosts.items():
+                # check if any actions should be applied
+                if(id in action_queue):
+                    for action_obj in action_queue[id]:
+                        logging.debug(f"{id} {action_obj['action']}")
+                        if(action_obj['action'] == 'silence'):
+                            aHost.silenced = action_obj['until']
+
+                        elif(action_obj['action'] == 'check_now'):
+                            aHost.next_check = action_obj['next_check']
+
                 # check if we need to check this host,
                 next_check = datetime.datetime.strptime(aHost.next_check, utils.TIME_FORMAT)
                 if(next_check < now):
@@ -351,8 +387,10 @@ class HostMonitor:
                     aHost.next_check = next_check.strftime(utils.TIME_FORMAT)
                     host_check['next_check'] = aHost.next_check
 
-                    self.hosts[id] = aHost
                     result.append(host_check)
+
+                # save any changed host data
+                self.hosts[id] = aHost
 
         return sorted(result, key=lambda o: o['name'])
 
@@ -361,41 +399,3 @@ class HostMonitor:
 
     def get_host(self, id):
         return self.hosts[id] if id in self.hosts else None
-
-    def check_now(self, id):
-        """sets the next check time on the host to now, forcing a check"""
-        result = {"success": False}
-
-        aHost = self.get_host(id)
-
-        if(aHost is not None):
-            with self.lock:
-                # reset the next check time and update the host
-                aHost.next_check = datetime.datetime.now().strftime(utils.TIME_FORMAT)
-                self.hosts[id] = aHost
-
-                result['next_check'] = aHost.next_check
-                result['success'] = True
-
-        return result
-
-    def silence_host(self, id, until):
-        """sets the silenced property on a host which will expire when the current time
-        exceeds the given datetime object
-        """
-        result = {"success": False}
-
-        aHost = self.get_host(id)
-
-        if(aHost is not None):
-            with self.lock:
-                # set the host as silenced until this datetime
-                aHost.silenced = until.strftime(utils.TIME_FORMAT)
-                self.hosts[id] = aHost
-
-                logging.debug(f"Silencing {id} until {aHost.silenced}")
-                result['is_silenced'] = aHost.is_silenced()
-                result['until'] = aHost.silenced
-                result['success'] = True
-
-        return result

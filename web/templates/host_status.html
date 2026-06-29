@@ -95,26 +95,60 @@ function load_status(){
 
       // create service link
       serviceLink = $('<a>').text(s.name).addClass(STATUS_COLORS[s.return_code]);
-      serviceLink.attr('href', '/status/services/-' + slugify(s.name) + "$");
+      serviceLink.attr('href', '/dashboard/status/services/-' + slugify(s.name) + "$");
       col1 = $('<div>').append(serviceLink).append(check_attempts);
 
       //create a column for the links (if any)
-      link1 = '';
-      if(s.hasOwnProperty('service_url'))
-      {
+      link1 = "";
+
+      // check if anchor for documentation exists
+      anchor_text = "#" + slugify(s.name);
+      if($(anchor_text).length){
+
+        // create documentation anchor link
         link1 = $('<a>');
-        link1.attr('href', s.service_url);
-        link1.attr('target', "_blank");
-        link1.attr('class', 'mdi mdi-launch icon-sm icon-inline');
+        link1.attr('class', 'mdi mdi-book-outline icon-sm icon-inline');
+        link1.attr('href', anchor_text);
+        link1.on('click', function(event) {
+            // Prevent default instant page jump
+            event.preventDefault();
+
+            // Get the target ID from the href attribute
+            target = this.hash;
+
+            // Ensure the target element exists on the page
+            if ($(target).length) {
+
+                // add to history so we can revert later
+                history.pushState({target: 'documentation'}, "", "#documentation")
+
+                // activate documentation tab
+                $('#host-content-nav a[href="#documentation"]').tab('show');
+
+                $('html, body').animate({
+                    scrollTop: $(target).offset().top
+                }, 800); // 800ms animation speed
+            }
+        });
         col_size = 6;
       }
 
       link2 = '';
-      if(s.hasOwnProperty('perf_data'))
+      if(s.hasOwnProperty('service_url'))
       {
         link2 = $('<a>');
-        link2.attr('href', '/perf_data/' + s.id);
-        link2.attr('class', 'mdi mdi-chart-areaspline-variant icon-sm icon-inline');
+        link2.attr('href', s.service_url);
+        link2.attr('target', "_blank");
+        link2.attr('class', 'mdi mdi-launch icon-sm icon-inline');
+        col_size = 6;
+      }
+
+      link3 = '';
+      if(s.hasOwnProperty('perf_data'))
+      {
+        link3 = $('<a>');
+        link3.attr('href', '/dashboard/perf_data/' + s.id);
+        link3.attr('class', 'mdi mdi-chart-areaspline-variant icon-sm icon-inline');
         col_size = 6;
       }
 
@@ -126,16 +160,16 @@ function load_status(){
       //if links exist add those as well
       if(col_size != 12)
       {
-        col2 = $('<div>').append(link1).append(link2);
+        col2 = $('<div>').append(link1).append(link2).append(link3);
         col2.attr('class', 'pl-0 col-6 text-right');
         row1.append(col2);
       }
 
       tag_div = $('<div>').addClass('col-sm-12').addClass('text-left');
       s.tags.forEach(function(aTag){
-        tagPill = $('<span>').text(TAGS[aTag]['name']).addClass('badge').addClass('rounded-pill').addClass('bg-' + TAGS[aTag]['color']);
-        tagLink = $('<a>').append(tagPill).addClass('text-light');
-        tagLink.attr('href', '/status/tag/' + aTag);
+        //tagPill = $('<span>').text(TAGS[aTag]['name']).addClass('badge').addClass('rounded-pill').addClass('tp-bg-' + TAGS[aTag]['color']);
+        tagLink = $('<a>').addClass('tag-pill').addClass('badge').addClass('rounded-pill').addClass('tp-bg-' + TAGS[aTag]['color']).text(TAGS[aTag]['name']);
+        tagLink.attr('href', '/dashboard/status/tag/service/' + aTag);
         tag_div.append(tagLink);
       });
 
@@ -157,6 +191,7 @@ function load_status(){
     $('#host-next-check').html(data.next_check);
 
     countdown.reset_countdown();
+
   }});
 
 }
@@ -168,15 +203,20 @@ function load_status(){
 <div class="container">
   <div class="row">
     <div class="col-lg-8">
-      <h2 class="mb-3 host-title"><i class="mdi mdi-{{ host['icon'] }} icon-2x"></i> {{ host['name'] }}</h2>
+      <h2 class="mb-0 host-title"><i class="mdi mdi-{{ host['icon'] }} icon-2x"></i> {{ host['name'] }}</h2>
+      <div class="mt-0 mb-4">
+        {% for t in host['tags']: %}
+        <a href="/dashboard/status/tag/host/{{ t }}" class="mt-0 p-1 badge rounded-pill tp-bg-{{ tags[t].color }}">{{ tags[t].name }}</a>
+        {% endfor %}
+      </div>
       <p>{{ host['info'] }}</p>
     </div>
     <div class="col-lg-4 host-status-card">
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title">Type: <span class="text-info">{{ host['type'] | replace('_',' ') | title }}</span></h5>
+          <h5 class="card-title">Status: <span id="host-overall-status">{{ overall_status[host['overall_status']] }}</span></h5>
           <p class="card-text">
-            Overall Status: <span id="host-overall-status">{{ overall_status[host['overall_status']] }}</span> <br />
+            Type: <span class="text-info">{{ host['type'] | replace('_',' ') | title }}</span> <br />
             Last Check: <span id="host-last-check">{{ host['last_check'] }}</span> <br />
             Next Check: <span id="host-next-check">{{ host['next_check'] }}</span> <br />
             IP Address: {{ host['address'] }}
@@ -215,7 +255,7 @@ function load_status(){
       <a class="nav-link active" id="services-tab" data-toggle="tab" href="#services" role="tab">Services</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" id="services-tab" data-toggle="tab" href="#documentation" role="tab">Documentation</a>
+      <a class="nav-link" id="documentation-tab" data-toggle="tab" href="#documentation" role="tab">Documentation</a>
     </li>
   </ul>
   <div class="tab-content" id="host-content">
@@ -241,7 +281,7 @@ function load_status(){
     <div class="tab-pane mt-3" id="documentation">
       {% if docs | length %}
       <div align="right">
-        <a href="/editor?path={{ doc_file }}" class="btn btn-sm btn-outline-secondary">Edit File</a>
+        <a href="/dashboard/editor?path={{ doc_file }}" class="btn btn-sm btn-outline-secondary">Edit File</a>
       </div>
       {{ docs | safe }}
       {% else %}
@@ -257,4 +297,16 @@ load_status();
 setInterval(load_status, 15000);
 countdown.start_countdown();
 copier.prepare();
+
+window.addEventListener("popstate", () => {
+  // check if returning from a hashed anchor
+  if (!window.location.hash) {
+    $('#host-content-nav a[href="#services"]').tab('show');
+
+    $('html, body').animate({
+        scrollTop: $("#documentation-tab").offset().top
+    }, 200);
+  }
+});
+
 {% endblock %}

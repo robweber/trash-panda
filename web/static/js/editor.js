@@ -41,10 +41,11 @@ function makePathLink(path, name, funcName = 'loadFiles'){
   return '<a href="#" onClick="return ' + funcName + '(\'' + path + '\')">' + name + '</a><br />';
 }
 
-function loadFiles(path){
+function loadFiles(path, reset=false){
 
   // send request to load file listings
-  $.ajax({type: 'GET', contentType: 'application/json', url: '/api/editor/browse_files/' + path, success: function(data, status, request){
+  $.ajax({type: 'POST', contentType: 'application/json', url: '/api/editor/browse_files',
+          data: JSON.stringify({'path': {'path': path, 'reset': reset}}), success: function(data, status, request){
 
     if(data.success)
     {
@@ -82,7 +83,8 @@ function loadFiles(path){
 }
 
 function loadEditor(){
-  $.ajax({type: 'POST', url: '/api/editor/load_file', data: {'file_path': $('#config_path').html()}, success: function(data, status, request){
+  $.ajax({type: 'POST', contentType: 'application/json',
+          url: '/api/editor/load_file', data: JSON.stringify({'file_path': {'path': $('#config_path').html()}}), success: function(data, status, request){
     editor.setValue(data,1);
 
     fileInfo = pathInfo($('#config_path').html());
@@ -109,15 +111,16 @@ function loadEditor(){
 }
 
 function saveFile(){
-    $.post('/api/editor/save_file', {'file_path': $('#config_path').html(), "file_contents":editor.getValue()}, function(data){
-        //show success
-        if(data.success)
-        {
-          //show message
-          $('#js-success-alert').html(data.message);
-          $('#js-success-alert').show().delay(3000).fadeOut();
-        }
-    });
+  $.ajax({type: 'POST', contentType: 'application/json', url: '/api/editor/save_file',
+          data: JSON.stringify({'save_file': {'path': $('#config_path').html(), "contents":editor.getValue()}}), success: function(data, status, request){
+      //show success
+      if(data.success)
+      {
+        //show message
+        $('#js-success-alert').html(data.message);
+        $('#js-success-alert').show().delay(3000).fadeOut();
+      }
+  }});
 }
 
 function checkConfig(){

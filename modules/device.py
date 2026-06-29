@@ -28,6 +28,7 @@ class Device:
         self.address = host_def['address']
         self.management_page = None if 'management_page' not in host_def else host_def['management_page']
         self.info = host_def['info']
+        self.tags = host_def['tags']
         self.icon = host_def['icon']
         self.interval = host_def['interval']
         self.notifier = host_def['notifier']
@@ -46,8 +47,9 @@ class Device:
         """takes the current host configuration and returns it as a dictionary object, which
         can be serialized for JSON output"""
         result = {'type': self.type, 'id': self.id, 'name': self.name, 'address': self.address,
-                  'icon': self.icon, 'info': self.info, 'interval': self.interval, 'service_check_attempts': self.check_attempts,
-                  'last_check': self.last_check, 'config': self.config, 'silenced': self.is_silenced()}
+                  'icon': self.icon, 'info': self.info, 'interval': self.interval, 'tags': self.tags,
+                  'service_check_attempts': self.check_attempts, 'last_check': self.last_check, 'config': self.config,
+                  'silenced': self.is_silenced()}
 
         # set these values if they exist
         if(self.management_page is not None):
@@ -82,6 +84,7 @@ class HostType:
     type = None
     name = None
     info = ""
+    tags = []
     icon = 'devices'
     interval = 5
     notifier = None
@@ -102,6 +105,9 @@ class HostType:
 
         if('icon' in type_def):
             self.icon = type_def['icon']
+
+        if('tags' in type_def):
+            self.tags = type_def['tags']
 
         if('config' in type_def):
             self.config = type_def['config']
@@ -133,6 +139,13 @@ class HostType:
 
         if('icon' not in device_def):
             device_def['icon'] = self.icon
+
+        # set tags if they don't exist
+        if('tags' not in device_def):
+            device_def['tags'] = self.tags
+        else:
+            # merge them if they do
+            device_def['tags'] = device_def['tags'] + self.tags
 
         if('interval' not in device_def):
             device_def['interval'] = self.interval

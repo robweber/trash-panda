@@ -9,6 +9,7 @@
         <link rel="stylesheet" href="/static/css/bootstrap.min.css" />
         <link rel="stylesheet" href="/static/css/bootstrap-theme.min.css" />
         <link rel="stylesheet" href="/static/css/materialdesignicons.min.css" />
+        <link rel="stylesheet" href="/static/css/colors.css" />
         <link rel="stylesheet" href="/static/css/icons.css" />
         <link rel="stylesheet" href="/static/css/mobile.css" />
         <script src="/static/js/jquery.min.js"></script>
@@ -20,31 +21,55 @@
         <div class="container">
         <div class="header">
           <nav class="navbar navbar-expand-lg">
-            <h3 class="navbar-brand text-muted"><a href="/"><img src="/static/favicon-50x50.png" class="mr-3"/></a><span class="tp-title"><span class="text-danger">Trash Panda</span> -</span> {{ page_title }}</h3>
+            <h3 class="navbar-brand text-muted"><a href="/dashboard/"><img src="/static/favicon-50x50.png" class="mr-3"/></a><span class="tp-title"><span class="text-danger">Trash Panda</span> -</span> {{ page_title }}</h3>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
               <span class="mdi mdi-menu icon-inline"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarToggler">
               <ul class="navbar-nav">
                 <li class="nav-item dropdown mb-2">
-                  <a class="nav-link dropdown-toggle btn btn-{{ get_nav_style() }} ml-2" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
+                  <a class="nav-link dropdown-toggle btn tp-bg-{{ get_nav_style() }} ml-2" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
                     Dashboards
                   </a>
                   <div class="dropdown-menu">
-                    <a class="dropdown-item" href="/">Overview</a>
-                    <a class="dropdown-item" href="/status/issues">Issues</a>
+                    <a class="dropdown-item" href="/dashboard/">Overview</a>
+                    <a class="dropdown-item" href="/dashboard/status/issues">Issues</a>
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="/tags">Tags</a>
+                    <a class="dropdown-item" href="/dashboard/tags/host">Host Tags</a>
+                    <a class="dropdown-item" href="/dashboard/tags/service">Service Tags</a>
                   </div>
                 </li>
-                <li class="nav-item mb-2">
-                  <a class="nav-link btn btn-{{ get_nav_style() }} ml-2" href="/editor" aria-haspopup="false" aria-expanded="false">Config</a>
+                <li class="nav-item dropdown mb-2">
+                  <a class="nav-link dropdown-toggle btn tp-bg-{{ get_nav_style() }} ml-2" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
+                    Hosts
+                  </a>
+                  <div class="dropdown-menu">
+                    {% for group in list_hostgroups() %}
+                      {% for host in group.members %}
+                      <a class="dropdown-item" href="/dashboard/status/host/{{ host.id }}"><i class="mdi mdi-{{ host.icon }} icon-sm"></i> {{ host.name }}</a>
+                      {% endfor %}
+                      {% if not loop.last %}
+                      <!-- don't put this at the end -->
+                      <div class="dropdown-divider"></div>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
                 </li>
-                {% for button in create_nav_links() %}
+                {% if create_nav_links() | length > 0 %}
+                <li class="nav-item dropdown mb-2">
+                  <a class="nav-link dropdown-toggle btn tp-bg-{{ get_nav_style() }} ml-2" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
+                    {{ custom_link_title() }}
+                  </a>
+                  <div class="dropdown-menu">
+                    {% for button in create_nav_links() %}
+                    <a class="dropdown-item" href="{{ button.url }}" target="{{ '_blank' if button.new_tab else '_self'}}">{{ button.name }}</a>
+                    {% endfor %}
+                  </div>
+                </li>
+                {% endif %}
                 <li class="nav-item">
-                  <a class="nav-link btn btn-{{ get_nav_style() }} ml-2" href="{{ button.url }}" target="{{ '_blank' if button.new_tab else '_self'}}">{{ button.name }}</a>
+                  <a class="nav-link btn tp-bg-{{ get_nav_style() }} ml-2" href="/dashboard/editor" aria-haspopup="false" aria-expanded="false"><i class="mdi mdi-cog" style="font-size: 16px"></i></a>
                 </li>
-                {% endfor %}
               </ul>
             </div>
           </nav>
@@ -65,10 +90,11 @@
         </script>
         <footer class="footer mt-5" align="center">
            <p>
-             <a href="/guide" class="mr-3"><i class="mdi mdi-book-open-page-variant-outline icon-2x"></i></a>
+             <a href="/dashboard/guide" class="mr-3"><i class="mdi mdi-book-open-page-variant-outline icon-2x"></i></a>
+             <a href="/api/docs" class="mr-3"><i class="mdi mdi-code-braces icon-2x"></i></a>
              <a href="https://github.com/robweber/trash-panda"><i class="mdi mdi-github icon-2x"></i></a>
            </p>
-           <p>Version 6.3</p>
+           <p>Version 7.0</p>
         </footer>
     </body>
 </html>

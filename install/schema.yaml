@@ -8,6 +8,9 @@ allowed_colors:
     - gray
     - green
     - light_blue
+    - orange
+    - pink
+    - purple
     - red
     - yellow
 
@@ -55,6 +58,7 @@ service_definition: &service_definition
       args:
         required: False
         type: dict
+        default: {}
         valueschema:
           type:
             - string
@@ -182,6 +186,10 @@ config:
                   type: string
                   default: gray
                   allowed: *allowed_colors
+            links_title:
+              required: False
+              type: string
+              default: Links
             links:
               required: False
               type: list
@@ -199,6 +207,13 @@ config:
                     required: False
                     type: boolean
                     default: True
+secrets:
+  required: False
+  type: dict
+  default: {}
+  minlength: 1
+  valueschema:
+    type: string
 services:
   required: True
   type: dict
@@ -229,6 +244,12 @@ types:
       icon:
         required: False
         type: string
+      tags:
+        required: False
+        type: list
+        default: []
+        schema:
+          type: string
       info:
         required: False
         type: string
@@ -287,6 +308,12 @@ hosts:
       service_check_attempts:
         required: False
         type: integer
+      tags:
+        required: False
+        type: list
+        default: []
+        schema:
+          type: string
       icon:
         required: False
         type: string

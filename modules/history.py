@@ -1,6 +1,7 @@
 import datetime
 import json
 import redis
+import modules.utils as utils
 from enum import Enum
 
 
@@ -39,6 +40,20 @@ class HostHistory:
 
         return all_hosts
 
+    def get_tags(self, type):
+        result = []
+
+        if(type == 'host'):
+            tags = self.__read_db_json(DBQueries.GET_HOST_TAG_IDS.value)
+        else:
+            tags = self.__read_db_json(DBQueries.GET_SERVICE_TAG_IDS.value)
+
+        # flatten the array
+        result = [t for h_tags in tags for t in h_tags]
+
+        # return unique set
+        return list(set(result))
+
     def get_host(self, host_id):
         """ get host information from the database based on the ID
 
@@ -53,7 +68,25 @@ class HostHistory:
 
         return host[0]
 
-    def get_tag(self, tag_id):
+    def get_host_tag(self, tag_id):
+        """ finds hosts matching the given tag id
+
+        :param tag_id: the id of the tag to lookup
+
+        :returns: list of hosts that include this tag
+        """
+
+        # get list of services matching this tag id
+        result = {"id": tag_id}
+        result['members'] = self.__read_db_json(DBQueries.GET_HOST_TAG.value.format(tag_id=tag_id))
+
+        # remove service info
+        for i in range(0, len(result['members'])):
+            result['members'][i].pop("services")
+
+        return result
+
+    def get_service_tag(self, tag_id):
         """ finds services matching the given tag id
 
         :param tag_id: the id of the tag to lookup
@@ -63,7 +96,7 @@ class HostHistory:
 
         # get list of services matching this tag id
         result = {"id": tag_id}
-        result['services'] = self.__read_db_json(DBQueries.GET_TAG.value.format(tag_id=tag_id))
+        result['members'] = self.__read_db_json(DBQueries.GET_SERVICE_TAG.value.format(tag_id=tag_id))
 
         return result
 
@@ -157,6 +190,59 @@ class HostHistory:
                         # add the value
                         self.db.ts().add(p['id'], unix_time * 1000, p['value'])
 
+    def consume_queued_actions(self):
+        """ load any actions queued in the database and reset the queue to 0 """
+        result = self.__read_db(DBKeys.QUEUED_ACTIONS.value)
+
+        self.__write_db(DBKeys.QUEUED_ACTIONS.value, {})
+
+        return result
+
+    def check_host_now(self, host_id):
+        """sets the next check time on the host to now, forcing a check
+
+        :param host_id: a valid host id
+        """
+        action_obj = {'next_check': datetime.datetime.now().strftime(utils.TIME_FORMAT),
+                      "action": "check_now"}
+
+        # load queued actions
+        queue = self.__read_db(DBKeys.QUEUED_ACTIONS.value)
+
+        # update queue or add new list
+        if(host_id in queue):
+            queue[host_id].append(action_obj)
+        else:
+            queue[host_id] = [action_obj]
+
+        self.__write_db(DBKeys.QUEUED_ACTIONS.value, queue)
+
+        return {"success": True, "next_check": action_obj['next_check']}
+
+    def silence_host(self, host_id, minutes):
+        """sets the silenced property on a host which will expire from the current time
+        plus the number of minutes indicated
+
+        :param host_id: a valid host id
+        :param minutes: the number of minutes the host will be silenced
+        """
+        until = datetime.datetime.now() + datetime.timedelta(minutes=int(minutes))
+        action_obj = {'action': 'silence',
+                      'until': until.strftime(utils.TIME_FORMAT)}
+
+        # load queued actions
+        queue = self.__read_db(DBKeys.QUEUED_ACTIONS.value)
+
+        # update queue or add new list
+        if(host_id in queue):
+            queue[host_id].append(action_obj)
+        else:
+            queue[host_id] = [action_obj]
+
+        self.__write_db(DBKeys.QUEUED_ACTIONS.value, queue)
+
+        return {"success": True, 'is_silenced': True, 'until': action_obj['until']}
+
     def __exists(self, key):
         return self.db.exists(key) > 0
 
@@ -184,7 +270,7 @@ class HostHistory:
         return result
 
     def __write_db(self, db_key, db_value):
-        """ write a value to the Redis DB as  JSON String"""
+        """ write a value to the Redis DB as a JSON String"""
         self.db.set(db_key, json.dumps(db_value))
 
 
@@ -192,13 +278,16 @@ class DBKeys(Enum):
     """Enum that holds the keys for Redis data lookups"""
     HOST_KEY = 'hosts'
     LAST_CHECK = "last_check_timestamp"
+    QUEUED_ACTIONS = "queued_actions"
 
 
 class DBQueries(Enum):
     """Enum that holds keys for JSON Queries"""
     GET_HOST_IDS = '$[*].id'
-    GET_TAG_IDS = '$[*].services[*].tags'
+    GET_HOST_TAG_IDS = '$[*].tags'
+    GET_SERVICE_TAG_IDS = '$[*].services[*].tags'
     GET_HOST = '$[?(@.id=="{host_id}")]'
+    GET_HOST_TAG = '$[?(@.tags[?(@=="{tag_id}")])]'
     GET_SERVICE = '$[*].services[?(@.id=="{service_id}")]'
-    GET_TAG = '$[*].services[?(@.tags[*]=="{tag_id}")]'
+    GET_SERVICE_TAG = '$[*].services[?(@.tags[*]=="{tag_id}")]'
     GET_SERVICES_BY_QUERY = '$[*].services[?(({return_codes}) && @.id=~"{service_regex}")]'
