@@ -9,6 +9,7 @@ pythonping
 python-slugify
 redis
 requests
+pykeepass
 pyyaml
 Jinja2
 starlette
