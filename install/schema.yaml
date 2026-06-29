@@ -207,6 +207,19 @@ config:
                     required: False
                     type: boolean
                     default: True
+    vault:
+      required: False
+      type: dict
+      default: {}
+      schema:
+        enabled:
+          required: False
+          type: boolean
+          default: False
+        keepass_file:
+          required: False
+          type: string
+          default: conf/passwords.kdbx
 secrets:
   required: False
   type: dict
