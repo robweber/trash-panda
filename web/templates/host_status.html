@@ -310,8 +310,8 @@ function load_status(){
       <table class="table table-striped" id="vault-table">
         <thead class="thead-dark">
           <tr>
-            <th>Name</th>
             <th class="hide-md">Group</th>
+            <th>Name</th>
             <th>Username</th>
             <th>Password</th>
           </tr>
@@ -319,8 +319,8 @@ function load_status(){
         <tbody>
           {% for e in vault_entries %}
           <tr>
-            <td><p>{{ e.title }}</p></td>
             <td class="hide-md"><p>{{ e.group.name }}</p></td>
+            <td><p>{{ e.title }}</p></td>
             <td><p><code>{{ e.username }}</code></p></td>
             <td><p><code id="vault-entry-{{ slugify(e.title) }}">{{ e.password }}</code></p></td>
           </tr>
@@ -336,7 +336,6 @@ function load_status(){
     {% endif %}
   </div>
 </div>
-<a href="#" onClick="return copier.copyTextLink(this, '#vault-entry-server-service')">Test Copy</a>
 {% endblock %}
 {% block onload_scripts %}
 hljs.highlightAll();

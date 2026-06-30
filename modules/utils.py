@@ -101,19 +101,17 @@ def unlock_vault_file(vault_file, password):
 
     return result
 
-def search_vault_file(vault_file, password, group=None):
+def search_vault_file(vault_file, password, tag=None):
     result = []
 
     # attempt to load the vault file first
     vault = unlock_vault_file(vault_file, password)
 
     if(vault['success']):
-        if(group is not None):
-            # try and find based on the group name
-            g = vault['keepass'].find_groups(name=group, first=True)
+        if(tag is not None):
+            # try and find based on the tag name
+            result = vault['keepass'].find_entries(tags=[tag])
 
-            if(g is not None):
-                result = g.entries
         else:
             result = vault['keepass'].entries
 

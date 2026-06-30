@@ -24,17 +24,17 @@ var copier = new DocumentationCopy();
   <table class="table table-striped" id="vault-table">
     <thead class="thead-dark">
       <tr>
-        <th>Name</th>
         <th class="hide-md">Group</th>
-        <th class="hide-sm">Username</th>
-        <th class="hide-sm">Password</th>
+        <th>Name</th>
+        <th>Username</th>
+        <th>Password</th>
       </tr>
     </thead>
     <tbody>
       {% for e in vault_entries %}
       <tr>
+        <td class="hide-md"><p>{{ e.group.name }}</p></td>
         <td><p>{{ e.title }}</p></td>
-        <td><p>{{ e.group.name }}</p></td>
         <td><p><code>{{ e.username }}</code></p></td>
         <td><p><code>{{ e.password }}</code></p></td>
       </tr>
