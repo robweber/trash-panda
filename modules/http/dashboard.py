@@ -44,8 +44,7 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
 
             vault_entries = []
             if(config_yaml['config']['vault']['enabled'] and 'vault_key' in session):
-                vault = utils.unlock_vault_file(config_yaml['config']['vault']['keepass_file'], session['vault_key'])
-                vault_entries = vault['keepass'].entries
+                vault_entries = utils.search_vault_file(config_yaml['config']['vault']['keepass_file'], session['vault_key'], id)
 
             return render_template("host_status.html", host=result, page_title='Host Status', has_notifier=notifier_configured,
                                    docs=utils.load_documentation(doc_file), doc_file=doc_file, vault_entries=vault_entries, tags=config_yaml['tags'])
@@ -97,17 +96,14 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
     @app.route('/vault', methods=['GET'])
     def vault():
         redirect_url = ""
-        
+
         # check if vault key is currently set
         vault_unlocked = 'vault_key' in session
 
         entries = []
         if(vault_unlocked):
             # list all the current entries
-            kp = utils.unlock_vault_file(config_yaml['config']['vault']['keepass_file'], session['vault_key'])
-
-            entries = kp['keepass'].entries
-            entries.sort(key=lambda e: (e.group.name, e.title))  # sort by group and then name
+            entries = utils.search_vault_file(config_yaml['config']['vault']['keepass_file'], session['vault_key'])
         else:
             # check if there is a redirect
             redirect_url = request.args.get('redirect') if request.args.get('redirect') != None else ""

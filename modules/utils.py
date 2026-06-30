@@ -101,6 +101,26 @@ def unlock_vault_file(vault_file, password):
 
     return result
 
+def search_vault_file(vault_file, password, group=None):
+    result = []
+
+    # attempt to load the vault file first
+    vault = unlock_vault_file(vault_file, password)
+
+    if(vault['success']):
+        if(group is not None):
+            # try and find based on the group name
+            g = vault['keepass'].find_groups(name=group, first=True)
+
+            if(g is not None):
+                result = g.entries
+        else:
+            result = vault['keepass'].entries
+
+        result.sort(key=lambda e: (e.group.name, e.title), reverse=True)  # sort by group and then name
+
+    return result
+
 
 # Checks if a string can be decoded into a JSON object
 def is_json(str):

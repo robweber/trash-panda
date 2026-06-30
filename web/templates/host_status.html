@@ -315,6 +315,8 @@ function load_status(){
           {% endfor %}
         </tbody>
       </table>
+      {% elif vault_status() == 'unlocked' %}
+      <p align="center">No vault entries found for this host specifically. <a href="/dashboard/vault">View the Vault</a> to see all entries.</p>
       {% else %}
       <p align="center"><a href="/dashboard/vault?redirect={{ host['id'] }}">Unlock the Vault</a> to view any matching entries for this host. </p>
       {% endif %}
