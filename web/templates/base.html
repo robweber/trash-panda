@@ -67,12 +67,13 @@
                   </div>
                 </li>
                 {% endif %}
-                {% if is_vault_enabled() %}
+                {% if vault_status() != 'disabled' %}
+                {% set vault_link_title = "Unlock Vault" if vault_status() == 'enabled' else "Vault" %}
                 <li class="nav-item dropdown">
                   <a class="nav-link btn dropdown-toggle tp-bg-{{ get_nav_style() }} ml-2" href="#" role="button" data-toggle="dropdown" aria-expanded="false"><i class="mdi mdi-cog" style="font-size: 16px"></i></a>
                   <div class="dropdown-menu">
                     <a class="dropdown-item" href="/dashboard/editor">Editor</a>
-                    <a class="dropdown-item" href="/dashboard/vault">Unlock Vault</a>
+                    <a class="dropdown-item" href="/dashboard/vault">{{ vault_link_title }}</a>
                   </div>
                 </li>
                 {% else %}

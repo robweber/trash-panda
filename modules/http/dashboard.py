@@ -41,8 +41,14 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
         if(result):
             # set if a notifier is configured to toggle silent mode controls
             doc_file = os.path.join(config_yaml['config']['docs_dir'], f"{id}.md")
+
+            vault_entries = []
+            if(config_yaml['config']['vault']['enabled'] and 'vault_key' in session):
+                vault = utils.unlock_vault_file(config_yaml['config']['vault']['keepass_file'], session['vault_key'])
+                vault_entries = vault['keepass'].entries
+
             return render_template("host_status.html", host=result, page_title='Host Status', has_notifier=notifier_configured,
-                                   docs=utils.load_documentation(doc_file), doc_file=doc_file, tags=config_yaml['tags'])
+                                   docs=utils.load_documentation(doc_file), doc_file=doc_file, vault_entries=vault_entries, tags=config_yaml['tags'])
         else:
             flash('Host page not found', 'warning')
             return redirect('/')
@@ -90,22 +96,28 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
 
     @app.route('/vault', methods=['GET'])
     def vault():
-
+        redirect_url = ""
+        
         # check if vault key is currently set
         vault_unlocked = 'vault_key' in session
 
         entries = []
         if(vault_unlocked):
+            # list all the current entries
             kp = utils.unlock_vault_file(config_yaml['config']['vault']['keepass_file'], session['vault_key'])
 
             entries = kp['keepass'].entries
             entries.sort(key=lambda e: (e.group.name, e.title))  # sort by group and then name
+        else:
+            # check if there is a redirect
+            redirect_url = request.args.get('redirect') if request.args.get('redirect') != None else ""
 
-        return render_template('vault.html', vault_unlocked=vault_unlocked, vault_entries=entries, page_title="Vault")
+        return render_template('vault.html', vault_unlocked=vault_unlocked, vault_entries=entries, redirect=redirect_url, page_title="Vault")
 
     @app.route('/vault', methods=['POST'])
     def unlock_vault():
         vault_pass = request.form.get('vault_password')
+        redirect_url = url_for('vault')  # default redirect back to vault unlock page
 
         # try to unlock the vault file
         unlocked = utils.unlock_vault_file(config_yaml['config']['vault']['keepass_file'], vault_pass)
@@ -114,10 +126,14 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
             # everything is OK
             session['vault_key'] = vault_pass
 
+            # if we came from another page
+            if(request.form.get('redirect_url') != ""):
+                redirect_url = url_for('host_status', id=request.form.get('redirect_url'))
+
         else:
             flash(unlocked['message'], 'danger')
 
-        return redirect(url_for('vault'))
+        return redirect(redirect_url)
 
     @app.route('/tags/<type>', methods=['GET'])
     def view_tags(type):
@@ -147,10 +163,17 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
 
     @app.context_processor
     def vault_enabled():
-        def is_vault_enabled():
-            # return if vault integration is enabled
-            return config_yaml['config']['vault']['enabled']
-        return dict(is_vault_enabled=is_vault_enabled)
+        # returns disabled, enabled, or unlocked depending on vault status
+        def get_vault_status():
+            result = "disabled"
+
+            if(config_yaml['config']['vault']['enabled'] and 'vault_key' in session):
+                result = "unlocked"
+            elif(config_yaml['config']['vault']['enabled']):
+                result = "enabled"
+
+            return result
+        return dict(vault_status=get_vault_status)
 
     @app.context_processor
     def nav_links():

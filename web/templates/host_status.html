@@ -193,7 +193,6 @@ function load_status(){
     countdown.reset_countdown();
 
   }});
-
 }
 
 </script>
@@ -257,6 +256,11 @@ function load_status(){
     <li class="nav-item">
       <a class="nav-link" id="documentation-tab" data-toggle="tab" href="#documentation" role="tab">Documentation</a>
     </li>
+    {% if vault_status() != 'disabled' %}
+    <li class="nav-item">
+      <a class="nav-link" id="vault-tab" data-toggle="tab" href="#vault" role="tab">Vault</a>
+    </li>
+    {% endif %}
   </ul>
   <div class="tab-content" id="host-content">
     <div class="tab-pane show active" id="services">
@@ -288,6 +292,34 @@ function load_status(){
       <p align="center">No documentation. Create the file <b>{{ host['id'] }}.md</b> to create some.</p>
       {% endif %}
     </div>
+    {% if vault_status() != 'disabled' %}
+    <div class="tab-pane mt-3" id="vault">
+      {% if vault_entries | length > 0 %}
+      <table class="table table-striped" id="vault-table">
+        <thead class="thead-dark">
+          <tr>
+            <th>Name</th>
+            <th class="hide-md">Group</th>
+            <th class="hide-sm">Username</th>
+            <th class="hide-sm">Password</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for e in vault_entries %}
+          <tr>
+            <td><p>{{ e.title }}</p></td>
+            <td><p>{{ e.group.name }}</p></td>
+            <td><p><code>{{ e.username }}</code></p></td>
+            <td><p><code>{{ e.password }}</code></p></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p align="center"><a href="/dashboard/vault?redirect={{ host['id'] }}">Unlock the Vault</a> to view any matching entries for this host. </p>
+      {% endif %}
+    </div>
+    {% endif %}
   </div>
 </div>
 {% endblock %}
