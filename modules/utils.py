@@ -115,7 +115,7 @@ def search_vault_file(vault_file, password, tag=None):
         else:
             result = vault['keepass'].entries
 
-        result.sort(key=lambda e: (e.group.name, e.title))  # sort by group and then name
+        result.sort(key=lambda e: ('\\'.join(e.group.path), e.title))  # sort by group and then name
 
     return result
 

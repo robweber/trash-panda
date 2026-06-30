@@ -36,7 +36,7 @@ var copier = new DocumentationCopy();
     <tbody>
       {% for e in vault_entries %}
       <tr>
-        <td class="hide-md"><p>{{ e.group.name }}</p></td>
+        <td class="hide-md"><p>{{ e.group.path | join("\\") }}</p></td>
         <td>
           <div class="row">
             <div class="col-sm-12">
