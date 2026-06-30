@@ -200,37 +200,6 @@ def api_app(config_file, config_yaml, history):
 
         return {'success': True, 'message': f"Saved {save_file.path}"}
 
-    @app.post("/vault/load_file", tags=['Vault'])
-    def load_vault_file(vault_file: Annotated[VaultFileLoad, Body(embed=True)]):
-        result = {"success": True}
-
-        unlocked = utils.unlock_vault_file(config_yaml['config']['vault']['keepass_file'], vault_file.password)
-
-        if(unlocked['success']):
-            # try to find the entries
-            kp_entries = []
-            if(vault_file.group_name is not None):
-                # find by group if given
-                group = unlocked['keepass'].find_groups(name=vault_file.group_name, first=True)
-
-                if(group is not None):
-                    kp_entries = group.entries
-            else:
-                kp_entries = unlocked['keepass'].entries
-
-            # create json response of all found entries
-            entries = []
-            for e in kp_entries:
-                entries.append({"username": e.username, "password": e.password, "title": e.title,
-                               "url": e.url, "notes": e.notes, "group": e.group.name})
-
-            result['entries'] = entries
-        else:
-            result['success'] = False
-            result['message'] = unlocked['message']
-
-        return result
-
     @app.get('/check_config', tags=['Health'], description=LoadPath('api_docs/get_check_config.md').read_text())
     def check_config():
         """
