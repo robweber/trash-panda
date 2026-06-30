@@ -34,7 +34,18 @@ var copier = new DocumentationCopy();
       {% for e in vault_entries %}
       <tr>
         <td class="hide-md"><p>{{ e.group.name }}</p></td>
-        <td><p>{{ e.title }}</p></td>
+        <td>
+          <div class="row">
+            <div class="col-sm-12">
+              <p>{{ e.title }}</p>
+            </div>
+            <div class="col-sm-12 text-left">
+              {% for t in e.tags: %}
+              <a href="/dashboard/status/host/{{ t }}" class="mt-0 p-1 badge rounded-pill tp-bg-gray">{{ t }}</a>
+              {% endfor %}
+            </div>
+          </div>
+        </td>
         <td><p><code>{{ e.username }}</code></p></td>
         <td><p><code>{{ e.password }}</code></p></td>
       </tr>
