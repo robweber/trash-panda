@@ -507,6 +507,7 @@ The following projects used within this project and contributed most of the heav
 * [Jinja](https://palletsprojects.com/p/jinja/) - templating engine
 * [JQuery](https://jquery.com/) - Javascript library
 * [Material Design Icons](https://materialdesignicons.com/) - open source web icons
+* [pykeepass](https://github.com/libkeepass/pykeepass) - KeePass Python library
 * [Twemoji](https://github.com/twitter/twemoji) - Twitter Open Source Emojis (Trash Panda Logo)
 
 ## License
