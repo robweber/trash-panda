@@ -18,6 +18,15 @@ class DocumentationCopy {
     $('li code').wrap(`<a href="#" class="code" onClick="return ${this.OBJECT_NAME}.copyTextLine(this)"></a>`);
   }
 
+  copyTextLink(linkElement, copyElement){
+    // copy text from copy element
+    this.copyText($(copyElement).text());
+
+    // flash the link element
+    $(linkElement).fadeOut(400).fadeIn(400);
+    return false;
+  }
+
   copyTextLine(element){
     // copy text within this link
     this.copyText($(element).text());

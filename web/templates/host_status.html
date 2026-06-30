@@ -101,15 +101,27 @@ function load_status(){
       //create a column for the links (if any)
       link1 = "";
 
+      // check if vault pass entry exists
+      anchor_text = '#vault-entry-' + slugify(s.name)
+      if($(anchor_text).length){
+        // create a link to copy the password
+        link1 = $('<a>');
+        link1.attr('class', 'mdi mdi-lock-open icon-sm icon-inline');
+        link1.attr('href', '#');
+        link1.attr('onClick', "return copier.copyTextLink(this, '#vault-entry-" + slugify(s.name) + "')");
+        col_size = 6;
+      }
+
       // check if anchor for documentation exists
+      link2 = '';
       anchor_text = "#" + slugify(s.name);
       if($(anchor_text).length){
 
         // create documentation anchor link
-        link1 = $('<a>');
-        link1.attr('class', 'mdi mdi-book-outline icon-sm icon-inline');
-        link1.attr('href', anchor_text);
-        link1.on('click', function(event) {
+        link2 = $('<a>');
+        link2.attr('class', 'mdi mdi-book-outline icon-sm icon-inline');
+        link2.attr('href', anchor_text);
+        link2.on('click', function(event) {
             // Prevent default instant page jump
             event.preventDefault();
 
@@ -133,22 +145,22 @@ function load_status(){
         col_size = 6;
       }
 
-      link2 = '';
+      link3 = '';
       if(s.hasOwnProperty('service_url'))
       {
-        link2 = $('<a>');
-        link2.attr('href', s.service_url);
-        link2.attr('target', "_blank");
-        link2.attr('class', 'mdi mdi-launch icon-sm icon-inline');
+        link3 = $('<a>');
+        link3.attr('href', s.service_url);
+        link3.attr('target', "_blank");
+        link3.attr('class', 'mdi mdi-launch icon-sm icon-inline');
         col_size = 6;
       }
 
-      link3 = '';
+      link4 = '';
       if(s.hasOwnProperty('perf_data'))
       {
-        link3 = $('<a>');
-        link3.attr('href', '/dashboard/perf_data/' + s.id);
-        link3.attr('class', 'mdi mdi-chart-areaspline-variant icon-sm icon-inline');
+        link4 = $('<a>');
+        link4.attr('href', '/dashboard/perf_data/' + s.id);
+        link4.attr('class', 'mdi mdi-chart-areaspline-variant icon-sm icon-inline');
         col_size = 6;
       }
 
@@ -160,7 +172,7 @@ function load_status(){
       //if links exist add those as well
       if(col_size != 12)
       {
-        col2 = $('<div>').append(link1).append(link2).append(link3);
+        col2 = $('<div>').append(link1).append(link2).append(link3).append(link4);
         col2.attr('class', 'pl-0 col-6 text-right');
         row1.append(col2);
       }
@@ -300,17 +312,17 @@ function load_status(){
           <tr>
             <th>Name</th>
             <th class="hide-md">Group</th>
-            <th class="hide-sm">Username</th>
-            <th class="hide-sm">Password</th>
+            <th>Username</th>
+            <th>Password</th>
           </tr>
         </thead>
         <tbody>
           {% for e in vault_entries %}
           <tr>
             <td><p>{{ e.title }}</p></td>
-            <td><p>{{ e.group.name }}</p></td>
+            <td class="hide-md"><p>{{ e.group.name }}</p></td>
             <td><p><code>{{ e.username }}</code></p></td>
-            <td><p><code>{{ e.password }}</code></p></td>
+            <td><p><code id="vault-entry-{{ slugify(e.title) }}">{{ e.password }}</code></p></td>
           </tr>
           {% endfor %}
         </tbody>
@@ -324,6 +336,7 @@ function load_status(){
     {% endif %}
   </div>
 </div>
+<a href="#" onClick="return copier.copyTextLink(this, '#vault-entry-server-service')">Test Copy</a>
 {% endblock %}
 {% block onload_scripts %}
 hljs.highlightAll();
