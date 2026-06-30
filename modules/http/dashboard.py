@@ -97,18 +97,16 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
     def vault():
         redirect_url = ""
 
-        # check if vault key is currently set
-        vault_unlocked = 'vault_key' in session
-
         entries = []
-        if(vault_unlocked):
+        # check if vault key is currently set
+        if(config_yaml['config']['vault']['enabled'] and 'vault_key' in session):
             # list all the current entries
             entries = utils.search_vault_file(config_yaml['config']['vault']['keepass_file'], session['vault_key'])
         else:
             # check if there is a redirect
             redirect_url = request.args.get('redirect') if request.args.get('redirect') != None else ""
 
-        return render_template('vault.html', vault_unlocked=vault_unlocked, vault_entries=entries, redirect=redirect_url, page_title="Vault")
+        return render_template('vault.html', vault_entries=entries, redirect=redirect_url, page_title="Vault")
 
     @app.route('/vault', methods=['POST'])
     def unlock_vault():
@@ -130,6 +128,14 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
             flash(unlocked['message'], 'danger')
 
         return redirect(redirect_url)
+
+    @app.route('/lock_vault', methods=['GET'])
+    def lock_vault():
+        # just destroy the session
+        session.clear()
+
+        flash('Vault Locked', 'success')
+        return redirect(url_for('vault'))
 
     @app.route('/tags/<type>', methods=['GET'])
     def view_tags(type):

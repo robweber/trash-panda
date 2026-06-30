@@ -8,7 +8,7 @@ var copier = new DocumentationCopy();
 {% endblock %}
 {% block content %}
 <div class="container">
-  {% if not vault_unlocked %}
+  {% if vault_status() == 'enabled' %}
   <form method="POST" action="/dashboard/vault">
     <input type="hidden" name="redirect_url" value="{{ redirect }}" />
     <div class="row align-items-center">
@@ -20,7 +20,10 @@ var copier = new DocumentationCopy();
         </div>
     </div>
   </form>
-  {% else %}
+  {% elif vault_status() == 'unlocked' %}
+  <div class="mb-2 pt-1" align="right">
+    <a href="/dashboard/lock_vault" class="btn btn-primary">Lock Vault</a>
+  </div>
   <table class="table table-striped" id="vault-table">
     <thead class="thead-dark">
       <tr>
