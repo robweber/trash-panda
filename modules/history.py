@@ -9,9 +9,14 @@ class HostHistory:
     """ Encapulates reading/writing to the Redis database"""
 
     db = None
+    db_host = None
 
     def __init__(self, db_host):
+        self.db_host = db_host
         self.db = redis.Redis(db_host, decode_responses=True)
+
+    def get_redis_host(self):
+        return self.db_host
 
     def save_last_check(self):
         """sets the last check time using the current time as a unix timestamp"""

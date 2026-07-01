@@ -1,6 +1,7 @@
 import logging
 import os
 import os.path
+import redis
 from .. import utils as utils
 from collections import defaultdict
 from datetime import timedelta
@@ -17,7 +18,10 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
 
     # generate random number for session secret key
     app.secret_key = os.urandom(24)
-    app.config['SESSION_TYPE'] = 'filesystem'
+
+    # setup redis based sessions using DB 1
+    app.config['SESSION_TYPE'] = 'redis'
+    app.config['SESSION_REDIS'] = redis.Redis(host=history.get_redis_host(), db=1)
     app.config['SESSION_PERMANENT'] = True
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=1)
 
