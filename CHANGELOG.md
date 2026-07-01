@@ -8,7 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Added
 
-- integration with Keepass Vault file, can unlock and display
+- integration with Keepass Vault file, disabled by default. Can unlock, display passwords, and match with specific hosts based on KeepPass tagging
+
+### Fixed
+
+- issue trying to load incorrect host id didn't redirect properly
 
 ## 7.0
 
