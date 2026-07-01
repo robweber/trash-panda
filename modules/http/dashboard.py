@@ -39,12 +39,13 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
         result = history.get_host(id)
 
         if(result):
-            # set if a notifier is configured to toggle silent mode controls
+            # create the documentation file path
             doc_file = os.path.join(config_yaml['config']['docs_dir'], f"{id}.md")
 
+            # load vault entries, if enabled and unlocked
             vault_entries = []
             if(config_yaml['config']['vault']['enabled'] and 'vault_key' in session):
-                vault_entries = utils.search_vault_file(config_yaml['config']['vault']['keepass_file'], session['vault_key'], id)
+                vault_entries = utils.search_vault_file(config_yaml['config']['vault']['keepass_file'], session['vault_key'], result['name'])
 
             return render_template("host_status.html", host=result, page_title='Host Status', has_notifier=notifier_configured,
                                    docs=utils.load_documentation(doc_file), doc_file=doc_file, vault_entries=vault_entries, tags=config_yaml['tags'])
@@ -96,8 +97,9 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
     @app.route('/vault', methods=['GET'])
     def vault():
         redirect_url = ""
-
         entries = []
+        host_ids = history.list_hosts()
+
         # check if vault key is currently set
         if(config_yaml['config']['vault']['enabled'] and 'vault_key' in session):
             # list all the current entries
@@ -106,7 +108,7 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
             # check if there is a redirect
             redirect_url = request.args.get('redirect') if request.args.get('redirect') != None else ""
 
-        return render_template('vault.html', vault_entries=entries, redirect=redirect_url, page_title="Vault")
+        return render_template('vault.html', vault_entries=entries, hosts=host_ids, redirect=redirect_url, page_title="Vault")
 
     @app.route('/vault', methods=['POST'])
     def unlock_vault():
