@@ -104,16 +104,13 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
         if(config_yaml['config']['vault']['enabled'] and 'vault_key' in session):
             # list all the current entries
             entries = utils.search_vault_file(config_yaml['config']['vault']['keepass_file'], session['vault_key'])
-        else:
-            # check if there is a redirect
-            redirect_url = request.args.get('redirect') if request.args.get('redirect') != None else ""
 
         return render_template('vault.html', vault_entries=entries, hosts=host_ids, redirect=redirect_url, page_title="Vault")
 
     @app.route('/vault', methods=['POST'])
     def unlock_vault():
         vault_pass = request.form.get('vault_password')
-        redirect_url = url_for('vault')  # default redirect back to vault unlock page
+        redirect_url = url_for('host_status', id=request.form.get('redirect_url')) if 'redirect_url' in request.form else url_for('vault')
 
         # try to unlock the vault file
         unlocked = utils.unlock_vault_file(config_yaml['config']['vault']['keepass_file'], vault_pass)
@@ -121,11 +118,6 @@ def flask_app(config_file, config_yaml, history, notifier_configured, debugMode=
         if(unlocked['success']):
             # everything is OK
             session['vault_key'] = vault_pass
-
-            # if we came from another page
-            if(request.form.get('redirect_url') != ""):
-                redirect_url = url_for('host_status', id=request.form.get('redirect_url'))
-
         else:
             flash(unlocked['message'], 'danger')
 

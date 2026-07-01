@@ -10,7 +10,6 @@ var copier = new DocumentationCopy();
 <div class="container">
   {% if vault_status() == 'enabled' %}
   <form method="POST" action="/dashboard/vault">
-    <input type="hidden" name="redirect_url" value="{{ redirect }}" />
     <div class="row align-items-center">
       <div class="col-md-3 offset-lg-1">
         <p>Enter vault password to unlock:</p>
