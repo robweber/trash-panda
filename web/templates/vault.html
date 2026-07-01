@@ -12,12 +12,15 @@ var copier = new DocumentationCopy();
   <form method="POST" action="/dashboard/vault">
     <input type="hidden" name="redirect_url" value="{{ redirect }}" />
     <div class="row align-items-center">
-        <div class="col-md-3 offset-lg-2">
-          <p>Enter vault password to unlock:</p>
-        </div>
-        <div class="col-md-6">
-          <input type="password" class="form-control" id="vault-password" name="vault_password"/>
-        </div>
+      <div class="col-md-3 offset-lg-1">
+        <p>Enter vault password to unlock:</p>
+      </div>
+      <div class="col-md-4">
+        <input type="password" class="form-control" id="vault-password" name="vault_password"/>
+      </div>
+      <div class="col-sm-12 col-md-2 mt-2 mt-md-0">
+        <button type="submit" class="btn btn-primary btn-block">Unlock</button>
+      </div>
     </div>
   </form>
   {% elif vault_status() == 'unlocked' %}
